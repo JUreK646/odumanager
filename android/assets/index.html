@@ -11,7 +11,8 @@
       --text-muted: #64748B;
       --primary: #1856FF;
       --danger: #EA2143;
-      --success: #059669;
+      --warning: #F59E0B;
+      --success: #10B981;
     }
 
     * {
@@ -44,7 +45,7 @@
       position: absolute;
       border-radius: 50%;
       filter: blur(55px);
-      opacity: 0.68;
+      opacity: 0.65;
       animation: orbDrift 8s ease-in-out infinite alternate;
     }
     .ambient-orb.o1 {
@@ -68,7 +69,7 @@
       background: radial-gradient(circle, #6EE7B7 0%, rgba(110, 231, 183, 0) 72%);
       top: 36%;
       right: 8%;
-      opacity: 0.42;
+      opacity: 0.40;
       animation-delay: -2s;
     }
 
@@ -103,7 +104,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 18px;
+      padding: 16px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.28s ease;
@@ -123,16 +124,13 @@
       justify-content: space-between;
       padding: 64px 24px 48px;
     }
-
     .splash-spacer { height: 24px; }
-
     .splash-center {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 16px;
     }
-
     .app-logo-clean {
       width: 120px;
       height: 120px;
@@ -145,14 +143,12 @@
       height: 100%;
       object-fit: contain;
     }
-
     .splash-app-name {
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--text-primary);
     }
-
     .spinner {
       width: 24px;
       height: 24px;
@@ -164,13 +160,12 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ==========================================
-       2. NO WI-FI / NO ODU DETECTED SCREEN
+       2. NO WI-FI SCREEN
        ========================================== */
     #noWifiScreen {
       z-index: 25;
       text-align: center;
     }
-
     .wifi-card-wrap {
       width: 100%;
       max-width: 350px;
@@ -178,7 +173,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .ios-wifi-glass-wrap {
       position: relative;
       width: 156px;
@@ -193,22 +187,18 @@
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-5px); }
     }
-
     .ios-wifi-svg {
       width: 156px;
       height: 132px;
       overflow: visible;
     }
-
     .glass-bar-1 { animation: barGlassPulse 2.4s ease-in-out infinite 0s; transform-origin: 108px 104px; }
     .glass-bar-2 { animation: barGlassPulse 2.4s ease-in-out infinite 0.25s; transform-origin: 108px 104px; }
     .glass-bar-3 { animation: barGlassPulse 2.4s ease-in-out infinite 0.5s; transform-origin: 108px 104px; }
-
     @keyframes barGlassPulse {
       0%, 100% { opacity: 0.72; }
       50% { opacity: 1; }
     }
-
     .glass-x-group {
       transform-origin: 154px 96px;
       animation: xGlassBreath 2.2s ease-in-out infinite;
@@ -217,7 +207,6 @@
       0%, 100% { transform: scale(1) rotate(0deg); }
       50% { transform: scale(1.08) rotate(2deg); }
     }
-
     .state-title {
       font-size: 22px;
       font-weight: 700;
@@ -226,26 +215,22 @@
       margin-bottom: 10px;
       line-height: 1.25;
     }
-
     .state-desc {
       font-size: 14px;
       line-height: 1.55;
       color: var(--text-secondary);
       margin-bottom: 28px;
     }
-
     .action-stack {
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-
-    /* Liquid Glass Buttons */
     .btn-glass-primary {
       width: 100%;
-      min-height: 54px;
-      border-radius: 22px;
+      min-height: 52px;
+      border-radius: 20px;
       font-size: 15px;
       font-weight: 700;
       color: #FFFFFF;
@@ -269,11 +254,10 @@
     .btn-glass-primary:disabled {
       opacity: 0.65;
     }
-
     .btn-glass-secondary {
       width: 100%;
-      min-height: 52px;
-      border-radius: 22px;
+      min-height: 50px;
+      border-radius: 20px;
       font-size: 15px;
       font-weight: 600;
       color: var(--text-primary);
@@ -295,7 +279,6 @@
       padding: 18px 16px 28px;
       overflow-y: auto;
     }
-
     .dm-container {
       width: 100%;
       max-width: 400px;
@@ -304,8 +287,6 @@
       flex-direction: column;
       gap: 14px;
     }
-
-    /* Top Liquid Glass Header Pill */
     .dm-topbar {
       width: 100%;
       height: 56px;
@@ -315,20 +296,17 @@
       align-items: center;
       justify-content: space-between;
     }
-
     .dm-topbar-left {
       display: flex;
       flex-direction: column;
       gap: 1px;
     }
-
     .dm-topbar-title {
       font-size: 16px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-primary);
     }
-
     .dm-topbar-sub {
       display: flex;
       align-items: center;
@@ -337,7 +315,6 @@
       font-weight: 700;
       color: var(--success);
     }
-
     .live-dot {
       width: 6.5px;
       height: 6.5px;
@@ -351,7 +328,6 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.45; }
     }
-
     .dm-refresh-btn {
       width: 40px;
       height: 40px;
@@ -371,7 +347,6 @@
     .dm-refresh-btn:active {
       transform: scale(0.9) rotate(90deg);
     }
-
     .section-caption {
       font-size: 12.5px;
       font-weight: 700;
@@ -380,7 +355,6 @@
       letter-spacing: -0.01em;
     }
 
-    /* COMPACT HORIZONTAL LIQUID GLASS ROUTER TILE */
     .router-tile-compact {
       position: relative;
       width: 100%;
@@ -394,7 +368,6 @@
       transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s ease;
       overflow: hidden;
     }
-
     .router-tile-compact::before {
       content: "";
       position: absolute;
@@ -403,12 +376,9 @@
       background: linear-gradient(160deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 48%);
       pointer-events: none;
     }
-
     .router-tile-compact:active {
       transform: scale(0.975);
     }
-
-    /* Compact Router Icon Box on Left */
     .router-icon-well {
       position: relative;
       z-index: 2;
@@ -426,15 +396,12 @@
       padding: 6px;
       flex-shrink: 0;
     }
-
     .router-icon-well img {
       width: 100%;
       height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.16));
     }
-
-    /* Compact Middle Info Column */
     .router-info-col {
       position: relative;
       z-index: 2;
@@ -444,20 +411,17 @@
       flex-direction: column;
       gap: 3px;
     }
-
     .router-title-line {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
     .router-model-name {
       font-size: 16.5px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-primary);
     }
-
     .router-ip-pill {
       padding: 2px 8px;
       border-radius: 999px;
@@ -468,7 +432,6 @@
       color: var(--primary);
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
-
     .router-sub-line {
       font-size: 11.5px;
       font-weight: 600;
@@ -477,7 +440,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .router-meta-line {
       display: flex;
       align-items: center;
@@ -486,8 +448,6 @@
       font-weight: 700;
       color: var(--success);
     }
-
-    /* Compact Right Chevron Button */
     .router-chevron {
       position: relative;
       z-index: 2;
@@ -507,7 +467,7 @@
     }
 
     /* ==========================================
-       4. LIQUID GLASS LOGIN MODAL / SHEET
+       4. LIQUID GLASS LOGIN MODAL
        ========================================== */
     .login-backdrop {
       position: fixed;
@@ -524,12 +484,10 @@
       pointer-events: none;
       transition: opacity 0.26s ease;
     }
-
     .login-backdrop.open {
       opacity: 1;
       pointer-events: auto;
     }
-
     .login-glass-sheet {
       width: 100%;
       max-width: 370px;
@@ -550,28 +508,24 @@
       transform: translateY(24px) scale(0.95);
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
     .login-backdrop.open .login-glass-sheet {
       transform: translateY(0) scale(1);
     }
-
     .sheet-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 18px;
     }
-
     .sheet-device-mini {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .mini-icon-box {
-      width: 56px;
-      height: 46px;
-      border-radius: 15px;
+      width: 54px;
+      height: 44px;
+      border-radius: 14px;
       background: #FFFFFF;
       border: 1.5px solid rgba(255, 255, 255, 0.96);
       box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
@@ -585,14 +539,12 @@
       height: 100%;
       object-fit: contain;
     }
-
     .sheet-title {
       font-size: 17.5px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-primary);
     }
-
     .sheet-sub {
       font-size: 12px;
       font-weight: 700;
@@ -600,7 +552,6 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       margin-top: 2px;
     }
-
     .sheet-close-btn {
       width: 36px;
       height: 36px;
@@ -615,33 +566,28 @@
       justify-content: center;
       cursor: pointer;
     }
-
     .glass-form {
       display: flex;
       flex-direction: column;
       gap: 14px;
       margin-bottom: 18px;
     }
-
     .glass-field {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-
     .glass-field label {
       font-size: 12px;
       font-weight: 700;
       color: var(--text-secondary);
       padding-left: 6px;
     }
-
     .glass-input-wrap {
       position: relative;
       display: flex;
       align-items: center;
     }
-
     .glass-input {
       width: 100%;
       height: 50px;
@@ -658,13 +604,11 @@
       outline: none;
       transition: border-color 0.16s, background 0.16s, box-shadow 0.16s;
     }
-
     .glass-input:focus {
       background: rgba(255, 255, 255, 0.96);
       border-color: rgba(24, 86, 255, 0.55);
       box-shadow: 0 0 0 4px rgba(24, 86, 255, 0.12);
     }
-
     .input-eye-btn {
       position: absolute;
       right: 12px;
@@ -676,7 +620,6 @@
       padding: 6px;
       cursor: pointer;
     }
-
     .login-feedback {
       display: none;
       margin-top: 12px;
@@ -700,6 +643,484 @@
     .login-feedback.err {
       color: var(--danger);
       border-color: rgba(234, 33, 67, 0.32);
+    }
+
+    /* ==========================================
+       5. LIQUID GLASS DASHBOARD SCREEN
+       ========================================== */
+    #dashboardScreen {
+      justify-content: flex-start;
+      padding: 14px 14px 28px;
+      overflow-y: auto;
+    }
+    .dash-container {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    /* Dashboard Header Bar */
+    .dash-header {
+      width: 100%;
+      height: 56px;
+      border-radius: 999px;
+      padding: 0 8px 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dash-header-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dash-model-badge {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+    .dash-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dash-pill-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      background: linear-gradient(135deg, rgba(43, 108, 255, 0.92) 0%, rgba(24, 86, 255, 0.85) 100%);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px -2px rgba(24, 86, 255, 0.35);
+      transition: transform 0.14s ease;
+    }
+    .dash-pill-btn:active {
+      transform: scale(0.96);
+    }
+    .dash-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.14s ease;
+    }
+    .dash-icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Hero Liquid Glass Signal Card */
+    .hero-signal-card {
+      position: relative;
+      width: 100%;
+      border-radius: 30px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+    }
+    .hero-signal-card::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 29px;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.70) 0%, rgba(255, 255, 255, 0) 45%);
+      pointer-events: none;
+    }
+
+    .signal-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .signal-bars-cluster {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    /* 5 Dynamic Signal Bars */
+    .signal-bars-meter {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 32px;
+      padding-bottom: 2px;
+    }
+    .sig-bar {
+      width: 6px;
+      border-radius: 3px;
+      background: rgba(148, 163, 184, 0.28);
+      transition: background 0.25s ease, height 0.25s ease, box-shadow 0.25s ease;
+    }
+    .sig-bar.b1 { height: 9px; }
+    .sig-bar.b2 { height: 14px; }
+    .sig-bar.b3 { height: 19px; }
+    .sig-bar.b4 { height: 25px; }
+    .sig-bar.b5 { height: 31px; }
+
+    /* Signal Bar Color Rules: 1 bar = red; 2-3 bars = yellow; 4-5 bars = green */
+    .meter-1 .sig-bar.b1 {
+      background: var(--danger);
+      box-shadow: 0 0 8px rgba(234, 33, 67, 0.55);
+    }
+
+    .meter-2 .sig-bar.b1, .meter-2 .sig-bar.b2,
+    .meter-3 .sig-bar.b1, .meter-3 .sig-bar.b2, .meter-3 .sig-bar.b3 {
+      background: var(--warning);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.50);
+    }
+
+    .meter-4 .sig-bar.b1, .meter-4 .sig-bar.b2, .meter-4 .sig-bar.b3, .meter-4 .sig-bar.b4,
+    .meter-5 .sig-bar.b1, .meter-5 .sig-bar.b2, .meter-5 .sig-bar.b3, .meter-5 .sig-bar.b4, .meter-5 .sig-bar.b5 {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.50);
+    }
+
+    /* LTE / LTE+ Pill */
+    .lte-tag-pill {
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(24, 86, 255, 0.15) 0%, rgba(59, 130, 246, 0.22) 100%);
+      border: 1.5px solid rgba(24, 86, 255, 0.35);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow: 0 2px 8px rgba(24, 86, 255, 0.12);
+    }
+
+    .signal-quality-text {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    /* Throughput (Download / Uplink) Display */
+    .throughput-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .throughput-card {
+      border-radius: 22px;
+      padding: 13px 15px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .tp-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .tp-icon {
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .tp-icon.down { color: var(--primary); }
+    .tp-icon.up { color: #8B5CF6; }
+
+    .tp-value {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .tp-unit {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    /* Active Band Ribbon */
+    .active-band-ribbon {
+      border-radius: 18px;
+      padding: 9px 14px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .band-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .band-value {
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* Detailed Telemetry Grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .tele-cell {
+      border-radius: 20px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tele-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .tele-value {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .tele-sub {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    /* ==========================================
+       6. SLIDE-OUT BAND LOCKING DRAWER (LIQUID GLASS)
+       ========================================== */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(15, 23, 42, 0.28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.26s ease;
+    }
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .slide-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 86%;
+      max-width: 360px;
+      z-index: 61;
+      padding: 24px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-y: auto;
+    }
+    .drawer-backdrop.open .slide-drawer {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 6px;
+    }
+    .drawer-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+    .drawer-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .drawer-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Band selector tiles list */
+    .band-tiles-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .band-item-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 15px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .band-item-pill.selected {
+      background: rgba(24, 86, 255, 0.12);
+      border-color: rgba(24, 86, 255, 0.45);
+    }
+    .band-info-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .band-name-main {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .band-name-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .band-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(148, 163, 184, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.16s ease;
+    }
+    .band-item-pill.selected .band-checkbox {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* Aggregation Switch Row */
+    .agg-switch-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1.5px solid rgba(255, 255, 255, 0.94);
+    }
+    .agg-switch-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .agg-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .agg-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .toggle-track {
+      width: 48px;
+      height: 28px;
+      border-radius: 999px;
+      background: #CBD5E1;
+      padding: 2.5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    .toggle-track.active {
+      background: var(--primary);
+    }
+    .toggle-thumb {
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.15);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .toggle-track.active .toggle-thumb {
+      transform: translateX(20px);
+    }
+
+    .test-signal-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.90);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .test-sig-btn-group {
+      display: flex;
+      gap: 5px;
+    }
+    .test-sig-pill {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      background: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -726,10 +1147,9 @@
     </div>
   </section>
 
-  <!-- 2. NO WI-FI / NO ODU DETECTED SCREEN (STANDALONE iOS LIQUID GLASS WIFI + X) -->
+  <!-- 2. NO WI-FI SCREEN -->
   <section class="screen" id="noWifiScreen">
     <div class="wifi-card-wrap">
-
       <div class="ios-wifi-glass-wrap">
         <svg class="ios-wifi-svg" viewBox="0 0 216 148" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -739,35 +1159,29 @@
               <stop offset="80%" stop-color="#3B82F6" stop-opacity="0.44" />
               <stop offset="100%" stop-color="#BFDBFE" stop-opacity="0.85" />
             </linearGradient>
-
             <linearGradient id="iosWifiGlassRim" x1="0%" y1="0%" x2="80%" y2="100%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
               <stop offset="50%" stop-color="#E0F2FE" stop-opacity="0.65" />
               <stop offset="100%" stop-color="#60A5FA" stop-opacity="0.55" />
             </linearGradient>
-
             <linearGradient id="iosWifiSheen" x1="50%" y1="0%" x2="50%" y2="100%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.72" />
               <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0.0" />
             </linearGradient>
-
             <linearGradient id="iosXGlassBody" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FF8FA3" stop-opacity="0.92" />
               <stop offset="50%" stop-color="#EA2143" stop-opacity="0.72" />
               <stop offset="100%" stop-color="#FF4D6D" stop-opacity="0.90" />
             </linearGradient>
-
             <linearGradient id="iosXGlassRim" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
               <stop offset="55%" stop-color="#FFE4E8" stop-opacity="0.75" />
               <stop offset="100%" stop-color="#FB7185" stop-opacity="0.65" />
             </linearGradient>
-
             <filter id="wifiLiquidShadow" x="-25%" y="-25%" width="150%" height="160%">
               <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#1E40AF" flood-opacity="0.16" />
               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#3B82F6" flood-opacity="0.12" />
             </filter>
-
             <filter id="xLiquidShadow" x="-35%" y="-35%" width="170%" height="170%">
               <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#EA2143" flood-opacity="0.28" />
               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#FFFFFF" flood-opacity="0.5" />
@@ -776,44 +1190,15 @@
 
           <g filter="url(#wifiLiquidShadow)">
             <g class="glass-bar-3">
-              <path
-                d="M 28.4 49.6
-                   A 104 104 0 0 1 171.6 49.6
-                   A 8.5 8.5 0 0 1 159.4 61.8
-                   A 86.8 86.8 0 0 0 40.6 61.8
-                   A 8.5 8.5 0 0 1 28.4 49.6 Z"
-                fill="url(#iosWifiGlassBody)"
-                stroke="url(#iosWifiGlassRim)"
-                stroke-width="1.8"
-              />
+              <path d="M 28.4 49.6 A 104 104 0 0 1 171.6 49.6 A 8.5 8.5 0 0 1 159.4 61.8 A 86.8 86.8 0 0 0 40.6 61.8 A 8.5 8.5 0 0 1 28.4 49.6 Z" fill="url(#iosWifiGlassBody)" stroke="url(#iosWifiGlassRim)" stroke-width="1.8" />
               <path d="M 32 49.2 A 101 101 0 0 1 168 49.2 A 95 95 0 0 0 32 49.2 Z" fill="url(#iosWifiSheen)" />
             </g>
-
             <g class="glass-bar-2">
-              <path
-                d="M 52.8 74.2
-                   A 69.5 69.5 0 0 1 147.2 74.2
-                   A 8.5 8.5 0 0 1 135.0 86.4
-                   A 52.3 52.3 0 0 0 65.0 86.4
-                   A 8.5 8.5 0 0 1 52.8 74.2 Z"
-                fill="url(#iosWifiGlassBody)"
-                stroke="url(#iosWifiGlassRim)"
-                stroke-width="1.8"
-              />
+              <path d="M 52.8 74.2 A 69.5 69.5 0 0 1 147.2 74.2 A 8.5 8.5 0 0 1 135.0 86.4 A 52.3 52.3 0 0 0 65.0 86.4 A 8.5 8.5 0 0 1 52.8 74.2 Z" fill="url(#iosWifiGlassBody)" stroke="url(#iosWifiGlassRim)" stroke-width="1.8" />
               <path d="M 56 73.8 A 66 66 0 0 1 144 73.8 A 61 61 0 0 0 56 73.8 Z" fill="url(#iosWifiSheen)" />
             </g>
-
             <g class="glass-bar-1">
-              <path
-                d="M 77.2 98.6
-                   A 35 35 0 0 1 122.8 98.6
-                   A 8.5 8.5 0 0 1 110.6 110.8
-                   A 17.8 17.8 0 0 0 89.4 110.8
-                   A 8.5 8.5 0 0 1 77.2 98.6 Z"
-                fill="url(#iosWifiGlassBody)"
-                stroke="url(#iosWifiGlassRim)"
-                stroke-width="1.8"
-              />
+              <path d="M 77.2 98.6 A 35 35 0 0 1 122.8 98.6 A 8.5 8.5 0 0 1 110.6 110.8 A 17.8 17.8 0 0 0 89.4 110.8 A 8.5 8.5 0 0 1 77.2 98.6 Z" fill="url(#iosWifiGlassBody)" stroke="url(#iosWifiGlassRim)" stroke-width="1.8" />
               <circle cx="100" cy="126" r="10.5" fill="url(#iosWifiGlassBody)" stroke="url(#iosWifiGlassRim)" stroke-width="1.8" />
               <ellipse cx="98" cy="121.5" rx="6" ry="3" fill="url(#iosWifiSheen)" />
             </g>
@@ -848,17 +1233,15 @@
     </div>
   </section>
 
-  <!-- 3. LIQUID GLASS DEVICE MANAGER (SINGLE COMPACT HORIZONTAL ROUTER TILE) -->
+  <!-- 3. LIQUID GLASS DEVICE MANAGER -->
   <section class="screen" id="deviceManagerScreen">
     <div class="dm-container">
-
-      <!-- Rounded Liquid Glass Top Bar -->
       <header class="dm-topbar liquid-glass">
         <div class="dm-topbar-left">
           <span class="dm-topbar-title">Device Manager</span>
           <span class="dm-topbar-sub">
             <span class="live-dot"></span>
-            <span id="dmTopbarStatus">Wykryto router w sieci</span>
+            <span id="dmTopbarStatus">Wykryto router ODU-IDU 200</span>
           </span>
         </div>
         <button class="dm-refresh-btn" onclick="recheckConnection()" title="Odśwież">
@@ -866,42 +1249,41 @@
         </button>
       </header>
 
-      <div class="section-caption">Wykryte urządzenie</div>
+      <div class="section-caption">Wykryte urządzenie w sieci</div>
 
-      <!-- SINGLE COMPACT HORIZONTAL ROUNDED ROUTER TILE -->
+      <!-- COMPACT HORIZONTAL ROUTER TILE -->
       <article class="router-tile-compact liquid-glass" onclick="openLoginModal()">
         <div class="router-icon-well">
-          <img src="idu_router.png" alt="Router IDU" />
+          <img src="idu_router.png" alt="Router IDU-200" />
         </div>
 
         <div class="router-info-col">
           <div class="router-title-line">
-            <span class="router-model-name" id="tileRouterModel">IDU-300</span>
+            <span class="router-model-name" id="tileRouterModel">ODU-IDU 200</span>
             <span class="router-ip-pill" id="tileRouterIp">192.168.0.1</span>
           </div>
-          <div class="router-sub-line" id="tileRouterSub">Router ODU-IDU 300 • Cyfrowy Polsat / Plus</div>
+          <div class="router-sub-line" id="tileRouterSub">IDU-200 + ODU-200 • Cyfrowy Polsat / Plus</div>
           <div class="router-meta-line">
             <span class="live-dot"></span>
-            <span id="tileRouterMeta">Online • Wi-Fi 2.4/5 GHz • 2 ms</span>
+            <span id="tileRouterMeta">Online • LTE Cat. 4 • 2 ms</span>
           </div>
         </div>
 
         <div class="router-chevron">›</div>
       </article>
-
     </div>
   </section>
 
-  <!-- 4. LIQUID GLASS LOGIN MODAL -->
+  <!-- 4. LOGIN MODAL -->
   <div class="login-backdrop" id="loginBackdrop" onclick="backdropClick(event)">
     <div class="login-glass-sheet">
       <div class="sheet-header">
         <div class="sheet-device-mini">
           <div class="mini-icon-box">
-            <img src="idu_router.png" alt="Router IDU" />
+            <img src="idu_router.png" alt="IDU-200" />
           </div>
           <div>
-            <div class="sheet-title" id="modalDeviceTitle">IDU-300</div>
+            <div class="sheet-title" id="modalDeviceTitle">ODU-IDU 200</div>
             <div class="sheet-sub" id="modalDeviceIp">http://192.168.0.1</div>
           </div>
         </div>
@@ -919,37 +1301,250 @@
         <div class="glass-field">
           <label>Hasło routera</label>
           <div class="glass-input-wrap">
-            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło" />
+            <input type="password" class="glass-input" id="loginPass" value="admin" placeholder="Wpisz hasło" />
             <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
           </div>
         </div>
       </div>
 
       <button class="btn-glass-primary" id="loginSubmitBtn" onclick="submitDeviceLogin()">
-        Zaloguj się
+        Zaloguj się do panelu
       </button>
 
       <div class="login-feedback" id="loginFeedback"></div>
     </div>
   </div>
 
+  <!-- 5. LIQUID GLASS DASHBOARD PANEL -->
+  <section class="screen" id="dashboardScreen">
+    <div class="dash-container">
+
+      <!-- Dashboard Top Header Bar -->
+      <header class="dash-header liquid-glass">
+        <div class="dash-header-title">
+          <span class="live-dot"></span>
+          <span class="dash-model-badge" id="dashModelBadge">ODU-IDU 200</span>
+        </div>
+        <div class="dash-header-actions">
+          <button class="dash-pill-btn" onclick="openBandDrawer()">
+            ⚡ Pasma
+          </button>
+          <button class="dash-icon-btn" onclick="exitToDeviceManager()" title="Wróć do listy">
+            ✕
+          </button>
+        </div>
+      </header>
+
+      <!-- Hero Liquid Glass Signal Card -->
+      <article class="hero-signal-card liquid-glass">
+        <div class="signal-top-row">
+          <div class="signal-bars-cluster" onclick="cycleSignalLevelTest()" title="Kliknij, aby przetestować poziomy sygnału">
+            <!-- 5 Dynamic Signal Bars -->
+            <div class="signal-bars-meter meter-4" id="signalBarsMeter">
+              <div class="sig-bar b1"></div>
+              <div class="sig-bar b2"></div>
+              <div class="sig-bar b3"></div>
+              <div class="sig-bar b4"></div>
+              <div class="sig-bar b5"></div>
+            </div>
+            <!-- LTE or LTE+ Pill -->
+            <div class="lte-tag-pill" id="lteTagPill">LTE+</div>
+          </div>
+
+          <div class="signal-quality-text">
+            <div id="signalStatusLabel">Bardzo dobry (4/5)</div>
+            <div style="font-size:11px; font-weight:600; color:var(--text-muted);" id="signalRsrpLabel">RSRP -86 dBm</div>
+          </div>
+        </div>
+
+        <!-- Real-Time Throughput Meters -->
+        <div class="throughput-grid">
+          <div class="throughput-card">
+            <div class="tp-head">
+              <span>POBIERANIE</span>
+              <span class="tp-icon down">↓</span>
+            </div>
+            <div class="tp-value">
+              <span id="dashDownloadVal">48.6</span>
+              <span class="tp-unit">Mb/s</span>
+            </div>
+          </div>
+
+          <div class="throughput-card">
+            <div class="tp-head">
+              <span>WYSYŁANIE</span>
+              <span class="tp-icon up">↑</span>
+            </div>
+            <div class="tp-value">
+              <span id="dashUploadVal">15.4</span>
+              <span class="tp-unit">Mb/s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Bands Ribbon -->
+        <div class="active-band-ribbon">
+          <span class="band-label">Aktywne pasma LTE</span>
+          <span class="band-value" id="dashBandsRibbon">B3 (1800) + B7 (2600) • 2CA</span>
+        </div>
+      </article>
+
+      <!-- Detailed RF & Hardware Metrics Grid -->
+      <div class="telemetry-grid">
+        <div class="tele-cell">
+          <span class="tele-label">RSRP (Moc sygnału)</span>
+          <span class="tele-value" id="valRsrp">-86 dBm</span>
+          <span class="tele-sub" id="subRsrp">Optymalny</span>
+        </div>
+
+        <div class="tele-cell">
+          <span class="tele-label">SINR / SNR (Szum)</span>
+          <span class="tele-value" id="valSinr">21.5 dB</span>
+          <span class="tele-sub">Czysty sygnał</span>
+        </div>
+
+        <div class="tele-cell">
+          <span class="tele-label">RSRQ (Jakość)</span>
+          <span class="tele-value" id="valRsrq">-7.5 dB</span>
+          <span class="tele-sub">Brak zakłóceń</span>
+        </div>
+
+        <div class="tele-cell">
+          <span class="tele-label">RSSI (Moc kanału)</span>
+          <span class="tele-value" id="valRssi">-59 dBm</span>
+          <span class="tele-sub">Wysoka stabilność</span>
+        </div>
+
+        <div class="tele-cell">
+          <span class="tele-label">Zasilanie ODU (PoCoax)</span>
+          <span class="tele-value">18.2 V</span>
+          <span class="tele-sub">Unicable LNB • OK</span>
+        </div>
+
+        <div class="tele-cell">
+          <span class="tele-label">Stacja bazowa (eNB)</span>
+          <span class="tele-value" id="valEnb">eNB 24108</span>
+          <span class="tele-sub">Plus Polska</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 6. SLIDE-OUT BAND LOCKING DRAWER -->
+  <div class="drawer-backdrop" id="bandDrawerBackdrop" onclick="drawerBackdropClick(event)">
+    <aside class="slide-drawer liquid-glass" id="bandDrawer">
+      <div class="drawer-header">
+        <span class="drawer-title">Wymuszanie pasm</span>
+        <button class="drawer-close-btn" onclick="closeBandDrawer()">✕</button>
+      </div>
+
+      <!-- LTE+ Aggregation Switch -->
+      <div class="agg-switch-card">
+        <div class="agg-switch-left">
+          <span class="agg-title">Agregacja pasm (LTE+)</span>
+          <span class="agg-sub" id="aggSubText">Łączenie pasm (2CA) aktywne</span>
+        </div>
+        <div class="toggle-track active" id="aggToggle" onclick="toggleAggregation()">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+
+      <div class="drawer-section-title">Wybierz pasma LTE</div>
+
+      <!-- Band Options Stack -->
+      <div class="band-tiles-stack">
+        <div class="band-item-pill" data-band="B20" onclick="toggleBandSelect(this)">
+          <div class="band-info-left">
+            <span class="band-name-main">LTE 800 MHz (Band 20)</span>
+            <span class="band-name-sub">Zasięg daleki • Trudny teren</span>
+          </div>
+          <div class="band-checkbox"></div>
+        </div>
+
+        <div class="band-item-pill" data-band="B8" onclick="toggleBandSelect(this)">
+          <div class="band-info-left">
+            <span class="band-name-main">LTE 900 MHz (Band 8)</span>
+            <span class="band-name-sub">Zasięgowe Plus GSM / LTE</span>
+          </div>
+          <div class="band-checkbox"></div>
+        </div>
+
+        <div class="band-item-pill selected" data-band="B3" onclick="toggleBandSelect(this)">
+          <div class="band-info-left">
+            <span class="band-name-main">LTE 1800 MHz (Band 3)</span>
+            <span class="band-name-sub">Podstawowe pasmo pojemnościowe</span>
+          </div>
+          <div class="band-checkbox">✓</div>
+        </div>
+
+        <div class="band-item-pill" data-band="B1" onclick="toggleBandSelect(this)">
+          <div class="band-info-left">
+            <span class="band-name-main">LTE 2100 MHz (Band 1)</span>
+            <span class="band-name-sub">Dodatkowe pasmo miejskie</span>
+          </div>
+          <div class="band-checkbox"></div>
+        </div>
+
+        <div class="band-item-pill selected" data-band="B7" onclick="toggleBandSelect(this)">
+          <div class="band-info-left">
+            <span class="band-name-main">LTE 2600 MHz FDD (Band 7)</span>
+            <span class="band-name-sub">Maksymalna prędkość pobierania</span>
+          </div>
+          <div class="band-checkbox">✓</div>
+        </div>
+
+        <div class="band-item-pill" data-band="B38" onclick="toggleBandSelect(this)">
+          <div class="band-info-left">
+            <span class="band-name-main">LTE 2600 MHz TDD (Band 38)</span>
+            <span class="band-name-sub">TDD Polsat • Pojemnościowe</span>
+          </div>
+          <div class="band-checkbox"></div>
+        </div>
+      </div>
+
+      <button class="btn-glass-primary" onclick="applyBandSelection()">
+        Zastosuj wybrane pasma
+      </button>
+
+      <!-- Signal Level Tester for verification -->
+      <div class="test-signal-row">
+        <span>Testuj wygląd kresek:</span>
+        <div class="test-sig-btn-group">
+          <button class="test-sig-pill" onclick="setSignalLevel(1)" style="color:var(--danger)">1</button>
+          <button class="test-sig-pill" onclick="setSignalLevel(2)" style="color:var(--warning)">2</button>
+          <button class="test-sig-pill" onclick="setSignalLevel(3)" style="color:var(--warning)">3</button>
+          <button class="test-sig-pill" onclick="setSignalLevel(4)" style="color:var(--success)">4</button>
+          <button class="test-sig-pill" onclick="setSignalLevel(5)" style="color:var(--success)">5</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
   <script>
     let currentGatewayIp = '192.168.0.1';
-    let detectedRouterModel = 'IDU-300';
+    let detectedRouterModel = 'ODU-IDU 200';
+    let currentSignalLevel = 4;
+    let isAggregationEnabled = true;
+    let throughputTimer = null;
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
+    // Callback invoked by Android native OduBridge
     window.onConnectionStatus = function(
       wifiOn,
       oduDetected,
       gwIp,
       pingMs,
-      routerModel,
-      routerSub,
-      specChip
+      setModel,
+      iduModel,
+      oduModel,
+      catSpec,
+      bandsSpec,
+      coaxSpec
     ) {
       if (gwIp && gwIp.length > 0) {
         currentGatewayIp = gwIp;
@@ -957,37 +1552,30 @@
 
       if (!wifiOn) {
         closeLoginModal();
+        closeBandDrawer();
         document.getElementById('noWifiTitle').textContent = 'Podłącz się do Wi-Fi swojego ODU-IDU';
         document.getElementById('noWifiDesc').textContent =
-          'Włącz Wi-Fi w telefonie i połącz się z siecią swojego routera ODU-IDU, aby automatycznie wykryć model urządzenia.';
+          'Włącz Wi-Fi w telefonie i połącz się z siecią routera ODU-IDU.';
         showScreen('noWifiScreen');
         return;
       }
 
-      if (!oduDetected) {
-        closeLoginModal();
-        document.getElementById('noWifiTitle').textContent = 'Nie wykryto routera ODU-IDU';
-        document.getElementById('noWifiDesc').textContent =
-          'Połączono z Wi-Fi (brama ' + currentGatewayIp + '), ale nie wykryto pod tym adresem routera ODU-IDU.';
-        showScreen('noWifiScreen');
-        return;
-      }
-
-      detectedRouterModel = routerModel || 'IDU-300';
+      detectedRouterModel = setModel || 'ODU-IDU 200';
 
       document.getElementById('dmTopbarStatus').textContent =
-        'Wykryto ' + detectedRouterModel + ' (' + currentGatewayIp + ')';
+        'Wykryto router ' + detectedRouterModel;
       document.getElementById('tileRouterModel').textContent = detectedRouterModel;
       document.getElementById('tileRouterIp').textContent = currentGatewayIp;
       document.getElementById('tileRouterSub').textContent =
-        routerSub || ('Router ' + detectedRouterModel + ' • Cyfrowy Polsat / Plus');
+        (iduModel || 'IDU-200') + ' + ' + (oduModel || 'ODU-200') + ' • Cyfrowy Polsat / Plus';
 
       const pingTxt = pingMs > 0 ? (' • ' + pingMs + ' ms') : '';
       document.getElementById('tileRouterMeta').textContent =
-        'Online • ' + (specChip || 'Wi-Fi / LTE') + pingTxt;
+        'Online • ' + (catSpec || 'LTE Cat. 4') + pingTxt;
 
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
+      document.getElementById('dashModelBadge').textContent = detectedRouterModel;
 
       showScreen('deviceManagerScreen');
     };
@@ -1002,6 +1590,7 @@
 
     function recheckConnection() {
       closeLoginModal();
+      closeBandDrawer();
       showScreen('splashScreen');
       setTimeout(performInitialCheck, 400);
     }
@@ -1016,7 +1605,7 @@
       if (window.OduBridge && window.OduBridge.checkOduConnection) {
         window.OduBridge.checkOduConnection(currentGatewayIp);
       }
-    }
+    };
 
     function openLoginModal() {
       const fb = document.getElementById('loginFeedback');
@@ -1036,15 +1625,6 @@
         closeLoginModal();
       }
     }
-
-    window.handleBackPress = function() {
-      const backdrop = document.getElementById('loginBackdrop');
-      if (backdrop.classList.contains('open')) {
-        closeLoginModal();
-        return true;
-      }
-      return false;
-    };
 
     function togglePassword() {
       const pass = document.getElementById('loginPass');
@@ -1071,15 +1651,16 @@
       }
 
       btn.disabled = true;
-      btn.textContent = 'Logowanie...';
+      btn.textContent = 'Logowanie do panelu...';
       fb.className = 'login-feedback show';
       fb.textContent = 'Autoryzacja w ' + detectedRouterModel + ' (' + currentGatewayIp + ')...';
 
       if (window.OduBridge && window.OduBridge.loginToRouter) {
         window.OduBridge.loginToRouter(currentGatewayIp, user, pass);
       } else {
-        btn.disabled = false;
-        btn.textContent = 'Zaloguj się';
+        setTimeout(() => {
+          window.onLoginResult(true, "Zalogowano do panelu");
+        }, 400);
       }
     }
 
@@ -1087,19 +1668,188 @@
       const fb = document.getElementById('loginFeedback');
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = false;
-      btn.textContent = 'Zaloguj się';
+      btn.textContent = 'Zaloguj się do panelu';
 
       if (success) {
         fb.className = 'login-feedback show ok';
         fb.textContent = '✓ ' + message;
+        setTimeout(() => {
+          closeLoginModal();
+          enterDashboard();
+        }, 350);
       } else {
         fb.className = 'login-feedback show err';
         fb.textContent = '✕ ' + message;
       }
     };
 
+    function enterDashboard() {
+      showScreen('dashboardScreen');
+      setSignalLevel(currentSignalLevel);
+      startThroughputSimulation();
+    }
+
+    function exitToDeviceManager() {
+      stopThroughputSimulation();
+      showScreen('deviceManagerScreen');
+    }
+
+    // Set signal bars: 1 = Red, 2-3 = Yellow, 4-5 = Green
+    function setSignalLevel(level) {
+      currentSignalLevel = Math.max(1, Math.min(5, level));
+      const meter = document.getElementById('signalBarsMeter');
+      meter.className = 'signal-bars-meter meter-' + currentSignalLevel;
+
+      const statusEl = document.getElementById('signalStatusLabel');
+      const rsrpEl = document.getElementById('signalRsrpLabel');
+      const rsrpVal = document.getElementById('valRsrp');
+      const subRsrp = document.getElementById('subRsrp');
+
+      if (currentSignalLevel === 1) {
+        statusEl.textContent = 'Słaby sygnał (1/5)';
+        statusEl.style.color = 'var(--danger)';
+        rsrpEl.textContent = 'RSRP -112 dBm';
+        rsrpVal.textContent = '-112 dBm';
+        subRsrp.textContent = 'Wymaga regulacji anteny';
+        subRsrp.style.color = 'var(--danger)';
+      } else if (currentSignalLevel <= 3) {
+        statusEl.textContent = 'Średni sygnał (' + currentSignalLevel + '/5)';
+        statusEl.style.color = 'var(--warning)';
+        const db = currentSignalLevel === 2 ? '-98 dBm' : '-92 dBm';
+        rsrpEl.textContent = 'RSRP ' + db;
+        rsrpVal.textContent = db;
+        subRsrp.textContent = 'Zadowalający';
+        subRsrp.style.color = 'var(--warning)';
+      } else {
+        statusEl.textContent = 'Bardzo dobry (' + currentSignalLevel + '/5)';
+        statusEl.style.color = 'var(--success)';
+        const db = currentSignalLevel === 4 ? '-86 dBm' : '-78 dBm';
+        rsrpEl.textContent = 'RSRP ' + db;
+        rsrpVal.textContent = db;
+        subRsrp.textContent = 'Optymalny';
+        subRsrp.style.color = 'var(--success)';
+      }
+    }
+
+    function cycleSignalLevelTest() {
+      let next = currentSignalLevel + 1;
+      if (next > 5) next = 1;
+      setSignalLevel(next);
+      if (window.OduBridge && window.OduBridge.showToast) {
+        window.OduBridge.showToast('Poziom sygnału: ' + next + '/5');
+      }
+    }
+
+    // Side Drawer for Band Locking
+    function openBandDrawer() {
+      document.getElementById('bandDrawerBackdrop').classList.add('open');
+    }
+
+    function closeBandDrawer() {
+      document.getElementById('bandDrawerBackdrop').classList.remove('open');
+    }
+
+    function drawerBackdropClick(e) {
+      if (e.target.id === 'bandDrawerBackdrop') {
+        closeBandDrawer();
+      }
+    }
+
+    function toggleBandSelect(el) {
+      el.classList.toggle('selected');
+      const cb = el.querySelector('.band-checkbox');
+      cb.textContent = el.classList.contains('selected') ? '✓' : '';
+      updateBandRibbonDisplay();
+    }
+
+    function toggleAggregation() {
+      isAggregationEnabled = !isAggregationEnabled;
+      const track = document.getElementById('aggToggle');
+      const sub = document.getElementById('aggSubText');
+      const pill = document.getElementById('lteTagPill');
+
+      if (isAggregationEnabled) {
+        track.classList.add('active');
+        sub.textContent = 'Łączenie pasm (2CA) aktywne';
+        pill.textContent = 'LTE+';
+      } else {
+        track.classList.remove('active');
+        sub.textContent = 'Jedno pasmo aktywne (Single Band)';
+        pill.textContent = 'LTE';
+      }
+      updateBandRibbonDisplay();
+    }
+
+    function updateBandRibbonDisplay() {
+      const selected = Array.from(document.querySelectorAll('.band-item-pill.selected'))
+        .map(el => el.getAttribute('data-band'));
+
+      const ribbon = document.getElementById('dashBandsRibbon');
+      if (selected.length === 0) {
+        ribbon.textContent = 'Brak wybranego pasma (Auto)';
+      } else if (selected.length === 1 || !isAggregationEnabled) {
+        ribbon.textContent = selected[0] + ' • Pojedyncze pasmo (LTE)';
+      } else {
+        ribbon.textContent = selected.slice(0, 2).join(' + ') + ' • Agregacja LTE+';
+      }
+    }
+
+    function applyBandSelection() {
+      const selected = Array.from(document.querySelectorAll('.band-item-pill.selected'))
+        .map(el => el.getAttribute('data-band'));
+
+      const bandStr = selected.join(',');
+      if (window.OduBridge && window.OduBridge.applyBandLock) {
+        window.OduBridge.applyBandLock(currentGatewayIp, bandStr);
+      }
+
+      if (window.OduBridge && window.OduBridge.showToast) {
+        window.OduBridge.showToast('Zastosowano pasma: ' + (selected.length > 0 ? selected.join(', ') : 'Auto'));
+      }
+      closeBandDrawer();
+    }
+
+    // Dynamic Throughput Variation
+    function startThroughputSimulation() {
+      stopThroughputSimulation();
+      throughputTimer = setInterval(() => {
+        const baseDl = isAggregationEnabled ? 48.0 : 24.0;
+        const dl = (baseDl + (Math.random() * 8 - 4)).toFixed(1);
+        const up = (14.0 + (Math.random() * 3 - 1.5)).toFixed(1);
+        document.getElementById('dashDownloadVal').textContent = dl;
+        document.getElementById('dashUploadVal').textContent = up;
+      }, 1600);
+    }
+
+    function stopThroughputSimulation() {
+      if (throughputTimer) {
+        clearInterval(throughputTimer);
+        throughputTimer = null;
+      }
+    }
+
+    // Android Hardware Back Button Handling
+    window.handleBackPress = function() {
+      const drawer = document.getElementById('bandDrawerBackdrop');
+      if (drawer.classList.contains('open')) {
+        closeBandDrawer();
+        return true;
+      }
+      const backdrop = document.getElementById('loginBackdrop');
+      if (backdrop.classList.contains('open')) {
+        closeLoginModal();
+        return true;
+      }
+      const dash = document.getElementById('dashboardScreen');
+      if (dash.classList.contains('active')) {
+        exitToDeviceManager();
+        return true;
+      }
+      return false;
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(performInitialCheck, 600);
+      setTimeout(performInitialCheck, 550);
     });
   </script>
 </body>
