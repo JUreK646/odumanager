@@ -6,18 +6,17 @@
 
 Niezależne, otwartoźródłowe oprogramowanie diagnostyczno-zarządcze dedykowane dla zestawów antenowo-routerowych **ODU-IDU** Grupy Polsat Plus / Cyfrowy Polsat (stworzonych z inicjatywy Zygmunta Solorza-Żaka).
 
-Program łączy się bezpośrednio z domowym routerem IDU i anteną ODU po lokalnej sieci, umożliwiając podgląd parametrów sygnału RF w czasie rzeczywistym, wymuszanie najszybszych pasm LTE/5G Plusa, diagnostykę kabla koncentrycznego oraz automatyczny watchdog.
+Program łączy się bezpośrednio z domowym routerem IDU i anteną ODU po lokalnej sieci, umożliwiając podgląd parametrów sygnału RF w czasie rzeczywistym, wymuszanie najszybszych pasm LTE Plusa, diagnostykę kabla koncentrycznego oraz automatyczny watchdog.
 
 ---
 
 ## 📡 Obsługiwane urządzenia
 
-| Model | Technologia | Pasma LTE / 5G | Agregacja (CA) |
+| Model | Technologia | Pasma LTE | Agregacja (CA) |
 | :--- | :--- | :--- | :--- |
-| **ODU-IDU 300** | LTE-Advanced | B1 (2100), B3 (1800), B7 (2600), B8 (900), B20 (800), **B38 (2600 TDD)** | 2CA / 3CA |
-| **ODU-IDU 200** | LTE | B3 (1800), B8 (900), B20 (800) | Brak |
-| **ODU-IDU 100** | LTE Cat 3 | B3 (1800) | Brak |
-| **ODU 5G / Nowe zestawy** | 5G NR + LTE | N78, N38, N1, N28 + LTE CA | 5G Sub-6 / LTE CA |
+| **ODU-IDU 300** | LTE-Advanced Cat. 6 (do 300 Mb/s) | B1 (2100), B3 (1800), B7 (2600), B8 (900), B20 (800), **B38 (2600 TDD)** | **2CA** (maks. 2 pasma) |
+| **ODU-IDU 200** | LTE Cat. 4 (do 150 Mb/s) | B3 (1800), B7 (2600), B8 (900), B20 (800) | Brak |
+| **ODU-IDU 100** | LTE Cat. 3 | B3 (1800) | Brak |
 
 ---
 
