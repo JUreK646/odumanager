@@ -115,9 +115,7 @@
       pointer-events: auto;
     }
 
-    /* ==========================================
-       1. NORMAL STARTUP SCREEN
-       ========================================== */
+    /* 1. STARTUP SCREEN */
     #splashScreen {
       z-index: 30;
       background: #FFFFFF;
@@ -159,9 +157,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ==========================================
-       2. NO WI-FI SCREEN
-       ========================================== */
+    /* 2. NO WI-FI SCREEN */
     #noWifiScreen {
       z-index: 25;
       text-align: center;
@@ -271,9 +267,7 @@
       transform: scale(0.97);
     }
 
-    /* ==========================================
-       3. DEVICE MANAGER (COMPACT HORIZONTAL ROUTER TILE)
-       ========================================== */
+    /* 3. DEVICE MANAGER (COMPACT HORIZONTAL ROUTER TILE) */
     #deviceManagerScreen {
       justify-content: flex-start;
       padding: 18px 16px 28px;
@@ -466,9 +460,7 @@
       flex-shrink: 0;
     }
 
-    /* ==========================================
-       4. LIQUID GLASS LOGIN MODAL
-       ========================================== */
+    /* 4. LOGIN MODAL */
     .login-backdrop {
       position: fixed;
       inset: 0;
@@ -645,9 +637,7 @@
       border-color: rgba(234, 33, 67, 0.32);
     }
 
-    /* ==========================================
-       5. LIQUID GLASS DASHBOARD SCREEN
-       ========================================== */
+    /* 5. DASHBOARD PANEL */
     #dashboardScreen {
       justify-content: flex-start;
       padding: 14px 14px 28px;
@@ -661,8 +651,6 @@
       flex-direction: column;
       gap: 13px;
     }
-
-    /* Dashboard Header Bar */
     .dash-header {
       width: 100%;
       height: 56px;
@@ -755,10 +743,9 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      cursor: pointer;
     }
 
-    /* 5 Dynamic Signal Bars */
+    /* 5 Dynamic Signal Bars: 1 = Red, 2-3 = Yellow, 4-5 = Green */
     .signal-bars-meter {
       display: flex;
       align-items: flex-end;
@@ -770,7 +757,7 @@
       width: 6px;
       border-radius: 3px;
       background: rgba(148, 163, 184, 0.28);
-      transition: background 0.25s ease, height 0.25s ease, box-shadow 0.25s ease;
+      transition: background 0.25s ease, box-shadow 0.25s ease;
     }
     .sig-bar.b1 { height: 9px; }
     .sig-bar.b2 { height: 14px; }
@@ -778,18 +765,16 @@
     .sig-bar.b4 { height: 25px; }
     .sig-bar.b5 { height: 31px; }
 
-    /* Signal Bar Color Rules: 1 bar = red; 2-3 bars = yellow; 4-5 bars = green */
+    /* Signal Rules */
     .meter-1 .sig-bar.b1 {
       background: var(--danger);
       box-shadow: 0 0 8px rgba(234, 33, 67, 0.55);
     }
-
     .meter-2 .sig-bar.b1, .meter-2 .sig-bar.b2,
     .meter-3 .sig-bar.b1, .meter-3 .sig-bar.b2, .meter-3 .sig-bar.b3 {
       background: var(--warning);
       box-shadow: 0 0 8px rgba(245, 158, 11, 0.50);
     }
-
     .meter-4 .sig-bar.b1, .meter-4 .sig-bar.b2, .meter-4 .sig-bar.b3, .meter-4 .sig-bar.b4,
     .meter-5 .sig-bar.b1, .meter-5 .sig-bar.b2, .meter-5 .sig-bar.b3, .meter-5 .sig-bar.b4, .meter-5 .sig-bar.b5 {
       background: var(--success);
@@ -806,7 +791,6 @@
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 0.04em;
-      box-shadow: 0 2px 8px rgba(24, 86, 255, 0.12);
     }
 
     .signal-quality-text {
@@ -816,56 +800,10 @@
       text-align: right;
     }
 
-    /* Throughput (Download / Uplink) Display */
-    .throughput-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .throughput-card {
-      border-radius: 22px;
-      padding: 13px 15px;
-      background: rgba(255, 255, 255, 0.65);
-      border: 1.5px solid rgba(255, 255, 255, 0.92);
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.95);
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .tp-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-    .tp-icon {
-      font-size: 13px;
-      font-weight: 800;
-    }
-    .tp-icon.down { color: var(--primary); }
-    .tp-icon.up { color: #8B5CF6; }
-
-    .tp-value {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-    .tp-unit {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-
     /* Active Band Ribbon */
     .active-band-ribbon {
       border-radius: 18px;
-      padding: 9px 14px;
+      padding: 10px 14px;
       background: rgba(255, 255, 255, 0.72);
       border: 1px solid rgba(255, 255, 255, 0.95);
       display: flex;
@@ -882,7 +820,7 @@
       color: var(--primary);
     }
 
-    /* Detailed Telemetry Grid */
+    /* Telemetry Grid */
     .telemetry-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -914,9 +852,7 @@
       color: var(--success);
     }
 
-    /* ==========================================
-       6. SLIDE-OUT BAND LOCKING DRAWER (LIQUID GLASS)
-       ========================================== */
+    /* 6. SLIDE-OUT BAND LOCKING DRAWER */
     .drawer-backdrop {
       position: fixed;
       inset: 0;
@@ -932,7 +868,6 @@
       opacity: 1;
       pointer-events: auto;
     }
-
     .slide-drawer {
       position: fixed;
       top: 0;
@@ -952,7 +887,6 @@
     .drawer-backdrop.open .slide-drawer {
       transform: translateX(0);
     }
-
     .drawer-header {
       display: flex;
       align-items: center;
@@ -979,7 +913,6 @@
       justify-content: center;
       cursor: pointer;
     }
-
     .drawer-section-title {
       font-size: 12px;
       font-weight: 700;
@@ -988,7 +921,6 @@
       letter-spacing: 0.04em;
     }
 
-    /* Band selector tiles list */
     .band-tiles-stack {
       display: flex;
       flex-direction: column;
@@ -1042,7 +974,6 @@
       font-weight: 800;
     }
 
-    /* Aggregation Switch Row */
     .agg-switch-card {
       display: flex;
       align-items: center;
@@ -1091,36 +1022,6 @@
     }
     .toggle-track.active .toggle-thumb {
       transform: translateX(20px);
-    }
-
-    .test-signal-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.90);
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-    .test-sig-btn-group {
-      display: flex;
-      gap: 5px;
-    }
-    .test-sig-pill {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      background: #FFFFFF;
-      font-size: 11px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -1219,7 +1120,7 @@
 
       <h1 class="state-title" id="noWifiTitle">Podłącz się do Wi-Fi swojego ODU-IDU</h1>
       <p class="state-desc" id="noWifiDesc">
-        Włącz Wi-Fi i połącz telefon z siecią swojego routera ODU-IDU, aby automatycznie wykryć urządzenie.
+        Włącz Wi-Fi w telefonie i połącz się z siecią routera ODU-IDU.
       </p>
 
       <div class="action-stack">
@@ -1233,7 +1134,7 @@
     </div>
   </section>
 
-  <!-- 3. LIQUID GLASS DEVICE MANAGER -->
+  <!-- 3. DEVICE MANAGER (COMPACT HORIZONTAL ROUTER TILE) -->
   <section class="screen" id="deviceManagerScreen">
     <div class="dm-container">
       <header class="dm-topbar liquid-glass">
@@ -1241,7 +1142,7 @@
           <span class="dm-topbar-title">Device Manager</span>
           <span class="dm-topbar-sub">
             <span class="live-dot"></span>
-            <span id="dmTopbarStatus">Wykryto router ODU-IDU 200</span>
+            <span id="dmTopbarStatus">Wykryto router ODU-IDU</span>
           </span>
         </div>
         <button class="dm-refresh-btn" onclick="recheckConnection()" title="Odśwież">
@@ -1254,18 +1155,18 @@
       <!-- COMPACT HORIZONTAL ROUTER TILE -->
       <article class="router-tile-compact liquid-glass" onclick="openLoginModal()">
         <div class="router-icon-well">
-          <img src="idu_router.png" alt="Router IDU-200" />
+          <img src="idu_router.png" alt="Router IDU" />
         </div>
 
         <div class="router-info-col">
           <div class="router-title-line">
-            <span class="router-model-name" id="tileRouterModel">ODU-IDU 200</span>
+            <span class="router-model-name" id="tileRouterModel">ODU-IDU 300</span>
             <span class="router-ip-pill" id="tileRouterIp">192.168.0.1</span>
           </div>
-          <div class="router-sub-line" id="tileRouterSub">IDU-200 + ODU-200 • Cyfrowy Polsat / Plus</div>
+          <div class="router-sub-line" id="tileRouterSub">IDU-300 + ODU-300 • Cyfrowy Polsat / Plus</div>
           <div class="router-meta-line">
             <span class="live-dot"></span>
-            <span id="tileRouterMeta">Online • LTE Cat. 4 • 2 ms</span>
+            <span id="tileRouterMeta">Online</span>
           </div>
         </div>
 
@@ -1280,10 +1181,10 @@
       <div class="sheet-header">
         <div class="sheet-device-mini">
           <div class="mini-icon-box">
-            <img src="idu_router.png" alt="IDU-200" />
+            <img src="idu_router.png" alt="IDU" />
           </div>
           <div>
-            <div class="sheet-title" id="modalDeviceTitle">ODU-IDU 200</div>
+            <div class="sheet-title" id="modalDeviceTitle">ODU-IDU 300</div>
             <div class="sheet-sub" id="modalDeviceIp">http://192.168.0.1</div>
           </div>
         </div>
@@ -1299,9 +1200,9 @@
         </div>
 
         <div class="glass-field">
-          <label>Hasło routera</label>
+          <label>Hasło do panelu routera</label>
           <div class="glass-input-wrap">
-            <input type="password" class="glass-input" id="loginPass" value="admin" placeholder="Wpisz hasło" />
+            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera" />
             <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
           </div>
         </div>
@@ -1315,7 +1216,7 @@
     </div>
   </div>
 
-  <!-- 5. LIQUID GLASS DASHBOARD PANEL -->
+  <!-- 5. REAL LIQUID GLASS DASHBOARD PANEL -->
   <section class="screen" id="dashboardScreen">
     <div class="dash-container">
 
@@ -1323,7 +1224,7 @@
       <header class="dash-header liquid-glass">
         <div class="dash-header-title">
           <span class="live-dot"></span>
-          <span class="dash-model-badge" id="dashModelBadge">ODU-IDU 200</span>
+          <span class="dash-model-badge" id="dashModelBadge">ODU-IDU 300</span>
         </div>
         <div class="dash-header-actions">
           <button class="dash-pill-btn" onclick="openBandDrawer()">
@@ -1338,8 +1239,8 @@
       <!-- Hero Liquid Glass Signal Card -->
       <article class="hero-signal-card liquid-glass">
         <div class="signal-top-row">
-          <div class="signal-bars-cluster" onclick="cycleSignalLevelTest()" title="Kliknij, aby przetestować poziomy sygnału">
-            <!-- 5 Dynamic Signal Bars -->
+          <div class="signal-bars-cluster">
+            <!-- 5 Dynamic Signal Bars: 1 = Red, 2-3 = Yellow, 4-5 = Green -->
             <div class="signal-bars-meter meter-4" id="signalBarsMeter">
               <div class="sig-bar b1"></div>
               <div class="sig-bar b2"></div>
@@ -1352,79 +1253,54 @@
           </div>
 
           <div class="signal-quality-text">
-            <div id="signalStatusLabel">Bardzo dobry (4/5)</div>
-            <div style="font-size:11px; font-weight:600; color:var(--text-muted);" id="signalRsrpLabel">RSRP -86 dBm</div>
-          </div>
-        </div>
-
-        <!-- Real-Time Throughput Meters -->
-        <div class="throughput-grid">
-          <div class="throughput-card">
-            <div class="tp-head">
-              <span>POBIERANIE</span>
-              <span class="tp-icon down">↓</span>
-            </div>
-            <div class="tp-value">
-              <span id="dashDownloadVal">48.6</span>
-              <span class="tp-unit">Mb/s</span>
-            </div>
-          </div>
-
-          <div class="throughput-card">
-            <div class="tp-head">
-              <span>WYSYŁANIE</span>
-              <span class="tp-icon up">↑</span>
-            </div>
-            <div class="tp-value">
-              <span id="dashUploadVal">15.4</span>
-              <span class="tp-unit">Mb/s</span>
-            </div>
+            <div id="signalStatusLabel">Sygnał</div>
+            <div style="font-size:11px; font-weight:600; color:var(--text-muted);" id="signalRsrpLabel">RSRP ---</div>
           </div>
         </div>
 
         <!-- Active Bands Ribbon -->
         <div class="active-band-ribbon">
-          <span class="band-label">Aktywne pasma LTE</span>
-          <span class="band-value" id="dashBandsRibbon">B3 (1800) + B7 (2600) • 2CA</span>
+          <span class="band-label">Aktywne pasmo</span>
+          <span class="band-value" id="dashBandsRibbon">---</span>
         </div>
       </article>
 
-      <!-- Detailed RF & Hardware Metrics Grid -->
+      <!-- Detailed Real RF & Hardware Metrics Grid -->
       <div class="telemetry-grid">
         <div class="tele-cell">
           <span class="tele-label">RSRP (Moc sygnału)</span>
-          <span class="tele-value" id="valRsrp">-86 dBm</span>
-          <span class="tele-sub" id="subRsrp">Optymalny</span>
+          <span class="tele-value" id="valRsrp">---</span>
+          <span class="tele-sub" id="subRsrp">---</span>
         </div>
 
         <div class="tele-cell">
           <span class="tele-label">SINR / SNR (Szum)</span>
-          <span class="tele-value" id="valSinr">21.5 dB</span>
-          <span class="tele-sub">Czysty sygnał</span>
+          <span class="tele-value" id="valSinr">---</span>
+          <span class="tele-sub">Stosunek sygnału</span>
         </div>
 
         <div class="tele-cell">
           <span class="tele-label">RSRQ (Jakość)</span>
-          <span class="tele-value" id="valRsrq">-7.5 dB</span>
-          <span class="tele-sub">Brak zakłóceń</span>
+          <span class="tele-value" id="valRsrq">---</span>
+          <span class="tele-sub">Jakość sygnału</span>
         </div>
 
         <div class="tele-cell">
           <span class="tele-label">RSSI (Moc kanału)</span>
-          <span class="tele-value" id="valRssi">-59 dBm</span>
-          <span class="tele-sub">Wysoka stabilność</span>
+          <span class="tele-value" id="valRssi">---</span>
+          <span class="tele-sub">Poziom mocy</span>
         </div>
 
         <div class="tele-cell">
-          <span class="tele-label">Zasilanie ODU (PoCoax)</span>
-          <span class="tele-value">18.2 V</span>
-          <span class="tele-sub">Unicable LNB • OK</span>
+          <span class="tele-label">Odpowiedź routera (Ping)</span>
+          <span class="tele-value" id="valPing">---</span>
+          <span class="tele-sub">Czas HTTP</span>
         </div>
 
         <div class="tele-cell">
-          <span class="tele-label">Stacja bazowa (eNB)</span>
-          <span class="tele-value" id="valEnb">eNB 24108</span>
-          <span class="tele-sub">Plus Polska</span>
+          <span class="tele-label">Stacja bazowa (eNB / Cell)</span>
+          <span class="tele-value" id="valEnb">---</span>
+          <span class="tele-sub">Identyfikator komórki</span>
         </div>
       </div>
 
@@ -1457,7 +1333,7 @@
         <div class="band-item-pill" data-band="B20" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 800 MHz (Band 20)</span>
-            <span class="band-name-sub">Zasięg daleki • Trudny teren</span>
+            <span class="band-name-sub">Zasięg daleki</span>
           </div>
           <div class="band-checkbox"></div>
         </div>
@@ -1465,7 +1341,7 @@
         <div class="band-item-pill" data-band="B8" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 900 MHz (Band 8)</span>
-            <span class="band-name-sub">Zasięgowe Plus GSM / LTE</span>
+            <span class="band-name-sub">Plus GSM / LTE</span>
           </div>
           <div class="band-checkbox"></div>
         </div>
@@ -1473,7 +1349,7 @@
         <div class="band-item-pill selected" data-band="B3" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 1800 MHz (Band 3)</span>
-            <span class="band-name-sub">Podstawowe pasmo pojemnościowe</span>
+            <span class="band-name-sub">Główne pasmo pojemnościowe</span>
           </div>
           <div class="band-checkbox">✓</div>
         </div>
@@ -1481,7 +1357,7 @@
         <div class="band-item-pill" data-band="B1" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 2100 MHz (Band 1)</span>
-            <span class="band-name-sub">Dodatkowe pasmo miejskie</span>
+            <span class="band-name-sub">Dodatkowe pasmo</span>
           </div>
           <div class="band-checkbox"></div>
         </div>
@@ -1489,7 +1365,7 @@
         <div class="band-item-pill selected" data-band="B7" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 2600 MHz FDD (Band 7)</span>
-            <span class="band-name-sub">Maksymalna prędkość pobierania</span>
+            <span class="band-name-sub">Maksymalna prędkość FDD</span>
           </div>
           <div class="band-checkbox">✓</div>
         </div>
@@ -1497,7 +1373,7 @@
         <div class="band-item-pill" data-band="B38" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 2600 MHz TDD (Band 38)</span>
-            <span class="band-name-sub">TDD Polsat • Pojemnościowe</span>
+            <span class="band-name-sub">Pojemnościowe TDD Polsat</span>
           </div>
           <div class="band-checkbox"></div>
         </div>
@@ -1506,27 +1382,15 @@
       <button class="btn-glass-primary" onclick="applyBandSelection()">
         Zastosuj wybrane pasma
       </button>
-
-      <!-- Signal Level Tester for verification -->
-      <div class="test-signal-row">
-        <span>Testuj wygląd kresek:</span>
-        <div class="test-sig-btn-group">
-          <button class="test-sig-pill" onclick="setSignalLevel(1)" style="color:var(--danger)">1</button>
-          <button class="test-sig-pill" onclick="setSignalLevel(2)" style="color:var(--warning)">2</button>
-          <button class="test-sig-pill" onclick="setSignalLevel(3)" style="color:var(--warning)">3</button>
-          <button class="test-sig-pill" onclick="setSignalLevel(4)" style="color:var(--success)">4</button>
-          <button class="test-sig-pill" onclick="setSignalLevel(5)" style="color:var(--success)">5</button>
-        </div>
-      </div>
     </aside>
   </div>
 
   <script>
     let currentGatewayIp = '192.168.0.1';
-    let detectedRouterModel = 'ODU-IDU 200';
+    let detectedRouterModel = 'ODU-IDU 300';
     let currentSignalLevel = 4;
     let isAggregationEnabled = true;
-    let throughputTimer = null;
+    let telemetryPollTimer = null;
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1560,18 +1424,18 @@
         return;
       }
 
-      detectedRouterModel = setModel || 'ODU-IDU 200';
+      detectedRouterModel = setModel || 'ODU-IDU 300';
 
       document.getElementById('dmTopbarStatus').textContent =
         'Wykryto router ' + detectedRouterModel;
       document.getElementById('tileRouterModel').textContent = detectedRouterModel;
       document.getElementById('tileRouterIp').textContent = currentGatewayIp;
       document.getElementById('tileRouterSub').textContent =
-        (iduModel || 'IDU-200') + ' + ' + (oduModel || 'ODU-200') + ' • Cyfrowy Polsat / Plus';
+        (iduModel || 'IDU-300') + ' + ' + (oduModel || 'ODU-300') + ' • Cyfrowy Polsat / Plus';
 
-      const pingTxt = pingMs > 0 ? (' • ' + pingMs + ' ms') : '';
+      const realPingText = pingMs > 0 ? (' • ' + pingMs + ' ms') : '';
       document.getElementById('tileRouterMeta').textContent =
-        'Online • ' + (catSpec || 'LTE Cat. 4') + pingTxt;
+        'Online • ' + (catSpec || 'LTE') + realPingText;
 
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
@@ -1646,25 +1510,24 @@
 
       if (!user || !pass) {
         fb.className = 'login-feedback show err';
-        fb.textContent = 'Wpisz nazwę użytkownika oraz hasło.';
+        fb.textContent = 'Wpisz hasło do routera.';
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Logowanie do panelu...';
+      btn.textContent = 'Weryfikacja hasła...';
       fb.className = 'login-feedback show';
-      fb.textContent = 'Autoryzacja w ' + detectedRouterModel + ' (' + currentGatewayIp + ')...';
+      fb.textContent = 'Wysyłanie danych do http://' + currentGatewayIp + '/cgi-bin/adm.cgi...';
 
       if (window.OduBridge && window.OduBridge.loginToRouter) {
         window.OduBridge.loginToRouter(currentGatewayIp, user, pass);
       } else {
-        setTimeout(() => {
-          window.onLoginResult(true, "Zalogowano do panelu");
-        }, 400);
+        btn.disabled = false;
+        btn.textContent = 'Zaloguj się do panelu';
       }
     }
 
-    window.onLoginResult = function(success, message) {
+    window.onLoginResult = function(success, message, telemetryData) {
       const fb = document.getElementById('loginFeedback');
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = false;
@@ -1675,23 +1538,77 @@
         fb.textContent = '✓ ' + message;
         setTimeout(() => {
           closeLoginModal();
-          enterDashboard();
-        }, 350);
+          enterDashboard(telemetryData);
+        }, 400);
       } else {
         fb.className = 'login-feedback show err';
         fb.textContent = '✕ ' + message;
       }
     };
 
-    function enterDashboard() {
+    function enterDashboard(telemetryData) {
       showScreen('dashboardScreen');
-      setSignalLevel(currentSignalLevel);
-      startThroughputSimulation();
+      if (telemetryData) {
+        applyTelemetryUpdate(telemetryData);
+      }
+      startTelemetryPolling();
     }
 
     function exitToDeviceManager() {
-      stopThroughputSimulation();
+      stopTelemetryPolling();
       showScreen('deviceManagerScreen');
+    }
+
+    function startTelemetryPolling() {
+      stopTelemetryPolling();
+      telemetryPollTimer = setInterval(() => {
+        if (window.OduBridge && window.OduBridge.refreshRealTelemetry) {
+          window.OduBridge.refreshRealTelemetry(currentGatewayIp);
+        }
+      }, 3500);
+    }
+
+    function stopTelemetryPolling() {
+      if (telemetryPollTimer) {
+        clearInterval(telemetryPollTimer);
+        telemetryPollTimer = null;
+      }
+    }
+
+    window.onTelemetryUpdate = function(data) {
+      if (!data) return;
+      applyTelemetryUpdate(data);
+    };
+
+    function applyTelemetryUpdate(data) {
+      if (data.signalLevel) {
+        setSignalLevel(data.signalLevel);
+      }
+      if (data.realPingMs > 0) {
+        document.getElementById('valPing').textContent = data.realPingMs + ' ms';
+      }
+      if (data.rsrp && data.rsrp !== 'Brak odczytu') {
+        document.getElementById('valRsrp').textContent = data.rsrp;
+        document.getElementById('signalRsrpLabel').textContent = 'RSRP ' + data.rsrp;
+      }
+      if (data.rsrq && data.rsrq !== 'Brak odczytu') {
+        document.getElementById('valRsrq').textContent = data.rsrq;
+      }
+      if (data.sinr && data.sinr !== 'Brak odczytu') {
+        document.getElementById('valSinr').textContent = data.sinr;
+      }
+      if (data.rssi && data.rssi !== 'Brak odczytu') {
+        document.getElementById('valRssi').textContent = data.rssi;
+      }
+      if (data.band && data.band !== 'Brak odczytu') {
+        document.getElementById('dashBandsRibbon').textContent = data.band;
+      }
+      if (data.cellId && data.cellId !== 'Brak odczytu') {
+        document.getElementById('valEnb').textContent = data.cellId;
+      }
+      if (data.isLtePlus !== undefined) {
+        document.getElementById('lteTagPill').textContent = data.isLtePlus ? 'LTE+' : 'LTE';
+      }
     }
 
     // Set signal bars: 1 = Red, 2-3 = Yellow, 4-5 = Green
@@ -1701,42 +1618,23 @@
       meter.className = 'signal-bars-meter meter-' + currentSignalLevel;
 
       const statusEl = document.getElementById('signalStatusLabel');
-      const rsrpEl = document.getElementById('signalRsrpLabel');
-      const rsrpVal = document.getElementById('valRsrp');
       const subRsrp = document.getElementById('subRsrp');
 
       if (currentSignalLevel === 1) {
         statusEl.textContent = 'Słaby sygnał (1/5)';
         statusEl.style.color = 'var(--danger)';
-        rsrpEl.textContent = 'RSRP -112 dBm';
-        rsrpVal.textContent = '-112 dBm';
-        subRsrp.textContent = 'Wymaga regulacji anteny';
+        subRsrp.textContent = 'Niski poziom';
         subRsrp.style.color = 'var(--danger)';
       } else if (currentSignalLevel <= 3) {
         statusEl.textContent = 'Średni sygnał (' + currentSignalLevel + '/5)';
         statusEl.style.color = 'var(--warning)';
-        const db = currentSignalLevel === 2 ? '-98 dBm' : '-92 dBm';
-        rsrpEl.textContent = 'RSRP ' + db;
-        rsrpVal.textContent = db;
         subRsrp.textContent = 'Zadowalający';
         subRsrp.style.color = 'var(--warning)';
       } else {
         statusEl.textContent = 'Bardzo dobry (' + currentSignalLevel + '/5)';
         statusEl.style.color = 'var(--success)';
-        const db = currentSignalLevel === 4 ? '-86 dBm' : '-78 dBm';
-        rsrpEl.textContent = 'RSRP ' + db;
-        rsrpVal.textContent = db;
         subRsrp.textContent = 'Optymalny';
         subRsrp.style.color = 'var(--success)';
-      }
-    }
-
-    function cycleSignalLevelTest() {
-      let next = currentSignalLevel + 1;
-      if (next > 5) next = 1;
-      setSignalLevel(next);
-      if (window.OduBridge && window.OduBridge.showToast) {
-        window.OduBridge.showToast('Poziom sygnału: ' + next + '/5');
       }
     }
 
@@ -1759,7 +1657,6 @@
       el.classList.toggle('selected');
       const cb = el.querySelector('.band-checkbox');
       cb.textContent = el.classList.contains('selected') ? '✓' : '';
-      updateBandRibbonDisplay();
     }
 
     function toggleAggregation() {
@@ -1777,21 +1674,6 @@
         sub.textContent = 'Jedno pasmo aktywne (Single Band)';
         pill.textContent = 'LTE';
       }
-      updateBandRibbonDisplay();
-    }
-
-    function updateBandRibbonDisplay() {
-      const selected = Array.from(document.querySelectorAll('.band-item-pill.selected'))
-        .map(el => el.getAttribute('data-band'));
-
-      const ribbon = document.getElementById('dashBandsRibbon');
-      if (selected.length === 0) {
-        ribbon.textContent = 'Brak wybranego pasma (Auto)';
-      } else if (selected.length === 1 || !isAggregationEnabled) {
-        ribbon.textContent = selected[0] + ' • Pojedyncze pasmo (LTE)';
-      } else {
-        ribbon.textContent = selected.slice(0, 2).join(' + ') + ' • Agregacja LTE+';
-      }
     }
 
     function applyBandSelection() {
@@ -1807,25 +1689,6 @@
         window.OduBridge.showToast('Zastosowano pasma: ' + (selected.length > 0 ? selected.join(', ') : 'Auto'));
       }
       closeBandDrawer();
-    }
-
-    // Dynamic Throughput Variation
-    function startThroughputSimulation() {
-      stopThroughputSimulation();
-      throughputTimer = setInterval(() => {
-        const baseDl = isAggregationEnabled ? 48.0 : 24.0;
-        const dl = (baseDl + (Math.random() * 8 - 4)).toFixed(1);
-        const up = (14.0 + (Math.random() * 3 - 1.5)).toFixed(1);
-        document.getElementById('dashDownloadVal').textContent = dl;
-        document.getElementById('dashUploadVal').textContent = up;
-      }, 1600);
-    }
-
-    function stopThroughputSimulation() {
-      if (throughputTimer) {
-        clearInterval(throughputTimer);
-        throughputTimer = null;
-      }
     }
 
     // Android Hardware Back Button Handling

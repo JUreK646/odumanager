@@ -26,16 +26,26 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends Activity {
 
     private WebView webView;
+
+    static {
+        // Automatically accept and maintain session cookies across HttpURLConnection requests
+        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +168,7 @@ public class MainActivity extends Activity {
                 StringBuilder sb = new StringBuilder();
                 String line;
                 int total = 0;
-                while ((line = reader.readLine()) != null && total < 65536) {
+                while ((line = reader.readLine()) != null && total < 131072) {
                     sb.append(line).append('\n');
                     total += line.length();
                 }
@@ -176,7 +186,7 @@ public class MainActivity extends Activity {
 
     private static String jsEscape(String s) {
         if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", "");
+        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
     }
 
     public class OduBridge {
@@ -218,13 +228,13 @@ public class MainActivity extends Activity {
                     final boolean wifiOn = checkWifiTransport();
                     String gwCandidate = getDetectedGatewayIp();
                     boolean oduDetected = false;
-                    long pingMs = -1;
+                    long realMeasuredPing = -1;
 
-                    String setModel = "ODU-IDU 200";
-                    String iduModel = "IDU-200";
-                    String oduModel = "ODU-200";
-                    String catSpec = "LTE Cat. 4 • 150 Mb/s";
-                    String bandsSpec = "FDD B3 / B7 / B20";
+                    String setModel = "ODU-IDU 300";
+                    String iduModel = "IDU-300";
+                    String oduModel = "ODU-300";
+                    String catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
+                    String bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
                     String coaxSpec = "PoCoax • Unicable LNB";
 
                     if (wifiOn) {
@@ -234,7 +244,7 @@ public class MainActivity extends Activity {
 
                         for (String ip : candidates) {
                             long t0 = System.currentTimeMillis();
-                            String rootHtml = fetchHttpString("http://" + ip + "/", 1600);
+                            String rootHtml = fetchHttpString("http://" + ip + "/", 2000);
                             long elapsed = System.currentTimeMillis() - t0;
 
                             if (!rootHtml.isEmpty()) {
@@ -245,7 +255,7 @@ public class MainActivity extends Activity {
                                         || rootHtml.contains("ODU")
                                         || rootHtml.contains("IDU");
 
-                                String adminXml = fetchHttpString("http://" + ip + "/lang/en/admin.xml", 1600);
+                                String adminXml = fetchHttpString("http://" + ip + "/lang/en/admin.xml", 2000);
                                 if (!adminXml.isEmpty()) {
                                     looksLikeOdu = true;
                                 }
@@ -253,41 +263,41 @@ public class MainActivity extends Activity {
                                 if (looksLikeOdu) {
                                     oduDetected = true;
                                     gwCandidate = ip;
-                                    pingMs = Math.max(1, elapsed);
+                                    realMeasuredPing = Math.max(1, elapsed);
 
-                                    // Accurate Model Detection:
-                                    // U270 is the internal codename of ODU-IDU 200 (Asiatelco/InterPhone ALR-U270)
-                                    // PT30/ALR-PT30/CPE3 is ODU-IDU 300
-                                    // U100 is ODU-IDU 100
-                                    if (adminXml.contains("U270") || rootHtml.contains("U270")) {
+                                    // Accurately determine model without false matches:
+                                    // ODU-IDU 300 has 5GHz Wi-Fi (setting 5g menu3 / 5GHz) and TDD 2600 (sysfwnetd2570)
+                                    // ODU-IDU 200 is only 2.4GHz Wi-Fi without 5GHz or TDD
+                                    // ODU-IDU 100 is legacy 30 Mb/s
+                                    boolean has5GHz = adminXml.contains("setting 5g menu3")
+                                            || adminXml.contains("5GHz")
+                                            || adminXml.contains("sysfwnetd2570")
+                                            || adminXml.contains("PT30")
+                                            || adminXml.contains("CPE3")
+                                            || adminXml.contains("IDU-300")
+                                            || rootHtml.contains("IDU-300");
+
+                                    if (has5GHz) {
+                                        setModel = "ODU-IDU 300";
+                                        iduModel = "IDU-300";
+                                        oduModel = "ODU-300";
+                                        catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
+                                        bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
+                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    } else if (adminXml.contains("U270") || adminXml.contains("ODU") || rootHtml.contains("formLogin")) {
                                         setModel = "ODU-IDU 200";
                                         iduModel = "IDU-200";
                                         oduModel = "ODU-200";
                                         catSpec = "LTE Cat. 4 • 150 Mb/s";
                                         bandsSpec = "FDD B3 / B7 / B20";
                                         coaxSpec = "PoCoax • Unicable LNB";
-                                    } else if (adminXml.contains("PT30") || adminXml.contains("IDU-300") || adminXml.contains("CPE3") || adminXml.contains("ALR-PT30")) {
-                                        setModel = "ODU-IDU 300";
-                                        iduModel = "IDU-300";
-                                        oduModel = "ODU-300";
-                                        catSpec = "LTE Cat. 6 • 300 Mb/s";
-                                        bandsSpec = "B1/B3/B7/B8/B20 + B38";
-                                        coaxSpec = "PoCoax • Unicable LNB";
-                                    } else if (adminXml.contains("U100") || adminXml.contains("IDU-100")) {
+                                    } else {
                                         setModel = "ODU-IDU 100";
                                         iduModel = "IDU-100";
                                         oduModel = "ODU-100";
                                         catSpec = "LTE Cat. 3 • 30 Mb/s";
                                         bandsSpec = "FDD B3 (1800 MHz)";
                                         coaxSpec = "PoCoax • Zasilanie ODU";
-                                    } else {
-                                        // Default to ODU-IDU 200 for Cyfrowy Polsat/Plus lighttpd setups
-                                        setModel = "ODU-IDU 200";
-                                        iduModel = "IDU-200";
-                                        oduModel = "ODU-200";
-                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
-                                        bandsSpec = "FDD B3 / B7 / B20";
-                                        coaxSpec = "PoCoax • Unicable LNB";
                                     }
                                     break;
                                 }
@@ -297,7 +307,7 @@ public class MainActivity extends Activity {
 
                     final boolean finalOdu = oduDetected;
                     final String finalGw = gwCandidate;
-                    final long finalPing = pingMs;
+                    final long finalPing = realMeasuredPing;
                     final String fSetModel = setModel;
                     final String fIduModel = iduModel;
                     final String fOduModel = oduModel;
@@ -334,14 +344,18 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     boolean success = false;
-                    String message;
+                    String message = "";
+                    long realPing = -1;
+                    String jsonTelemetry = "{}";
+
                     HttpURLConnection conn = null;
                     try {
                         String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
+                        long t0 = System.currentTimeMillis();
                         URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
                         conn = (HttpURLConnection) url.openConnection();
-                        conn.setConnectTimeout(3000);
-                        conn.setReadTimeout(3000);
+                        conn.setConnectTimeout(3500);
+                        conn.setReadTimeout(3500);
                         conn.setRequestMethod("POST");
                         conn.setInstanceFollowRedirects(false);
                         conn.setDoOutput(true);
@@ -363,37 +377,34 @@ public class MainActivity extends Activity {
                         os.close();
 
                         int responseCode = conn.getResponseCode();
+                        realPing = System.currentTimeMillis() - t0;
                         String location = conn.getHeaderField("Location");
                         if (location == null) location = "";
 
-                        if (location.contains("/idu/home") || responseCode == 200) {
-                            success = true;
-                            message = "Zalogowano do routera " + targetIp;
-                        } else if (location.contains("id=401.2")) {
+                        if (location.contains("id=401.2")) {
                             success = false;
-                            message = "Zbyt wiele nieudanych prób logowania. Odczekaj chwilę.";
+                            message = "Zbyt wiele nieudanych prób logowania (401.2). Odczekaj chwilę.";
                         } else if (location.contains("id=401")) {
-                            // If credentials are admin/admin or provided by user, authenticate into the panel
-                            if ("admin".equalsIgnoreCase(username)) {
-                                success = true;
-                                message = "Zalogowano jako " + username;
-                            } else {
-                                success = false;
-                                message = "Nieprawidłowe hasło lub login routera.";
-                            }
-                        } else {
+                            success = false;
+                            message = "Nieprawidłowe hasło lub login routera (kod 401). Wpisz poprawne hasło.";
+                        } else if (location.contains("/idu/home") || responseCode == 200 || (responseCode == 302 && !location.contains("401"))) {
                             success = true;
-                            message = "Połączono z routerem " + targetIp;
+                            message = "Zalogowano pomyślnie do " + targetIp;
+
+                            // Fetch real pages and parse genuine telemetry
+                            String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                            String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
+                            String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
+                            String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
+
+                            jsonTelemetry = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml, realPing);
+                        } else {
+                            success = false;
+                            message = "Odpowiedź routera HTTP " + responseCode;
                         }
                     } catch (Exception e) {
-                        // In case of local network read timeout or network glitch, allow verified admin login
-                        if ("admin".equalsIgnoreCase(username)) {
-                            success = true;
-                            message = "Zalogowano do panelu routera";
-                        } else {
-                            success = false;
-                            message = "Błąd połączenia: " + e.getMessage();
-                        }
+                        success = false;
+                        message = "Błąd połączenia: " + e.getMessage();
                     } finally {
                         if (conn != null) {
                             conn.disconnect();
@@ -402,13 +413,16 @@ public class MainActivity extends Activity {
 
                     final boolean finalSuccess = success;
                     final String finalMsg = message;
+                    final String finalJson = jsonTelemetry;
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             String js = String.format(
-                                "window.onLoginResult && window.onLoginResult(%b, '%s');",
+                                "window.onLoginResult && window.onLoginResult(%b, '%s', %s);",
                                 finalSuccess,
-                                jsEscape(finalMsg)
+                                jsEscape(finalMsg),
+                                finalJson
                             );
                             webView.evaluateJavascript(js, null);
                         }
@@ -418,11 +432,104 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public void refreshRealTelemetry(final String gatewayIp) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
+                    long t0 = System.currentTimeMillis();
+                    String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                    long realPing = Math.max(1, System.currentTimeMillis() - t0);
+
+                    String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
+                    String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
+
+                    final String json = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + statHtml, realPing);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            webView.evaluateJavascript("window.onTelemetryUpdate && window.onTelemetryUpdate(" + json + ");", null);
+                        }
+                    });
+                }
+            }).start();
+        }
+
+        private String parseRouterTelemetry(String html, long realPing) {
+            String rsrp = extractParam(html, "rsrp", "RSRP");
+            String rsrq = extractParam(html, "rsrq", "RSRQ");
+            String sinr = extractParam(html, "sinr", "SINR");
+            String rssi = extractParam(html, "rssi", "RSSI");
+            String band = extractParam(html, "band", "BAND");
+            String cellId = extractParam(html, "cellid", "Cell ID");
+            int signalLevel = extractSignalLevel(html, rsrp);
+            boolean isLtePlus = html.contains("2CA") || html.contains("LTE+") || html.contains("LTE-A") || html.contains("CA");
+
+            return "{"
+                    + "\"realPingMs\":" + realPing + ","
+                    + "\"signalLevel\":" + signalLevel + ","
+                    + "\"isLtePlus\":" + isLtePlus + ","
+                    + "\"rsrp\":\"" + jsEscape(rsrp) + "\","
+                    + "\"rsrq\":\"" + jsEscape(rsrq) + "\","
+                    + "\"sinr\":\"" + jsEscape(sinr) + "\","
+                    + "\"rssi\":\"" + jsEscape(rssi) + "\","
+                    + "\"band\":\"" + jsEscape(band) + "\","
+                    + "\"cellId\":\"" + jsEscape(cellId) + "\""
+                    + "}";
+        }
+
+        private String extractParam(String text, String key, String label) {
+            if (text == null || text.isEmpty()) return "Brak odczytu";
+            // Check JS variable or table cell: var rsrp = '...'; or <td>RSRP</td><td>...</td>
+            Pattern p1 = Pattern.compile("(?i)(?:var\\s+)?" + key + "\\s*=\\s*['\"]([^'\"]+)['\"]");
+            Matcher m1 = p1.matcher(text);
+            if (m1.find()) {
+                String val = m1.group(1).trim();
+                if (!val.isEmpty()) return val;
+            }
+
+            Pattern p2 = Pattern.compile("(?i)" + label + "\\s*[:=]?\\s*</td>?\\s*<td[^>]*>([^<]+)<");
+            Matcher m2 = p2.matcher(text);
+            if (m2.find()) {
+                String val = m2.group(1).trim();
+                if (!val.isEmpty()) return val;
+            }
+
+            return "Brak odczytu";
+        }
+
+        private int extractSignalLevel(String text, String rsrpStr) {
+            // Check if signal level is explicitly reported (1..5)
+            Pattern p = Pattern.compile("(?i)(?:sigLevel|signal_level|signal|lteSigLevel)\\s*=\\s*['\"]?([1-5])['\"]?");
+            Matcher m = p.matcher(text);
+            if (m.find()) {
+                try {
+                    return Integer.parseInt(m.group(1));
+                } catch (Exception ignored) {
+                }
+            }
+
+            // Fallback calculation based on genuine RSRP
+            if (rsrpStr != null && !rsrpStr.equals("Brak odczytu")) {
+                try {
+                    String num = rsrpStr.replaceAll("[^-\\d]", "");
+                    int r = Integer.parseInt(num);
+                    if (r >= -80) return 5;
+                    if (r >= -90) return 4;
+                    if (r >= -100) return 3;
+                    if (r >= -110) return 2;
+                    return 1;
+                } catch (Exception ignored) {
+                }
+            }
+            return 4;
+        }
+
+        @JavascriptInterface
         public void applyBandLock(final String gatewayIp, final String bandSelection) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    // Send band change request to router
                     try {
                         String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
                         URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
