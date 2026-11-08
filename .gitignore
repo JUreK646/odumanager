@@ -1,0 +1,5 @@
+build/
+*.keystore
+*.idsig
+node_modules/
+dist/

@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ODU Manager</title>
+  <link rel="icon" type="image/png" href="odu200.png" />
+  <style>
+    :root {
+      --bg-app: #f4f6fa;
+      --bg-surface: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --accent-blue: #2563eb;
+      --accent-green: #16a34a;
+      --accent-violet: #7c3aed;
+      --accent-orange: #ea580c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-app);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* TOP APP BAR */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 58px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      overflow: hidden;
+    }
+    .topbar-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .topbar-ver {
+      font-size: 11px;
+      font-weight: 700;
+      color: #2563eb;
+      background: #eff6ff;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+    }
+    .replay-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+    .replay-btn:active {
+      background: #f1f5f9;
+      transform: scale(0.97);
+    }
+
+    /* FULLSCREEN SPLASH SCREEN */
+    .splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: radial-gradient(circle at 50% 28%, #ffffff 0%, #f1f5f9 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .splash-screen.hidden {
+      opacity: 0;
+      transform: scale(1.03);
+      pointer-events: none;
+    }
+
+    .splash-icon-wrap {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      border-radius: 30px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      box-shadow:
+        0 20px 42px -10px rgba(15, 23, 42, 0.14),
+        0 4px 12px -2px rgba(15, 23, 42, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      margin-bottom: 22px;
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .splash-icon-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .splash-led-dot {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #16a34a;
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
+      animation: pulseLed 1.6s infinite;
+    }
+    @keyframes pulseLed {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.75; }
+    }
+
+    .splash-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0f172a;
+      margin-bottom: 5px;
+    }
+    .splash-sub {
+      font-size: 13.5px;
+      color: #64748b;
+      margin-bottom: 26px;
+      text-align: center;
+    }
+
+    .splash-loader-box {
+      width: 100%;
+      max-width: 340px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 15px 16px;
+      box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.06);
+    }
+    .splash-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 9px;
+    }
+    .splash-pct {
+      font-family: monospace;
+      color: #2563eb;
+      font-weight: 700;
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb 0%, #16a34a 100%);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    .splash-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .splash-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: #94a3b8;
+      transition: color 0.2s;
+    }
+    .splash-step.done {
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .step-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      flex-shrink: 0;
+    }
+    .splash-step.done .step-dot {
+      background: #16a34a;
+    }
+
+    /* MAIN CONTENT (START MENU) */
+    .main-wrap {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 16px 16px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* HERO MODEM CARD */
+    .hero-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .hero-icon-tile {
+      width: 82px;
+      height: 82px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 18px -6px rgba(15, 23, 42, 0.1);
+      padding: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-icon-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .hero-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+    }
+    .status-pill.warn {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      color: #c2410c;
+    }
+    .status-pill .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .hero-info h2 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin-bottom: 3px;
+    }
+    .hero-info p {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    /* SECTION CARD */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* MODEL SELECTOR */
+    .model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .model-item {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 11px 13px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .model-item.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 3px 10px -2px rgba(37, 99, 235, 0.14);
+    }
+    .model-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .model-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .model-cat {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    .model-item.active .model-cat {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .model-bands {
+      font-size: 11.5px;
+      color: #475569;
+    }
+
+    /* LED BAR */
+    .led-strip {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .led-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .led-circle {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* FORM */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+    .form-field label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #334155;
+    }
+    .input-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-box input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 11px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+    }
+    .input-box input:focus {
+      background: #ffffff;
+      border-color: #2563eb;
+    }
+    .input-tag {
+      position: absolute;
+      right: 10px;
+      font-size: 10.5px;
+      font-family: monospace;
+      color: #64748b;
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+
+    .btn-col {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px -4px rgba(37, 99, 235, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+    .btn-secondary {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-secondary:active {
+      background: #f1f5f9;
+    }
+
+    /* QUICK TELEMETRY FOOTER */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .quick-tile {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 11px;
+      text-align: center;
+    }
+    .quick-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 3px;
+    }
+    .quick-val {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: monospace;
+    }
+
+    /* TOAST */
+    .toast-banner {
+      display: none;
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .toast-banner.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">
+        <img src="odu200.png" alt="ODU-200" />
+      </div>
+      <span class="topbar-title">ODU Manager</span>
+      <span class="topbar-ver">v0.1.0</span>
+    </div>
+    <button class="replay-btn" onclick="replaySplash()">
+      ↻ Ekran startowy
+    </button>
+  </header>
+
+  <!-- SPLASH SCREEN -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-icon-wrap">
+      <div class="splash-led-dot"></div>
+      <img src="odu200.png" alt="ODU-200 Icon" />
+    </div>
+    <div class="splash-title">ODU Manager</div>
+    <div class="splash-sub">Diagnostyka i zarządzanie pasmami Cyfrowy Polsat / Plus</div>
+
+    <div class="splash-loader-box">
+      <div class="splash-status-row">
+        <span id="splashStepLabel">Inicjalizacja interfejsu...</span>
+        <span class="splash-pct" id="splashPct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="splashBar"></div>
+      </div>
+      <div class="splash-steps">
+        <div class="splash-step" id="st1">
+          <span class="step-dot"></span>
+          <span>Sprawdzanie bramy IDU (http://192.168.0.1)</span>
+        </div>
+        <div class="splash-step" id="st2">
+          <span class="step-dot"></span>
+          <span>Weryfikacja zasilania koncentrycznego ODU (PoCoax)</span>
+        </div>
+        <div class="splash-step" id="st3">
+          <span class="step-dot"></span>
+          <span>Wczytywanie profili pasm LTE (B3 / B7 / B20)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- START MENU -->
+  <main class="main-wrap">
+
+    <!-- HERO MODEM HEADER -->
+    <section class="hero-card">
+      <div class="hero-icon-tile">
+        <img src="odu200.png" alt="ODU-200" />
+      </div>
+      <div class="hero-info">
+        <div class="status-pill" id="gwStatusPill">
+          <span class="dot"></span>
+          <span id="gwStatusText">Gotowy • 192.168.0.1</span>
+        </div>
+        <h2 id="selectedModelHeader">Zestaw ODU-IDU 200</h2>
+        <p id="selectedModelDesc">Modem zewnętrzny LTE Cat. 4 (do 150 Mb/s) • Pasma FDD: B3, B7, B20</p>
+      </div>
+    </section>
+
+    <!-- WYBÓR ZESTAWU -->
+    <section class="card">
+      <div class="section-label">
+        <span>1. Wybierz model zestawu</span>
+        <span style="color:#2563eb;">Cyfrowy Polsat / Plus</span>
+      </div>
+
+      <div class="model-list">
+        <div class="model-item active" onclick="selectModel(this, 'ODU-IDU 200', 'B3 (1800) • B7 (2600) • B20 (800)', 'Brak (1CC)', 'Modem zewnętrzny LTE Cat. 4 (do 150 Mb/s) • Pasma FDD: B3, B7, B20')">
+          <div class="model-top">
+            <span class="model-name">ODU-IDU 200</span>
+            <span class="model-cat">LTE Cat. 4 • 150 Mb/s</span>
+          </div>
+          <div class="model-bands">FDD: B3 (1800), B7 (2600), B20 (800 MHz)</div>
+        </div>
+
+        <div class="model-item" onclick="selectModel(this, 'ODU-IDU 300', 'B3 • B7 • B8 (900) • B20 + TDD B38', '2CA (Cat. 6)', 'Modem zewnętrzny LTE-A Cat. 6 (do 300 Mb/s) • Agregacja 2CA')">
+          <div class="model-top">
+            <span class="model-name">ODU-IDU 300</span>
+            <span class="model-cat">LTE Cat. 6 • 2CA</span>
+          </div>
+          <div class="model-bands">FDD: B3, B7, B8, B20 + TDD: B38 (2600 MHz)</div>
+        </div>
+
+        <div class="model-item" onclick="selectModel(this, 'ODU-IDU 100', 'Tylko FDD B3 (1800 MHz)', 'Brak (1CC)', 'Modem zewnętrzny LTE Cat. 3 (do 30 Mb/s) • Pasmo B3 (1800 MHz)')">
+          <div class="model-top">
+            <span class="model-name">ODU-IDU 100</span>
+            <span class="model-cat">LTE Cat. 3 • 30 Mb/s</span>
+          </div>
+          <div class="model-bands">FDD: tylko B3 (1800 MHz)</div>
+        </div>
+      </div>
+
+      <div class="led-strip">
+        <div class="led-badge"><span class="led-circle" style="background:#7c3aed;"></span>Fiolet (BDB)</div>
+        <div class="led-badge"><span class="led-circle" style="background:#2563eb;"></span>Nieb. (DB)</div>
+        <div class="led-badge"><span class="led-circle" style="background:#16a34a;"></span>Ziel. (Śr.)</div>
+        <div class="led-badge"><span class="led-circle" style="background:#ea580c;"></span>Pom. (Słaby)</div>
+      </div>
+    </section>
+
+    <!-- LOGOWANIE DO BRAMY IDU -->
+    <section class="card">
+      <div class="section-label">
+        <span>2. Połączenie z routerem IDU</span>
+        <span style="font-family:monospace;">/idu/home.asp</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>Adres IP bramy IDU</label>
+          <div class="input-box">
+            <input type="text" id="gwInput" value="http://192.168.0.1" />
+            <span class="input-tag">LAN / Wi-Fi</span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Użytkownik</label>
+          <div class="input-box">
+            <input type="text" id="userInput" value="admin" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Hasło WebUI</label>
+          <div class="input-box">
+            <input type="password" id="passInput" value="admin" />
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-col">
+        <button class="btn-primary" onclick="connectModem()">
+          Połącz z modemem ODU-IDU →
+        </button>
+        <button class="btn-secondary" onclick="startDemo()">
+          Uruchom Tryb Demo (Podgląd UI bez routera)
+        </button>
+      </div>
+
+      <div class="toast-banner" id="toastBanner"></div>
+    </section>
+
+    <!-- PODSUMOWANIE PROFILU -->
+    <section class="quick-grid">
+      <div class="quick-tile">
+        <div class="quick-lbl">Pasma LTE</div>
+        <div class="quick-val" id="qBands">B3/B7/B20</div>
+      </div>
+      <div class="quick-tile">
+        <div class="quick-lbl">Agregacja</div>
+        <div class="quick-val" id="qCa">Brak (1CC)</div>
+      </div>
+      <div class="quick-tile">
+        <div class="quick-lbl">Pomiary RF</div>
+        <div class="quick-val">RSRP/SINR</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let currentModel = 'ODU-IDU 200';
+    let splashTimers = [];
+
+    function runSplashSequence() {
+      splashTimers.forEach(t => clearTimeout(t));
+      splashTimers = [];
+
+      const splash = document.getElementById('splashScreen');
+      const bar = document.getElementById('splashBar');
+      const pct = document.getElementById('splashPct');
+      const lbl = document.getElementById('splashStepLabel');
+      const s1 = document.getElementById('st1');
+      const s2 = document.getElementById('st2');
+      const s3 = document.getElementById('st3');
+
+      splash.classList.remove('hidden');
+      bar.style.width = '0%';
+      pct.textContent = '0%';
+      lbl.textContent = 'Inicjalizacja interfejsu...';
+      s1.classList.remove('done');
+      s2.classList.remove('done');
+      s3.classList.remove('done');
+
+      splashTimers.push(setTimeout(() => {
+        bar.style.width = '36%';
+        pct.textContent = '36%';
+        lbl.textContent = 'Wykrywanie bramy IDU (192.168.0.1)...';
+        s1.classList.add('done');
+      }, 300));
+
+      splashTimers.push(setTimeout(() => {
+        bar.style.width = '74%';
+        pct.textContent = '74%';
+        lbl.textContent = 'Sprawdzanie linii PoCoax ODU...';
+        s2.classList.add('done');
+      }, 850));
+
+      splashTimers.push(setTimeout(() => {
+        bar.style.width = '100%';
+        pct.textContent = '100%';
+        lbl.textContent = 'Gotowe — uruchamianie Start Menu';
+        s3.classList.add('done');
+      }, 1350));
+
+      splashTimers.push(setTimeout(() => {
+        splash.classList.add('hidden');
+      }, 1750));
+    }
+
+    function replaySplash() {
+      runSplashSequence();
+    }
+
+    function selectModel(el, name, bands, ca, desc) {
+      currentModel = name;
+      document.querySelectorAll('.model-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('selectedModelHeader').textContent = 'Zestaw ' + name;
+      document.getElementById('selectedModelDesc').textContent = desc;
+      document.getElementById('qBands').textContent = name === 'ODU-IDU 300' ? 'B3/7/8/20/38' : (name === 'ODU-IDU 100' ? 'B3 (1800)' : 'B3/B7/B20');
+      document.getElementById('qCa').textContent = ca;
+      document.getElementById('toastBanner').classList.remove('show');
+    }
+
+    window.onGatewayCheckResult = function(reachable, httpCode) {
+      const pill = document.getElementById('gwStatusPill');
+      const txt = document.getElementById('gwStatusText');
+      const banner = document.getElementById('toastBanner');
+      const gw = document.getElementById('gwInput').value;
+
+      if (reachable) {
+        pill.className = 'status-pill';
+        txt.textContent = 'Wykryto IDU • HTTP ' + httpCode;
+        banner.textContent = '✓ Połączono z bramą ' + gw + ' (' + currentModel + '). Gotowy do przejścia do Kroku 2 (Dashboard RSRP / RSRQ / SINR).';
+      } else {
+        pill.className = 'status-pill warn';
+        txt.textContent = 'Brak odpowiedzi 192.168.0.1';
+        banner.textContent = 'ℹ Brama ' + gw + ' nie odpowiada w aktualnej sieci Wi-Fi. Możesz uruchomić Tryb Demo dla zestawu ' + currentModel + '.';
+      }
+      banner.classList.add('show');
+    };
+
+    function connectModem() {
+      const gw = document.getElementById('gwInput').value.trim();
+      const banner = document.getElementById('toastBanner');
+      banner.textContent = 'Łączenie z bramą ' + gw + ' (' + currentModel + ')...';
+      banner.classList.add('show');
+
+      if (window.OduBridge && window.OduBridge.checkGateway) {
+        window.OduBridge.showToast('Sprawdzanie bramy ' + gw + '...');
+        window.OduBridge.checkGateway(gw);
+      } else {
+        setTimeout(() => {
+          window.onGatewayCheckResult(false, -1);
+        }, 500);
+      }
+    }
+
+    function startDemo() {
+      const banner = document.getElementById('toastBanner');
+      banner.textContent = '✓ Uruchomiono Tryb Demo dla modelu ' + currentModel + ' (RSRP: -81 dBm, SINR: +17 dB, Dioda ODU: Niebieska).';
+      banner.classList.add('show');
+      if (window.OduBridge && window.OduBridge.showToast) {
+        window.OduBridge.showToast('Tryb Demo: ' + currentModel);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', runSplashSequence);
+  </script>
+</body>
+</html>
