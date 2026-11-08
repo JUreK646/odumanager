@@ -336,52 +336,61 @@ public class MainActivity extends Activity {
                                     gwCandidate = ip;
                                     realMeasuredPing = Math.max(1, elapsed);
 
-                                    // Hardware model fingerprinting:
-                                    // ODU-IDU 100: ALR-U100 (U100)
-                                    // ODU-IDU 200: ALR-U270 (U270, CPE2, PT12)
-                                    // ODU-IDU 300: ALR-PT30 / AOL-PT40 (PT30, PT40, CPE3, IDU-300, or any ODU without U270/U100)
-                                    boolean hasU100 = adminXml.contains("U100")
-                                            || adminXml.contains("IDU-100")
-                                            || adminXml.contains("ODU-100");
-
-                                    boolean hasU270 = adminXml.contains("U270")
-                                            || adminXml.contains("IDU-200")
-                                            || adminXml.contains("ODU-200")
-                                            || adminXml.contains("PT12")
-                                            || adminXml.contains("CPE2");
-
-                                    boolean has300 = adminXml.contains("PT30")
+                                    // Genuine hardware model fingerprinting:
+                                    // ODU-IDU 300 features LTE-Advanced (lteA), Mesh Wi-Fi (mesh / 5G mesh), Guest Wi-Fi (guestwifi), and Cat. 6 2CA
+                                    // ODU-IDU 200 is LTE Cat. 4 (U270) without mesh or lteA
+                                    // ODU-IDU 100 is legacy LTE Cat. 3 (U100)
+                                    boolean is300 = adminXml.contains("mesh")
+                                            || adminXml.contains("Mesh")
+                                            || adminXml.contains("lteA")
+                                            || adminXml.contains("guestwifi")
+                                            || adminXml.contains("PT30")
                                             || adminXml.contains("PT40")
                                             || adminXml.contains("CPE3")
                                             || adminXml.contains("IDU-300")
                                             || adminXml.contains("ODU-300")
-                                            || rootHtml.contains("IDU-300")
-                                            || rootHtml.contains("ODU-300");
+                                            || rootHtml.contains("IDU-300");
+
+                                    boolean is200 = !is300 && (adminXml.contains("U270")
+                                            || adminXml.contains("IDU-200")
+                                            || adminXml.contains("ODU-200")
+                                            || adminXml.contains("PT12")
+                                            || adminXml.contains("CPE2"));
+
+                                    boolean is100 = !is300 && (adminXml.contains("U100")
+                                            || adminXml.contains("IDU-100")
+                                            || adminXml.contains("ODU-100"));
 
                                     Log.d("OduManager", "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
-                                    Log.d("OduManager", "Fingerprint check: hasU100=" + hasU100 + ", hasU270=" + hasU270 + ", has300=" + has300);
+                                    Log.d("OduManager", "Fingerprint check: is300=" + is300 + ", is200=" + is200 + ", is100=" + is100);
 
-                                    if (hasU100) {
-                                        setModel = "ODU-IDU 100";
-                                        iduModel = "IDU-100";
-                                        oduModel = "ODU-100";
-                                        catSpec = "LTE Cat. 3 • 30 Mb/s";
-                                        bandsSpec = "FDD B3 (1800 MHz)";
-                                        coaxSpec = "PoCoax • Zasilanie ODU";
-                                    } else if (hasU270) {
+                                    if (is300) {
+                                        setModel = "ODU-IDU 300";
+                                        iduModel = "IDU-300";
+                                        oduModel = "ODU-300";
+                                        catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
+                                        bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
+                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    } else if (is200) {
                                         setModel = "ODU-IDU 200";
                                         iduModel = "IDU-200";
                                         oduModel = "ODU-200";
                                         catSpec = "LTE Cat. 4 • 150 Mb/s";
                                         bandsSpec = "FDD B3 / B7 / B20";
                                         coaxSpec = "PoCoax • Unicable LNB";
+                                    } else if (is100) {
+                                        setModel = "ODU-IDU 100";
+                                        iduModel = "IDU-100";
+                                        oduModel = "ODU-100";
+                                        catSpec = "LTE Cat. 3 • 30 Mb/s";
+                                        bandsSpec = "FDD B3 (1800 MHz)";
+                                        coaxSpec = "PoCoax • Zasilanie ODU";
                                     } else {
-                                        // On ODU-IDU 300, U270 does NOT exist; it is an ODU-IDU 300
-                                        setModel = "ODU-IDU 300";
-                                        iduModel = "IDU-300";
-                                        oduModel = "ODU-300";
-                                        catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
-                                        bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
+                                        setModel = "ODU-IDU 200";
+                                        iduModel = "IDU-200";
+                                        oduModel = "ODU-200";
+                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
+                                        bandsSpec = "FDD B3 / B7 / B20";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     }
                                     Log.d("OduManager", "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
