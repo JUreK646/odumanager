@@ -6,15 +6,12 @@
   <title>ODU Manager</title>
   <style>
     :root {
-      --surface: #FFFFFF;
-      --surface-subtle: #F8FAFC;
-      --text-primary: #141414;
-      --text-secondary: #64748B;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
       --primary: #1856FF;
-      --primary-pressed: #1040CC;
       --danger: #EA2143;
-      --border: #E2E8F0;
-      --radius-md: 14px;
+      --success: #059669;
     }
 
     * {
@@ -27,7 +24,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: var(--surface);
+      background: linear-gradient(155deg, #E8F1FF 0%, #F4F8FF 48%, #ECF3FF 100%);
       color: var(--text-primary);
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', 'Inter', sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -35,15 +32,78 @@
       overflow-x: hidden;
     }
 
+    /* Ambient light orbs behind Liquid Glass UI */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(55px);
+      opacity: 0.68;
+      animation: orbDrift 8s ease-in-out infinite alternate;
+    }
+    .ambient-orb.o1 {
+      width: 270px;
+      height: 270px;
+      background: radial-gradient(circle, #93C5FD 0%, rgba(147, 197, 253, 0) 72%);
+      top: -40px;
+      left: -50px;
+    }
+    .ambient-orb.o2 {
+      width: 290px;
+      height: 290px;
+      background: radial-gradient(circle, #C4B5FD 0%, rgba(196, 181, 253, 0) 72%);
+      bottom: -60px;
+      right: -50px;
+      animation-delay: -4s;
+    }
+    .ambient-orb.o3 {
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, #6EE7B7 0%, rgba(110, 231, 183, 0) 72%);
+      top: 36%;
+      right: 8%;
+      opacity: 0.42;
+      animation-delay: -2s;
+    }
+
+    @keyframes orbDrift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(16px, -18px) scale(1.08); }
+    }
+
+    /* Reusable Liquid Glass Surface */
+    .liquid-glass {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.80) 0%,
+        rgba(255, 255, 255, 0.50) 52%,
+        rgba(255, 255, 255, 0.72) 100%
+      );
+      backdrop-filter: blur(28px) saturate(195%);
+      -webkit-backdrop-filter: blur(28px) saturate(195%);
+      border: 1.5px solid rgba(255, 255, 255, 0.90);
+      box-shadow:
+        0 18px 40px -14px rgba(15, 23, 42, 0.10),
+        0 4px 14px -2px rgba(24, 86, 255, 0.06),
+        inset 0 2px 3px rgba(255, 255, 255, 0.96),
+        inset 0 -2px 6px rgba(148, 163, 184, 0.14);
+    }
+
     .screen {
       position: fixed;
       inset: 0;
+      z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-      background: var(--surface);
+      padding: 18px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.28s ease;
@@ -59,13 +119,12 @@
        ========================================== */
     #splashScreen {
       z-index: 30;
+      background: #FFFFFF;
       justify-content: space-between;
       padding: 64px 24px 48px;
     }
 
-    .splash-spacer {
-      height: 24px;
-    }
+    .splash-spacer { height: 24px; }
 
     .splash-center {
       display: flex;
@@ -81,7 +140,6 @@
       align-items: center;
       justify-content: center;
     }
-
     .app-logo-clean img {
       width: 100%;
       height: 100%;
@@ -95,12 +153,6 @@
       color: var(--text-primary);
     }
 
-    .splash-footer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
     .spinner {
       width: 24px;
       height: 24px;
@@ -109,18 +161,14 @@
       border-radius: 50%;
       animation: spin 0.75s linear infinite;
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ==========================================
-       2. NO WI-FI SCREEN (PURE iOS LIQUID GLASS WIFI + X)
+       2. NO WI-FI / NO ODU DETECTED SCREEN
        ========================================== */
     #noWifiScreen {
-      z-index: 20;
+      z-index: 25;
       text-align: center;
-      background: radial-gradient(circle at 50% 34%, #F4F8FF 0%, #FFFFFF 68%);
     }
 
     .wifi-card-wrap {
@@ -131,7 +179,6 @@
       align-items: center;
     }
 
-    /* Standalone iOS SF Symbol Wi-Fi + X in Liquid Glass (no circle/box container) */
     .ios-wifi-glass-wrap {
       position: relative;
       width: 156px;
@@ -142,7 +189,6 @@
       margin-bottom: 24px;
       animation: floatSymbol 3.2s ease-in-out infinite;
     }
-
     @keyframes floatSymbol {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-5px); }
@@ -154,34 +200,19 @@
       overflow: visible;
     }
 
-    /* Subtle sequential liquid refraction pulse on the 3 iOS Wi-Fi bars */
-    .glass-bar-1 {
-      animation: barGlassPulse 2.4s ease-in-out infinite;
-      animation-delay: 0s;
-      transform-origin: 108px 104px;
-    }
-    .glass-bar-2 {
-      animation: barGlassPulse 2.4s ease-in-out infinite;
-      animation-delay: 0.25s;
-      transform-origin: 108px 104px;
-    }
-    .glass-bar-3 {
-      animation: barGlassPulse 2.4s ease-in-out infinite;
-      animation-delay: 0.5s;
-      transform-origin: 108px 104px;
-    }
+    .glass-bar-1 { animation: barGlassPulse 2.4s ease-in-out infinite 0s; transform-origin: 108px 104px; }
+    .glass-bar-2 { animation: barGlassPulse 2.4s ease-in-out infinite 0.25s; transform-origin: 108px 104px; }
+    .glass-bar-3 { animation: barGlassPulse 2.4s ease-in-out infinite 0.5s; transform-origin: 108px 104px; }
 
     @keyframes barGlassPulse {
       0%, 100% { opacity: 0.72; }
       50% { opacity: 1; }
     }
 
-    /* Standalone Liquid Glass X animation */
     .glass-x-group {
-      transform-origin: 154px 92px;
+      transform-origin: 154px 96px;
       animation: xGlassBreath 2.2s ease-in-out infinite;
     }
-
     @keyframes xGlassBreath {
       0%, 100% { transform: scale(1) rotate(0deg); }
       50% { transform: scale(1.08) rotate(2deg); }
@@ -207,226 +238,544 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .btn {
+    /* Liquid Glass Buttons */
+    .btn-glass-primary {
       width: 100%;
-      min-height: 50px;
-      border-radius: var(--radius-md);
+      min-height: 54px;
+      border-radius: 22px;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, rgba(43, 108, 255, 0.94) 0%, rgba(24, 86, 255, 0.84) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255, 255, 255, 0.58);
+      box-shadow:
+        0 14px 28px -8px rgba(24, 86, 255, 0.45),
+        inset 0 2px 2px rgba(255, 255, 255, 0.55);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: transform 0.12s ease, background 0.15s ease;
-      border: none;
+      transition: transform 0.14s ease, opacity 0.14s ease;
+    }
+    .btn-glass-primary:active {
+      transform: scale(0.97);
+    }
+    .btn-glass-primary:disabled {
+      opacity: 0.65;
     }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #FFFFFF;
-      box-shadow: 0 8px 20px -6px rgba(24, 86, 255, 0.42);
-    }
-
-    .btn-primary:active {
-      background: var(--primary-pressed);
-    }
-
-    .btn-secondary {
-      background: var(--surface-subtle);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-    }
-
-    .btn-text {
-      margin-top: 6px;
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 13px;
+    .btn-glass-secondary {
+      width: 100%;
+      min-height: 52px;
+      border-radius: 22px;
+      font-size: 15px;
       font-weight: 600;
-      padding: 10px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: transform 0.14s ease;
+    }
+    .btn-glass-secondary:active {
+      transform: scale(0.97);
     }
 
     /* ==========================================
-       3. SIMPLE MINIMAL START / LOGIN SCREEN
+       3. DEVICE MANAGER (HORIZONTAL LIQUID GLASS TILES)
        ========================================== */
-    #startScreen {
-      z-index: 10;
+    #deviceManagerScreen {
       justify-content: flex-start;
-      padding: 32px 24px 24px;
+      padding: 16px 16px 28px;
       overflow-y: auto;
     }
 
-    .start-container {
+    .dm-container {
       width: 100%;
-      max-width: 380px;
-      margin: auto;
+      max-width: 420px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 14px;
     }
 
-    .modem-preview {
-      width: 96px;
-      height: 96px;
-      margin-bottom: 12px;
+    /* Top Liquid Glass Header Pill */
+    .dm-topbar {
+      width: 100%;
+      height: 60px;
+      border-radius: 999px;
+      padding: 0 10px 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dm-topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .dm-topbar-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .dm-topbar-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
+      animation: dotPulse 2s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .dm-refresh-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 700;
+      transition: transform 0.2s ease;
+    }
+    .dm-refresh-btn:active {
+      transform: scale(0.9) rotate(90deg);
+    }
+
+    .section-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 8px 0;
+    }
+
+    .section-caption {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: -0.01em;
+    }
+
+    .auto-detect-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(24, 86, 255, 0.10);
+      border: 1px solid rgba(24, 86, 255, 0.20);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    /* HORIZONTAL ROUNDED LIQUID GLASS DEVICE TILES */
+    .horizontal-tiles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .device-tile-horizontal {
+      position: relative;
+      width: 100%;
+      border-radius: 30px;
+      padding: 14px 16px 14px 14px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+      overflow: hidden;
+    }
+
+    .device-tile-horizontal::before {
+      content: "";
+      position: absolute;
+      inset: 1.5px;
+      border-radius: 28px;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0) 46%);
+      pointer-events: none;
+    }
+
+    .device-tile-horizontal:active {
+      transform: scale(0.975);
+    }
+
+    /* Left Real Hardware Photo Well inside Horizontal Tile */
+    .tile-photo-well {
+      position: relative;
+      z-index: 2;
+      width: 92px;
+      height: 92px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(241, 245, 249, 0.75) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.98);
+      box-shadow:
+        0 8px 18px -6px rgba(15, 23, 42, 0.08),
+        inset 0 2px 4px rgba(255, 255, 255, 0.98);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
+    .tile-photo-well img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 8px rgba(15, 23, 42, 0.12));
+    }
+
+    /* Middle Details Column inside Horizontal Tile */
+    .tile-info-col {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .tile-top-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .tile-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.98);
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .tile-ip-badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(24, 86, 255, 0.10);
+      border: 1px solid rgba(24, 86, 255, 0.22);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .tile-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tile-subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tile-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 2px;
+    }
+
+    .tile-meta-chip {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    /* Right Chevron Action Button inside Horizontal Tile */
+    .tile-chevron-btn {
+      position: relative;
+      z-index: 2;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(43, 108, 255, 0.92) 0%, rgba(24, 86, 255, 0.85) 100%);
+      color: #FFFFFF;
+      border: 1.5px solid rgba(255, 255, 255, 0.80);
+      box-shadow: 0 6px 14px -3px rgba(24, 86, 255, 0.42);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Bottom Horizontal Summary Strip */
+    .network-summary-strip {
+      border-radius: 24px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .network-summary-strip strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    /* ==========================================
+       4. LIQUID GLASS LOGIN MODAL / SHEET
+       ========================================== */
+    .login-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.24);
+      backdrop-filter: blur(18px) saturate(165%);
+      -webkit-backdrop-filter: blur(18px) saturate(165%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.26s ease;
+    }
+
+    .login-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .login-glass-sheet {
+      width: 100%;
+      max-width: 375px;
+      border-radius: 34px;
+      padding: 22px 20px 20px;
+      background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(255, 255, 255, 0.64) 55%,
+        rgba(248, 250, 252, 0.85) 100%
+      );
+      backdrop-filter: blur(32px) saturate(200%);
+      -webkit-backdrop-filter: blur(32px) saturate(200%);
+      border: 1.5px solid rgba(255, 255, 255, 0.94);
+      box-shadow:
+        0 28px 60px -12px rgba(15, 23, 42, 0.22),
+        inset 0 2px 4px rgba(255, 255, 255, 0.98);
+      transform: translateY(24px) scale(0.95);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .login-backdrop.open .login-glass-sheet {
+      transform: translateY(0) scale(1);
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .sheet-device-mini {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mini-icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: #FFFFFF;
+      border: 1.5px solid rgba(255, 255, 255, 0.96);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+      padding: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
-    .modem-preview img {
+    .mini-icon-box img {
       width: 100%;
       height: 100%;
       object-fit: contain;
     }
 
-    .wifi-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #F0FDF4;
-      color: #15803D;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-
-    .wifi-badge.offline {
-      background: #FEF2F2;
-      color: var(--danger);
-    }
-
-    .wifi-badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-
-    .start-title {
-      font-size: 24px;
-      font-weight: 700;
+    .sheet-title {
+      font-size: 17.5px;
+      font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-primary);
-      margin-bottom: 4px;
     }
 
-    .start-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    .segmented-control {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      background: var(--surface-subtle);
-      padding: 4px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      margin-bottom: 8px;
-    }
-
-    .seg-btn {
-      padding: 10px 6px;
-      border: none;
-      background: transparent;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .seg-btn.active {
-      background: var(--surface);
-      color: var(--text-primary);
-      box-shadow: 0 2px 6px rgba(20, 20, 20, 0.06);
-    }
-
-    .model-spec-line {
+    .sheet-sub {
       font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-      text-align: center;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-top: 2px;
     }
 
-    .form-box {
-      width: 100%;
+    .sheet-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .glass-form {
       display: flex;
       flex-direction: column;
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
-    .field {
+    .glass-field {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .field label {
+    .glass-field label {
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-secondary);
+      padding-left: 6px;
     }
 
-    .field input {
+    .glass-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .glass-input {
       width: 100%;
-      height: 48px;
-      padding: 0 14px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      background: var(--surface-subtle);
+      height: 52px;
+      padding: 0 48px 0 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1.5px solid rgba(255, 255, 255, 0.94);
+      box-shadow:
+        inset 0 2px 5px rgba(15, 23, 42, 0.04),
+        0 2px 6px rgba(15, 23, 42, 0.03);
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text-primary);
       outline: none;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.16s, background 0.16s, box-shadow 0.16s;
     }
 
-    .field input:focus {
-      background: var(--surface);
-      border-color: var(--primary);
+    .glass-input:focus {
+      background: rgba(255, 255, 255, 0.96);
+      border-color: rgba(24, 86, 255, 0.55);
+      box-shadow: 0 0 0 4px rgba(24, 86, 255, 0.12);
     }
 
-    .status-msg {
+    .input-eye-btn {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .login-feedback {
       display: none;
-      width: 100%;
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      font-weight: 500;
-      line-height: 1.45;
-      background: var(--surface-subtle);
-      border: 1px solid var(--border);
+      margin-top: 12px;
+      padding: 11px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.96);
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--text-primary);
       text-align: center;
+      line-height: 1.4;
     }
-
-    .status-msg.show {
+    .login-feedback.show {
       display: block;
+    }
+    .login-feedback.ok {
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .login-feedback.err {
+      color: var(--danger);
+      border-color: rgba(234, 33, 67, 0.32);
     }
   </style>
 </head>
 <body>
+
+  <!-- Ambient Liquid Glass Lighting -->
+  <div class="ambient-bg">
+    <div class="ambient-orb o1"></div>
+    <div class="ambient-orb o2"></div>
+    <div class="ambient-orb o3"></div>
+  </div>
 
   <!-- 1. NORMAL STARTUP SCREEN -->
   <section class="screen active" id="splashScreen">
@@ -442,14 +791,13 @@
     </div>
   </section>
 
-  <!-- 2. NO WI-FI SCREEN (AUTHENTIC iOS SF SYMBOL WIFI + X IN LIQUID GLASS, NO CIRCLE/BOX) -->
+  <!-- 2. NO WI-FI / NO ODU DETECTED SCREEN (STANDALONE iOS LIQUID GLASS WIFI + X) -->
   <section class="screen" id="noWifiScreen">
     <div class="wifi-card-wrap">
 
       <div class="ios-wifi-glass-wrap">
         <svg class="ios-wifi-svg" viewBox="0 0 216 148" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <!-- Translucent iOS Liquid Glass Body for Wi-Fi Bars -->
             <linearGradient id="iosWifiGlassBody" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#DCEBFF" stop-opacity="0.88" />
               <stop offset="45%" stop-color="#93C5FD" stop-opacity="0.52" />
@@ -457,49 +805,41 @@
               <stop offset="100%" stop-color="#BFDBFE" stop-opacity="0.85" />
             </linearGradient>
 
-            <!-- Top-left Specular Highlight Gradient for Wi-Fi Bars -->
             <linearGradient id="iosWifiGlassRim" x1="0%" y1="0%" x2="80%" y2="100%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
               <stop offset="50%" stop-color="#E0F2FE" stop-opacity="0.65" />
               <stop offset="100%" stop-color="#60A5FA" stop-opacity="0.55" />
             </linearGradient>
 
-            <!-- Inner Glass Sheen Overlay -->
             <linearGradient id="iosWifiSheen" x1="50%" y1="0%" x2="50%" y2="100%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.72" />
               <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0.0" />
             </linearGradient>
 
-            <!-- Translucent iOS Liquid Glass Body for the Standalone X -->
             <linearGradient id="iosXGlassBody" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FF8FA3" stop-opacity="0.92" />
               <stop offset="50%" stop-color="#EA2143" stop-opacity="0.72" />
               <stop offset="100%" stop-color="#FF4D6D" stop-opacity="0.90" />
             </linearGradient>
 
-            <!-- Specular Glass Rim for the Standalone X -->
             <linearGradient id="iosXGlassRim" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
               <stop offset="55%" stop-color="#FFE4E8" stop-opacity="0.75" />
               <stop offset="100%" stop-color="#FB7185" stop-opacity="0.65" />
             </linearGradient>
 
-            <!-- Soft Refractive Drop Shadow for Wi-Fi Glass Bars -->
             <filter id="wifiLiquidShadow" x="-25%" y="-25%" width="150%" height="160%">
               <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#1E40AF" flood-opacity="0.16" />
               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#3B82F6" flood-opacity="0.12" />
             </filter>
 
-            <!-- Soft Refractive Drop Shadow for Standalone Liquid Glass X -->
             <filter id="xLiquidShadow" x="-35%" y="-35%" width="170%" height="170%">
               <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#EA2143" flood-opacity="0.28" />
               <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#FFFFFF" flood-opacity="0.5" />
             </filter>
           </defs>
 
-          <!-- AUTHENTIC APPLE iOS SF SYMBOL WI-FI FILLED WEDGES IN LIQUID GLASS -->
           <g filter="url(#wifiLiquidShadow)">
-            <!-- Outer Wi-Fi Wedge (Arc 3) -->
             <g class="glass-bar-3">
               <path
                 d="M 28.4 49.6
@@ -511,14 +851,9 @@
                 stroke="url(#iosWifiGlassRim)"
                 stroke-width="1.8"
               />
-              <!-- Specular top glass reflection -->
-              <path
-                d="M 32 49.2 A 101 101 0 0 1 168 49.2 A 95 95 0 0 0 32 49.2 Z"
-                fill="url(#iosWifiSheen)"
-              />
+              <path d="M 32 49.2 A 101 101 0 0 1 168 49.2 A 95 95 0 0 0 32 49.2 Z" fill="url(#iosWifiSheen)" />
             </g>
 
-            <!-- Middle Wi-Fi Wedge (Arc 2) -->
             <g class="glass-bar-2">
               <path
                 d="M 52.8 74.2
@@ -530,13 +865,9 @@
                 stroke="url(#iosWifiGlassRim)"
                 stroke-width="1.8"
               />
-              <path
-                d="M 56 73.8 A 66 66 0 0 1 144 73.8 A 61 61 0 0 0 56 73.8 Z"
-                fill="url(#iosWifiSheen)"
-              />
+              <path d="M 56 73.8 A 66 66 0 0 1 144 73.8 A 61 61 0 0 0 56 73.8 Z" fill="url(#iosWifiSheen)" />
             </g>
 
-            <!-- Inner Wi-Fi Wedge (Arc 1) + Bottom Dot -->
             <g class="glass-bar-1">
               <path
                 d="M 77.2 98.6
@@ -548,193 +879,270 @@
                 stroke="url(#iosWifiGlassRim)"
                 stroke-width="1.8"
               />
-              <!-- Bottom iOS Wi-Fi Circle Dot -->
-              <circle
-                cx="100"
-                cy="126"
-                r="10.5"
-                fill="url(#iosWifiGlassBody)"
-                stroke="url(#iosWifiGlassRim)"
-                stroke-width="1.8"
-              />
-              <ellipse
-                cx="98"
-                cy="121.5"
-                rx="6"
-                ry="3"
-                fill="url(#iosWifiSheen)"
-              />
+              <circle cx="100" cy="126" r="10.5" fill="url(#iosWifiGlassBody)" stroke="url(#iosWifiGlassRim)" stroke-width="1.8" />
+              <ellipse cx="98" cy="121.5" rx="6" ry="3" fill="url(#iosWifiSheen)" />
             </g>
           </g>
 
-          <!-- STANDALONE LIQUID GLASS 'X' (NO CIRCLE/SQUARE CONTAINER) -->
           <g class="glass-x-group" filter="url(#xLiquidShadow)">
-            <!-- First Glass Capsule of X (\) -->
             <g transform="translate(154, 96) rotate(45)">
-              <rect
-                x="-23"
-                y="-6.5"
-                width="46"
-                height="13"
-                rx="6.5"
-                fill="url(#iosXGlassBody)"
-                stroke="url(#iosXGlassRim)"
-                stroke-width="1.6"
-              />
-              <!-- Specular glass highlight strip inside rod -->
-              <rect
-                x="-19"
-                y="-4.5"
-                width="38"
-                height="3.5"
-                rx="1.75"
-                fill="#FFFFFF"
-                fill-opacity="0.55"
-              />
+              <rect x="-23" y="-6.5" width="46" height="13" rx="6.5" fill="url(#iosXGlassBody)" stroke="url(#iosXGlassRim)" stroke-width="1.6" />
+              <rect x="-19" y="-4.5" width="38" height="3.5" rx="1.75" fill="#FFFFFF" fill-opacity="0.55" />
             </g>
-
-            <!-- Second Glass Capsule of X (/) -->
             <g transform="translate(154, 96) rotate(-45)">
-              <rect
-                x="-23"
-                y="-6.5"
-                width="46"
-                height="13"
-                rx="6.5"
-                fill="url(#iosXGlassBody)"
-                stroke="url(#iosXGlassRim)"
-                stroke-width="1.6"
-              />
-              <!-- Specular glass highlight strip inside rod -->
-              <rect
-                x="-19"
-                y="-4.5"
-                width="38"
-                height="3.5"
-                rx="1.75"
-                fill="#FFFFFF"
-                fill-opacity="0.55"
-              />
+              <rect x="-23" y="-6.5" width="46" height="13" rx="6.5" fill="url(#iosXGlassBody)" stroke="url(#iosXGlassRim)" stroke-width="1.6" />
+              <rect x="-19" y="-4.5" width="38" height="3.5" rx="1.75" fill="#FFFFFF" fill-opacity="0.55" />
             </g>
           </g>
         </svg>
       </div>
 
-      <h1 class="state-title">Podłącz się do Wi-Fi swojego ODU-IDU</h1>
-      <p class="state-desc">
-        Nie wykryto połączenia z siecią Wi-Fi routera ODU-IDU. Połącz telefon z Wi-Fi swojego zestawu, aby kontynuować.
+      <h1 class="state-title" id="noWifiTitle">Podłącz się do Wi-Fi swojego ODU-IDU</h1>
+      <p class="state-desc" id="noWifiDesc">
+        Włącz Wi-Fi i połącz telefon z siecią swojego routera ODU-IDU, aby automatycznie wykryć model urządzenia.
       </p>
 
       <div class="action-stack">
-        <button class="btn btn-primary" onclick="openWifiSettings()">
+        <button class="btn-glass-primary" onclick="openWifiSettings()">
           Otwórz ustawienia Wi-Fi
         </button>
-        <button class="btn btn-secondary" onclick="recheckWifi()">
-          Sprawdź ponownie
-        </button>
-        <button class="btn-text" onclick="showScreen('startScreen')">
-          Przejdź do logowania ręcznego →
+        <button class="btn-glass-secondary liquid-glass" onclick="recheckConnection()">
+          Skanuj ponownie
         </button>
       </div>
     </div>
   </section>
 
-  <!-- 3. SIMPLE START / LOGIN SCREEN -->
-  <section class="screen" id="startScreen">
-    <div class="start-container">
-      <div class="modem-preview">
-        <img src="odu200.png" alt="ODU-200" />
-      </div>
+  <!-- 3. LIQUID GLASS DEVICE MANAGER (HORIZONTAL ROUNDED TILES + AUTO-DETECTED MODEL) -->
+  <section class="screen" id="deviceManagerScreen">
+    <div class="dm-container">
 
-      <div class="wifi-badge" id="wifiStatusBadge" onclick="showScreen('noWifiScreen')">
-        <span class="wifi-badge-dot"></span>
-        <span id="wifiStatusLabel">Sprawdzanie Wi-Fi...</span>
-      </div>
-
-      <h1 class="start-title">ODU Manager</h1>
-      <p class="start-subtitle">Wybierz swój zestaw i zaloguj się do bramy IDU</p>
-
-      <div class="segmented-control">
-        <button class="seg-btn active" onclick="pickModel(this, 'ODU-IDU 200', 'LTE Cat. 4 (150 Mb/s) • FDD: B3, B7, B20')">
-          ODU-200
-        </button>
-        <button class="seg-btn" onclick="pickModel(this, 'ODU-IDU 300', 'LTE Cat. 6 (2CA 300 Mb/s) • B3, B7, B8, B20, B38')">
-          ODU-300
-        </button>
-        <button class="seg-btn" onclick="pickModel(this, 'ODU-IDU 100', 'LTE Cat. 3 (30 Mb/s) • FDD: B3 (1800 MHz)')">
-          ODU-100
-        </button>
-      </div>
-      <div class="model-spec-line" id="modelSpecLine">
-        LTE Cat. 4 (150 Mb/s) • FDD: B3, B7, B20
-      </div>
-
-      <div class="form-box">
-        <div class="field">
-          <label>Adres bramy IDU</label>
-          <input type="text" id="gwInput" value="192.168.0.1" />
+      <!-- Rounded Liquid Glass Top Bar -->
+      <header class="dm-topbar liquid-glass">
+        <div class="dm-topbar-left">
+          <span class="dm-topbar-title">Device Manager</span>
+          <span class="dm-topbar-sub">
+            <span class="live-dot"></span>
+            <span id="dmTopbarStatus">Automatycznie wykryto ODU-IDU 200</span>
+          </span>
         </div>
-        <div class="field">
-          <label>Hasło administratora (domyślnie: admin)</label>
-          <input type="password" id="passInput" value="admin" />
-        </div>
-      </div>
-
-      <div class="action-stack">
-        <button class="btn btn-primary" onclick="loginToOdu()">
-          Połącz z modemem
+        <button class="dm-refresh-btn" onclick="recheckConnection()" title="Skanuj ponownie">
+          ↻
         </button>
+      </header>
+
+      <div class="section-header-row">
+        <span class="section-caption">Wykryte urządzenia w sieci</span>
+        <span class="auto-detect-pill" id="autoDetectBadge">Auto-detekcja • OK</span>
       </div>
 
-      <div class="status-msg" id="statusMsg"></div>
+      <!-- HORIZONTAL ROUNDED LIQUID GLASS TILES -->
+      <div class="horizontal-tiles-list">
+
+        <!-- Horizontal Tile 1: Complete Detected Set ODU-IDU -->
+        <article class="device-tile-horizontal liquid-glass" onclick="openLoginModal('set')">
+          <div class="tile-photo-well">
+            <img src="odu_pair_trans.png" alt="Zestaw ODU-IDU" />
+          </div>
+          <div class="tile-info-col">
+            <div class="tile-top-row">
+              <span class="tile-status-badge">
+                <span class="live-dot"></span>
+                Wykryto zestaw
+              </span>
+              <span class="tile-ip-badge" id="tileSetIp">192.168.0.1</span>
+            </div>
+            <div class="tile-title" id="tileSetTitle">Zestaw ODU-IDU 200</div>
+            <div class="tile-subtitle">Cyfrowy Polsat / Plus • Internet Domowy</div>
+            <div class="tile-meta-row">
+              <span class="tile-meta-chip" id="tileSetCat">LTE Cat. 4 • 150 Mb/s</span>
+              <span class="tile-meta-chip" id="tileSetPing">Ping 2 ms</span>
+            </div>
+          </div>
+          <div class="tile-chevron-btn">›</div>
+        </article>
+
+        <!-- Horizontal Tile 2: Indoor Wi-Fi Router IDU -->
+        <article class="device-tile-horizontal liquid-glass" onclick="openLoginModal('idu')">
+          <div class="tile-photo-well">
+            <img src="idu_unit.png" alt="Router IDU" />
+          </div>
+          <div class="tile-info-col">
+            <div class="tile-top-row">
+              <span class="tile-status-badge">
+                <span class="live-dot"></span>
+                Router domowy
+              </span>
+              <span class="tile-ip-badge" id="tileIduIp">192.168.0.1</span>
+            </div>
+            <div class="tile-title" id="tileIduTitle">Router Wi-Fi IDU-200</div>
+            <div class="tile-subtitle">Jednostka wewnętrzna • Brama sieciowa</div>
+            <div class="tile-meta-row">
+              <span class="tile-meta-chip">Wi-Fi / 4× LAN</span>
+              <span class="tile-meta-chip">Panel: /idu/home.shtml</span>
+            </div>
+          </div>
+          <div class="tile-chevron-btn">›</div>
+        </article>
+
+        <!-- Horizontal Tile 3: Outdoor LTE Modem ODU -->
+        <article class="device-tile-horizontal liquid-glass" onclick="openLoginModal('odu')">
+          <div class="tile-photo-well">
+            <img src="odu_unit.png" alt="Modem ODU" />
+          </div>
+          <div class="tile-info-col">
+            <div class="tile-top-row">
+              <span class="tile-status-badge">
+                <span class="live-dot"></span>
+                Modem LTE
+              </span>
+              <span class="tile-ip-badge">PoCoax</span>
+            </div>
+            <div class="tile-title" id="tileOduTitle">Modem zewnętrzny ODU-200</div>
+            <div class="tile-subtitle">Jednostka zewnętrzna • Antena LTE</div>
+            <div class="tile-meta-row">
+              <span class="tile-meta-chip" id="tileOduBands">FDD B3 / B7 / B20</span>
+              <span class="tile-meta-chip" id="tileOduCoax">PoCoax • Unicable LNB</span>
+            </div>
+          </div>
+          <div class="tile-chevron-btn">›</div>
+        </article>
+
+      </div>
+
+      <!-- Rounded Liquid Glass Footer Info Strip -->
+      <div class="network-summary-strip liquid-glass">
+        <span>Brama: <strong id="footerGwIp">http://192.168.0.1</strong></span>
+        <span>Dotknij kafelka, aby się zalogować</span>
+      </div>
+
     </div>
   </section>
+
+  <!-- 4. LIQUID GLASS LOGIN MODAL (OPENS WHEN TAPPING ANY HORIZONTAL DEVICE TILE) -->
+  <div class="login-backdrop" id="loginBackdrop" onclick="backdropClick(event)">
+    <div class="login-glass-sheet">
+      <div class="sheet-header">
+        <div class="sheet-device-mini">
+          <div class="mini-icon-box">
+            <img src="odu_pair_trans.png" id="modalDeviceImg" alt="Urządzenie ODU-IDU" />
+          </div>
+          <div>
+            <div class="sheet-title" id="modalDeviceTitle">Zestaw ODU-IDU 200</div>
+            <div class="sheet-sub" id="modalDeviceIp">http://192.168.0.1</div>
+          </div>
+        </div>
+        <button class="sheet-close-btn" onclick="closeLoginModal()">✕</button>
+      </div>
+
+      <div class="glass-form">
+        <div class="glass-field">
+          <label>Nazwa użytkownika</label>
+          <div class="glass-input-wrap">
+            <input type="text" class="glass-input" id="loginUser" value="admin" placeholder="admin" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="glass-field">
+          <label>Hasło routera ODU-IDU</label>
+          <div class="glass-input-wrap">
+            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło administratora" />
+            <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-glass-primary" id="loginSubmitBtn" onclick="submitDeviceLogin()">
+        Zaloguj się do urządzenia
+      </button>
+
+      <div class="login-feedback" id="loginFeedback"></div>
+    </div>
+  </div>
 
   <script>
-    let selectedModel = 'ODU-IDU 200';
-    let lastWifiState = false;
-    let lastOduReachable = false;
+    let currentGatewayIp = '192.168.0.1';
+    let detectedSetModel = 'ODU-IDU 200';
+    let detectedIduModel = 'IDU-200';
+    let detectedOduModel = 'ODU-200';
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
-    function updateBadge(wifiOn, oduReachable) {
-      const badge = document.getElementById('wifiStatusBadge');
-      const label = document.getElementById('wifiStatusLabel');
-      if (wifiOn && oduReachable) {
-        badge.className = 'wifi-badge';
-        label.textContent = 'Połączono z ODU-IDU (192.168.0.1)';
-      } else if (wifiOn) {
-        badge.className = 'wifi-badge offline';
-        label.textContent = 'Wi-Fi aktywne • Brak bramy ODU-IDU';
-      } else {
-        badge.className = 'wifi-badge offline';
-        label.textContent = 'Brak połączenia Wi-Fi';
+    window.onConnectionStatus = function(
+      wifiOn,
+      oduDetected,
+      gwIp,
+      pingMs,
+      setModel,
+      iduModel,
+      oduModel,
+      catSpec,
+      bandsSpec,
+      coaxSpec
+    ) {
+      if (gwIp && gwIp.length > 0) {
+        currentGatewayIp = gwIp;
       }
-    }
 
-    window.onConnectionStatus = function(wifiOn, oduReachable, httpCode) {
-      lastWifiState = wifiOn;
-      lastOduReachable = oduReachable;
-      updateBadge(wifiOn, oduReachable);
-
-      if (!wifiOn || !oduReachable) {
+      if (!wifiOn) {
+        closeLoginModal();
+        document.getElementById('noWifiTitle').textContent = 'Podłącz się do Wi-Fi swojego ODU-IDU';
+        document.getElementById('noWifiDesc').textContent =
+          'Włącz Wi-Fi w telefonie i połącz się z siecią swojego routera ODU-IDU, aby automatycznie wykryć model urządzenia.';
         showScreen('noWifiScreen');
-      } else {
-        showScreen('startScreen');
+        return;
       }
+
+      if (!oduDetected) {
+        closeLoginModal();
+        document.getElementById('noWifiTitle').textContent = 'Nie wykryto routera ODU-IDU w tej sieci Wi-Fi';
+        document.getElementById('noWifiDesc').textContent =
+          'Jesteś połączony z Wi-Fi (brama ' + currentGatewayIp + '), ale nie odpowiada na niej żaden zestaw ODU-IDU. Przełącz się na sieć Wi-Fi swojego routera ODU-IDU.';
+        showScreen('noWifiScreen');
+        return;
+      }
+
+      // Real ODU-IDU router detected! Populate auto-detected model & specs
+      detectedSetModel = setModel || 'ODU-IDU 200';
+      detectedIduModel = iduModel || 'IDU-200';
+      detectedOduModel = oduModel || 'ODU-200';
+
+      document.getElementById('dmTopbarStatus').textContent =
+        'Automatycznie wykryto ' + detectedSetModel + ' (' + currentGatewayIp + ')';
+      document.getElementById('autoDetectBadge').textContent =
+        detectedSetModel + ' • Online';
+
+      document.getElementById('tileSetIp').textContent = currentGatewayIp;
+      document.getElementById('tileIduIp').textContent = currentGatewayIp;
+      document.getElementById('footerGwIp').textContent = 'http://' + currentGatewayIp;
+
+      document.getElementById('tileSetTitle').textContent = 'Zestaw ' + detectedSetModel;
+      document.getElementById('tileIduTitle').textContent = 'Router Wi-Fi ' + detectedIduModel;
+      document.getElementById('tileOduTitle').textContent = 'Modem zewnętrzny ' + detectedOduModel;
+
+      if (catSpec) document.getElementById('tileSetCat').textContent = catSpec;
+      if (pingMs > 0) document.getElementById('tileSetPing').textContent = 'Odpowiedź ' + pingMs + ' ms';
+      if (bandsSpec) document.getElementById('tileOduBands').textContent = bandsSpec;
+      if (coaxSpec) document.getElementById('tileOduCoax').textContent = coaxSpec;
+
+      showScreen('deviceManagerScreen');
     };
 
     function performInitialCheck() {
-      const gw = document.getElementById('gwInput').value.trim();
       if (window.OduBridge && window.OduBridge.checkOduConnection) {
-        window.OduBridge.checkOduConnection(gw);
+        window.OduBridge.checkOduConnection(currentGatewayIp);
       } else {
-        updateBadge(false, false);
-        showScreen('noWifiScreen');
+        showScreen('deviceManagerScreen');
       }
+    }
+
+    function recheckConnection() {
+      closeLoginModal();
+      showScreen('splashScreen');
+      setTimeout(performInitialCheck, 400);
     }
 
     function openWifiSettings() {
@@ -743,50 +1151,109 @@
       }
     }
 
-    function recheckWifi() {
-      showScreen('splashScreen');
-      setTimeout(performInitialCheck, 550);
-    }
-
     window.onNativeResume = function() {
-      const gw = document.getElementById('gwInput').value.trim();
       if (window.OduBridge && window.OduBridge.checkOduConnection) {
-        window.OduBridge.checkOduConnection(gw);
+        window.OduBridge.checkOduConnection(currentGatewayIp);
       }
     };
 
-    function pickModel(btn, modelName, specText) {
-      selectedModel = modelName;
-      document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('modelSpecLine').textContent = specText;
-      document.getElementById('statusMsg').classList.remove('show');
-    }
+    function openLoginModal(unitType) {
+      const fb = document.getElementById('loginFeedback');
+      fb.className = 'login-feedback';
+      fb.textContent = '';
 
-    function loginToOdu() {
-      const gw = document.getElementById('gwInput').value.trim();
-      const msg = document.getElementById('statusMsg');
-      msg.textContent = 'Łączenie z ' + gw + ' (' + selectedModel + ')...';
-      msg.classList.add('show');
+      const imgEl = document.getElementById('modalDeviceImg');
+      const titleEl = document.getElementById('modalDeviceTitle');
+      const ipEl = document.getElementById('modalDeviceIp');
 
-      if (window.OduBridge && window.OduBridge.checkOduConnection) {
-        if (!window.OduBridge.isWifiConnected()) {
-          showScreen('noWifiScreen');
-          return;
-        }
+      if (unitType === 'idu') {
+        imgEl.src = 'idu_unit.png';
+        titleEl.textContent = 'Router Wi-Fi ' + detectedIduModel;
+      } else if (unitType === 'odu') {
+        imgEl.src = 'odu_unit.png';
+        titleEl.textContent = 'Modem ' + detectedOduModel + ' (przez ' + detectedIduModel + ')';
+      } else {
+        imgEl.src = 'odu_pair_trans.png';
+        titleEl.textContent = 'Zestaw ' + detectedSetModel;
       }
 
-      setTimeout(() => {
-        if (lastOduReachable) {
-          msg.textContent = 'Połączono z bramą ' + gw + ' (' + selectedModel + ').';
-        } else {
-          msg.textContent = 'Brama ' + gw + ' nie odpowiada — upewnij się, że jesteś podpięty pod Wi-Fi swojego ODU-IDU.';
-        }
-      }, 450);
+      ipEl.textContent = 'http://' + currentGatewayIp;
+      document.getElementById('loginBackdrop').classList.add('open');
     }
 
+    function closeLoginModal() {
+      document.getElementById('loginBackdrop').classList.remove('open');
+    }
+
+    function backdropClick(e) {
+      if (e.target.id === 'loginBackdrop') {
+        closeLoginModal();
+      }
+    }
+
+    window.handleBackPress = function() {
+      const backdrop = document.getElementById('loginBackdrop');
+      if (backdrop.classList.contains('open')) {
+        closeLoginModal();
+        return true;
+      }
+      return false;
+    };
+
+    function togglePassword() {
+      const pass = document.getElementById('loginPass');
+      const btn = document.getElementById('eyeBtn');
+      if (pass.type === 'password') {
+        pass.type = 'text';
+        btn.textContent = 'Ukryj';
+      } else {
+        pass.type = 'password';
+        btn.textContent = 'Pokaż';
+      }
+    }
+
+    function submitDeviceLogin() {
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value;
+      const fb = document.getElementById('loginFeedback');
+      const btn = document.getElementById('loginSubmitBtn');
+
+      if (!user || !pass) {
+        fb.className = 'login-feedback show err';
+        fb.textContent = 'Wpisz nazwę użytkownika oraz hasło routera.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Logowanie do ' + currentGatewayIp + '...';
+      fb.className = 'login-feedback show';
+      fb.textContent = 'Łączenie z http://' + currentGatewayIp + '/cgi-bin/adm.cgi...';
+
+      if (window.OduBridge && window.OduBridge.loginToRouter) {
+        window.OduBridge.loginToRouter(currentGatewayIp, user, pass);
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Zaloguj się do urządzenia';
+      }
+    }
+
+    window.onLoginResult = function(success, message) {
+      const fb = document.getElementById('loginFeedback');
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = false;
+      btn.textContent = 'Zaloguj się do urządzenia';
+
+      if (success) {
+        fb.className = 'login-feedback show ok';
+        fb.textContent = '✓ ' + message;
+      } else {
+        fb.className = 'login-feedback show err';
+        fb.textContent = '✕ ' + message;
+      }
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(performInitialCheck, 850);
+      setTimeout(performInitialCheck, 650);
     });
   </script>
 </body>

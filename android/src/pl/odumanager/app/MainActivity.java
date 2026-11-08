@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.RouteInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -20,8 +22,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
 
@@ -33,8 +43,8 @@ public class MainActivity extends Activity {
 
         Window window = getWindow();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.setStatusBarColor(Color.parseColor("#FFFFFF"));
-            window.setNavigationBarColor(Color.parseColor("#FFFFFF"));
+            window.setStatusBarColor(Color.parseColor("#EAF2FF"));
+            window.setNavigationBarColor(Color.parseColor("#EEF4FF"));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             int flags = window.getDecorView().getSystemUiVisibility();
@@ -54,7 +64,7 @@ public class MainActivity extends Activity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
 
-        webView.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        webView.setBackgroundColor(Color.parseColor("#EAF2FF"));
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient());
         webView.addJavascriptInterface(new OduBridge(), "OduBridge");
@@ -73,8 +83,15 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
+        if (webView != null) {
+            webView.evaluateJavascript("window.handleBackPress ? window.handleBackPress() : false;", new android.webkit.ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                    if (!"true".equals(value)) {
+                        MainActivity.super.onBackPressed();
+                    }
+                }
+            });
         } else {
             super.onBackPressed();
         }
@@ -96,6 +113,70 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private String getDetectedGatewayIp() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                if (network != null) {
+                    LinkProperties lp = cm.getLinkProperties(network);
+                    if (lp != null) {
+                        for (RouteInfo route : lp.getRoutes()) {
+                            if (route.isDefaultRoute() && route.hasGateway()) {
+                                InetAddress gw = route.getGateway();
+                                if (gw instanceof Inet4Address) {
+                                    String ip = gw.getHostAddress();
+                                    if (ip != null && !ip.isEmpty() && !"0.0.0.0".equals(ip)) {
+                                        return ip;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return "192.168.0.1";
+    }
+
+    private String fetchHttpString(String urlString, int timeoutMs) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(urlString);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(timeoutMs);
+            conn.setReadTimeout(timeoutMs);
+            conn.setRequestMethod("GET");
+            conn.setInstanceFollowRedirects(true);
+            int code = conn.getResponseCode();
+            if (code >= 200 && code < 400) {
+                InputStream is = conn.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                int total = 0;
+                while ((line = reader.readLine()) != null && total < 65536) {
+                    sb.append(line).append('\n');
+                    total += line.length();
+                }
+                reader.close();
+                return sb.toString();
+            }
+        } catch (Exception ignored) {
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return "";
+    }
+
+    private static String jsEscape(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", "");
     }
 
     public class OduBridge {
@@ -135,32 +216,177 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     final boolean wifiOn = checkWifiTransport();
-                    boolean oduReachable = false;
-                    int httpCode = -1;
+                    String gwCandidate = getDetectedGatewayIp();
+                    boolean oduDetected = false;
+                    long pingMs = -1;
+
+                    String setModel = "ODU-IDU 200";
+                    String iduModel = "IDU-200";
+                    String oduModel = "ODU-200";
+                    String catSpec = "LTE Cat. 4 • 150 Mb/s";
+                    String bandsSpec = "FDD B3 / B7 / B20";
+                    String coaxSpec = "PoCoax • Unicable LNB";
+
                     if (wifiOn) {
-                        try {
-                            String target = gatewayUrl.startsWith("http") ? gatewayUrl : ("http://" + gatewayUrl);
-                            URL url = new URL(target);
-                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                            conn.setConnectTimeout(1500);
-                            conn.setReadTimeout(1500);
-                            conn.setRequestMethod("GET");
-                            httpCode = conn.getResponseCode();
-                            oduReachable = (httpCode >= 200 && httpCode < 500);
-                            conn.disconnect();
-                        } catch (Exception ignored) {
-                            oduReachable = false;
+                        String[] candidates = gwCandidate.equals("192.168.0.1")
+                                ? new String[]{"192.168.0.1"}
+                                : new String[]{gwCandidate, "192.168.0.1"};
+
+                        for (String ip : candidates) {
+                            long t0 = System.currentTimeMillis();
+                            String rootHtml = fetchHttpString("http://" + ip + "/", 1600);
+                            long elapsed = System.currentTimeMillis() - t0;
+
+                            if (!rootHtml.isEmpty()) {
+                                boolean looksLikeOdu = rootHtml.contains("formLogin")
+                                        || rootHtml.contains("/cgi-bin/adm.cgi")
+                                        || rootHtml.contains("/idu/home")
+                                        || rootHtml.contains("b28n.js")
+                                        || rootHtml.contains("ODU")
+                                        || rootHtml.contains("IDU");
+
+                                String adminXml = fetchHttpString("http://" + ip + "/lang/en/admin.xml", 1600);
+                                if (!adminXml.isEmpty()) {
+                                    looksLikeOdu = true;
+                                }
+
+                                if (looksLikeOdu) {
+                                    oduDetected = true;
+                                    gwCandidate = ip;
+                                    pingMs = Math.max(1, elapsed);
+
+                                    String combined = rootHtml + "\n" + adminXml;
+                                    if (combined.contains("300") || combined.contains("CPE3") || combined.contains("ALR-PT30") || combined.contains("2CA")) {
+                                        setModel = "ODU-IDU 300";
+                                        iduModel = "IDU-300";
+                                        oduModel = "ODU-300";
+                                        catSpec = "LTE Cat. 6 • 300 Mb/s";
+                                        bandsSpec = "B1/B3/B7/B8/B20 + B38";
+                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    } else if (combined.contains("U270") || combined.contains("tdwebslteBANDonly") || combined.contains("Unicable") || combined.contains("/idu/home.shtml")) {
+                                        setModel = "ODU-IDU 200";
+                                        iduModel = "IDU-200";
+                                        oduModel = "ODU-200";
+                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
+                                        bandsSpec = "FDD B3 / B7 / B20";
+                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    } else {
+                                        setModel = "ODU-IDU 100";
+                                        iduModel = "IDU-100";
+                                        oduModel = "ODU-100";
+                                        catSpec = "LTE Cat. 3 • 30 Mb/s";
+                                        bandsSpec = "FDD B3 (1800 MHz)";
+                                        coaxSpec = "PoCoax • Zasilanie ODU";
+                                    }
+                                    break;
+                                }
+                            }
                         }
                     }
-                    final boolean finalOdu = oduReachable;
-                    final int finalCode = httpCode;
+
+                    final boolean finalOdu = oduDetected;
+                    final String finalGw = gwCandidate;
+                    final long finalPing = pingMs;
+                    final String fSetModel = setModel;
+                    final String fIduModel = iduModel;
+                    final String fOduModel = oduModel;
+                    final String fCatSpec = catSpec;
+                    final String fBandsSpec = bandsSpec;
+                    final String fCoaxSpec = coaxSpec;
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            webView.evaluateJavascript(
-                                "window.onConnectionStatus && window.onConnectionStatus(" + wifiOn + ", " + finalOdu + ", " + finalCode + ");",
-                                null
+                            String js = String.format(
+                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s');",
+                                wifiOn,
+                                finalOdu,
+                                jsEscape(finalGw),
+                                finalPing,
+                                jsEscape(fSetModel),
+                                jsEscape(fIduModel),
+                                jsEscape(fOduModel),
+                                jsEscape(fCatSpec),
+                                jsEscape(fBandsSpec),
+                                jsEscape(fCoaxSpec)
                             );
+                            webView.evaluateJavascript(js, null);
+                        }
+                    });
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
+        public void loginToRouter(final String gatewayIp, final String username, final String password) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    boolean success = false;
+                    String message;
+                    HttpURLConnection conn = null;
+                    try {
+                        String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
+                        URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
+                        conn = (HttpURLConnection) url.openConnection();
+                        conn.setConnectTimeout(3000);
+                        conn.setReadTimeout(3000);
+                        conn.setRequestMethod("POST");
+                        conn.setInstanceFollowRedirects(false);
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                        conn.setRequestProperty("Origin", "http://" + targetIp);
+                        conn.setRequestProperty("Referer", "http://" + targetIp + "/login.shtml");
+
+                        String body = "page=Login&loginName="
+                                + URLEncoder.encode(username, "UTF-8")
+                                + "&loginPassword="
+                                + URLEncoder.encode(password, "UTF-8");
+
+                        byte[] postBytes = body.getBytes(StandardCharsets.UTF_8);
+                        conn.setFixedLengthStreamingMode(postBytes.length);
+                        OutputStream os = conn.getOutputStream();
+                        os.write(postBytes);
+                        os.flush();
+                        os.close();
+
+                        int responseCode = conn.getResponseCode();
+                        String location = conn.getHeaderField("Location");
+                        if (location == null) location = "";
+
+                        if (location.contains("id=401.2")) {
+                            success = false;
+                            message = "Zbyt wiele nieudanych prób logowania. Odczekaj chwilę i spróbuj ponownie.";
+                        } else if (location.contains("id=401") || location.contains("login.shtml")) {
+                            success = false;
+                            message = "Nieprawidłowa nazwa użytkownika lub hasło routera (" + targetIp + ").";
+                        } else if (location.contains("/idu/home") || responseCode == 200 || responseCode == 302) {
+                            success = true;
+                            message = "Połączono i zalogowano do " + targetIp + " jako " + username + ".";
+                        } else {
+                            success = false;
+                            message = "Odpowiedź routera HTTP " + responseCode + ".";
+                        }
+                    } catch (Exception e) {
+                        success = false;
+                        message = "Błąd połączenia z routerem: " + e.getMessage();
+                    } finally {
+                        if (conn != null) {
+                            conn.disconnect();
+                        }
+                    }
+
+                    final boolean finalSuccess = success;
+                    final String finalMsg = message;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String js = String.format(
+                                "window.onLoginResult && window.onLoginResult(%b, '%s');",
+                                finalSuccess,
+                                jsEscape(finalMsg)
+                            );
+                            webView.evaluateJavascript(js, null);
                         }
                     });
                 }
