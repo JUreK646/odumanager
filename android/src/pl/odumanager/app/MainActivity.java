@@ -337,32 +337,24 @@ public class MainActivity extends Activity {
                                     realMeasuredPing = Math.max(1, elapsed);
 
                                     // Genuine hardware model fingerprinting:
-                                    // ODU-IDU 300 features LTE-Advanced (lteA), Mesh Wi-Fi (mesh / 5G mesh), Guest Wi-Fi (guestwifi), and Cat. 6 2CA
-                                    // ODU-IDU 200 is LTE Cat. 4 (U270) without mesh or lteA
-                                    // ODU-IDU 100 is legacy LTE Cat. 3 (U100)
-                                    boolean is300 = adminXml.contains("mesh")
-                                            || adminXml.contains("Mesh")
-                                            || adminXml.contains("lteA")
-                                            || adminXml.contains("guestwifi")
-                                            || adminXml.contains("PT30")
-                                            || adminXml.contains("PT40")
-                                            || adminXml.contains("CPE3")
-                                            || adminXml.contains("IDU-300")
-                                            || adminXml.contains("ODU-300")
-                                            || rootHtml.contains("IDU-300");
+                                    // ODU-IDU 300 features:
+                                    // - Extended dictionary with Mesh Wi-Fi (adminXml.length() > 71000 bytes, mesh_tplg; on IDU-200 it is ~68238 bytes)
+                                    // - Direct full login page in root (rootHtml.length() > 5000 bytes; on IDU-200 root is a ~341-byte short redirect)
+                                    // - Model strings: IDU-300, ODU-300, PT30, PT40, CPE3
+                                    boolean hasMesh = adminXml.contains("mesh_tplg") || adminXml.contains("menu3_mesh");
+                                    boolean has300Tag = adminXml.contains("IDU-300") || adminXml.contains("ODU-300") || rootHtml.contains("IDU-300") || adminXml.contains("PT30") || adminXml.contains("PT40") || adminXml.contains("CPE3");
+                                    boolean is300Size = adminXml.length() > 71000 || rootHtml.length() > 5000;
 
-                                    boolean is200 = !is300 && (adminXml.contains("U270")
-                                            || adminXml.contains("IDU-200")
-                                            || adminXml.contains("ODU-200")
-                                            || adminXml.contains("PT12")
-                                            || adminXml.contains("CPE2"));
+                                    boolean is300 = hasMesh || has300Tag || is300Size;
 
                                     boolean is100 = !is300 && (adminXml.contains("U100")
                                             || adminXml.contains("IDU-100")
                                             || adminXml.contains("ODU-100"));
 
+                                    boolean is200 = !is300 && !is100;
+
                                     Log.d("OduManager", "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
-                                    Log.d("OduManager", "Fingerprint check: is300=" + is300 + ", is200=" + is200 + ", is100=" + is100);
+                                    Log.d("OduManager", "Fingerprint check: is300=" + is300 + " (mesh=" + hasMesh + ", size=" + is300Size + ", tag=" + has300Tag + "), is200=" + is200 + ", is100=" + is100);
 
                                     if (is300) {
                                         setModel = "ODU-IDU 300";
