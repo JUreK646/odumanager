@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Web%20%2F%20CLI%20%2F%20Desktop-orange.svg)](#)
 [![Network](https://img.shields.io/badge/Network-Plus%20%2F%20Polsat%20Plus-10b981.svg)](#)
 
-Niezależne, otwartoźródłowe oprogramowanie diagnostyczno-zarządcze dedykowane dla zestawów antenowo-routerowych **ODU-IDU** Grupy Polsat Plus / Cyfrowy Polsat (stworzonych z inicjatywy Zygmunta Solorza-Żaka).
+Niezależne, otwartoźródłowe oprogramowanie diagnostyczno-zarządcze dedykowane dla zestawów antenowo-routerowych **ODU-IDU** Grupy Polsat Plus / Cyfrowy Polsat (stworzonych z inicjatywy Zygmunta Solorza-Żaka, produkowanych przez InterPhone Service).
 
 Program łączy się bezpośrednio z domowym routerem IDU i anteną ODU po lokalnej sieci, umożliwiając podgląd parametrów sygnału RF w czasie rzeczywistym, wymuszanie najszybszych pasm LTE Plusa, diagnostykę kabla koncentrycznego oraz automatyczny watchdog.
 
@@ -12,11 +12,11 @@ Program łączy się bezpośrednio z domowym routerem IDU i anteną ODU po lokal
 
 ## 📡 Obsługiwane urządzenia
 
-| Model | Technologia | Pasma LTE | Agregacja (CA) |
+| Model | Technologia | Obsługiwane pasma LTE (MHz) | Agregacja (CA) |
 | :--- | :--- | :--- | :--- |
-| **ODU-IDU 300** | LTE-Advanced Cat. 6 (do 300 Mb/s) | B1 (2100), B3 (1800), B7 (2600), B8 (900), B20 (800), **B38 (2600 TDD)** | **2CA** (maks. 2 pasma) |
-| **ODU-IDU 200** | LTE Cat. 4 (do 150 Mb/s) | B3 (1800), B7 (2600), B8 (900), B20 (800) | Brak |
-| **ODU-IDU 100** | LTE Cat. 3 | B3 (1800) | Brak |
+| **ODU-IDU 300** | LTE-Advanced Cat. 6 (DL do 300 Mb/s, UL do 50 Mb/s) | FDD: **B3 (1800)**, **B7 (2600)**, **B8 (900)**, **B20 (800)** + TDD: **B38 (2600)** | **2CA** (B3+B7, B3+B8, B3+B20, B7+B20) |
+| **ODU-IDU 200** | LTE Cat. 4 (DL do 150 Mb/s, UL do 50 Mb/s) | FDD: **B3 (1800)**, **B7 (2600)**, **B20 (800)** | Brak |
+| **ODU-IDU 100** | LTE Cat. 3 (DL do 30 Mb/s) | FDD: **B3 (1800)** | Brak |
 
 ---
 
@@ -32,9 +32,9 @@ Program łączy się bezpośrednio z domowym routerem IDU i anteną ODU po lokal
 
 ### 2. Wymuszanie i blokowanie pasm LTE Plusa (Band Locking)
 * Konfiguracja i blokowanie konkretnych pasm w modemie ODU:
-  * Wymuszanie szybkich pasm pojemnościowych: **B7 (2600 MHz)** + **B3 (1800 MHz)** + **B1 (2100 MHz)**,
-  * Wymuszanie pasma TDD sieci Plus / Aero2: **B38 (2600 MHz TDD)**,
-  * Wykluczanie zapchanego pasma zasięgowego **B20 (800 MHz)**.
+  * Wymuszanie szybkich pasm pojemnościowych FDD: **B7 (2600 MHz)** + **B3 (1800 MHz)**,
+  * Wymuszanie pasma TDD sieci Plus / Aero2: **B38 (2600 MHz TDD)** (w ODU-300),
+  * Wykluczanie zapchanych pasm zasięgowych **B8 (900 MHz)** oraz **B20 (800 MHz)**.
 
 ### 3. Diagnostyka instalacji jednokablowej (ODU-IDU Coax)
 * Kontrola zasilania modemu ODU przesyłanego kablem koncentrycznym TV-SAT z routera IDU.
