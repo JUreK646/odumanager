@@ -15,6 +15,9 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
+import android.util.Log;
+import android.net.wifi.WifiManager;
+import android.net.DhcpInfo;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -41,6 +44,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends Activity {
 
     private WebView webView;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     static {
         // Automatically accept and maintain session cookies across HttpURLConnection requests
@@ -73,6 +77,7 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         webView.setBackgroundColor(Color.parseColor("#EAF2FF"));
         webView.setWebChromeClient(new WebChromeClient());
@@ -81,6 +86,56 @@ public class MainActivity extends Activity {
 
         setContentView(webView);
         webView.loadUrl("file:///android_asset/index.html");
+
+        // React immediately when user switches Wi-Fi or connects/disconnects
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (cm != null) {
+                    networkCallback = new ConnectivityManager.NetworkCallback() {
+                        @Override
+                        public void onAvailable(Network network) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (webView != null) {
+                                        webView.evaluateJavascript("window.onNativeResume && window.onNativeResume();", null);
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onLost(Network network) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (webView != null) {
+                                        webView.evaluateJavascript("window.onNativeResume && window.onNativeResume();", null);
+                                    }
+                                }
+                            });
+                        }
+                    };
+                    cm.registerDefaultNetworkCallback(networkCallback);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (networkCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (cm != null) {
+                    cm.unregisterNetworkCallback(networkCallback);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -149,6 +204,18 @@ public class MainActivity extends Activity {
             }
         } catch (Exception ignored) {
         }
+        try {
+            WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wm != null) {
+                DhcpInfo dhcp = wm.getDhcpInfo();
+                if (dhcp != null && dhcp.gateway != 0) {
+                    int g = dhcp.gateway;
+                    String gw = (g & 0xFF) + "." + ((g >> 8) & 0xFF) + "." + ((g >> 16) & 0xFF) + "." + ((g >> 24) & 0xFF);
+                    if (!"0.0.0.0".equals(gw)) return gw;
+                }
+            }
+        } catch (Exception ignored) {
+        }
         return "192.168.0.1";
     }
 
@@ -157,6 +224,10 @@ public class MainActivity extends Activity {
         try {
             URL url = new URL(urlString);
             conn = (HttpURLConnection) url.openConnection();
+            conn.setUseCaches(false);
+            conn.setDefaultUseCaches(false);
+            conn.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+            conn.setRequestProperty("Pragma", "no-cache");
             conn.setConnectTimeout(timeoutMs);
             conn.setReadTimeout(timeoutMs);
             conn.setRequestMethod("GET");
@@ -230,11 +301,11 @@ public class MainActivity extends Activity {
                     boolean oduDetected = false;
                     long realMeasuredPing = -1;
 
-                    String setModel = "ODU-IDU 300";
-                    String iduModel = "IDU-300";
-                    String oduModel = "ODU-300";
-                    String catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
-                    String bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
+                    String setModel = "ODU-IDU 200";
+                    String iduModel = "IDU-200";
+                    String oduModel = "ODU-200";
+                    String catSpec = "LTE Cat. 4 • 150 Mb/s";
+                    String bandsSpec = "FDD B3 / B7 / B20";
                     String coaxSpec = "PoCoax • Unicable LNB";
 
                     if (wifiOn) {
@@ -265,26 +336,39 @@ public class MainActivity extends Activity {
                                     gwCandidate = ip;
                                     realMeasuredPing = Math.max(1, elapsed);
 
-                                    // Accurately determine model without false matches:
-                                    // ODU-IDU 300 has 5GHz Wi-Fi (setting 5g menu3 / 5GHz) and TDD 2600 (sysfwnetd2570)
-                                    // ODU-IDU 200 is only 2.4GHz Wi-Fi without 5GHz or TDD
-                                    // ODU-IDU 100 is legacy 30 Mb/s
-                                    boolean has5GHz = adminXml.contains("setting 5g menu3")
-                                            || adminXml.contains("5GHz")
-                                            || adminXml.contains("sysfwnetd2570")
-                                            || adminXml.contains("PT30")
+                                    // Hardware model fingerprinting:
+                                    // ODU-IDU 100: ALR-U100 (U100)
+                                    // ODU-IDU 200: ALR-U270 (U270, CPE2, PT12)
+                                    // ODU-IDU 300: ALR-PT30 / AOL-PT40 (PT30, PT40, CPE3, IDU-300, or any ODU without U270/U100)
+                                    boolean hasU100 = adminXml.contains("U100")
+                                            || adminXml.contains("IDU-100")
+                                            || adminXml.contains("ODU-100");
+
+                                    boolean hasU270 = adminXml.contains("U270")
+                                            || adminXml.contains("IDU-200")
+                                            || adminXml.contains("ODU-200")
+                                            || adminXml.contains("PT12")
+                                            || adminXml.contains("CPE2");
+
+                                    boolean has300 = adminXml.contains("PT30")
+                                            || adminXml.contains("PT40")
                                             || adminXml.contains("CPE3")
                                             || adminXml.contains("IDU-300")
-                                            || rootHtml.contains("IDU-300");
+                                            || adminXml.contains("ODU-300")
+                                            || rootHtml.contains("IDU-300")
+                                            || rootHtml.contains("ODU-300");
 
-                                    if (has5GHz) {
-                                        setModel = "ODU-IDU 300";
-                                        iduModel = "IDU-300";
-                                        oduModel = "ODU-300";
-                                        catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
-                                        bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
-                                        coaxSpec = "PoCoax • Unicable LNB";
-                                    } else if (adminXml.contains("U270") || adminXml.contains("ODU") || rootHtml.contains("formLogin")) {
+                                    Log.d("OduManager", "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
+                                    Log.d("OduManager", "Fingerprint check: hasU100=" + hasU100 + ", hasU270=" + hasU270 + ", has300=" + has300);
+
+                                    if (hasU100) {
+                                        setModel = "ODU-IDU 100";
+                                        iduModel = "IDU-100";
+                                        oduModel = "ODU-100";
+                                        catSpec = "LTE Cat. 3 • 30 Mb/s";
+                                        bandsSpec = "FDD B3 (1800 MHz)";
+                                        coaxSpec = "PoCoax • Zasilanie ODU";
+                                    } else if (hasU270) {
                                         setModel = "ODU-IDU 200";
                                         iduModel = "IDU-200";
                                         oduModel = "ODU-200";
@@ -292,13 +376,15 @@ public class MainActivity extends Activity {
                                         bandsSpec = "FDD B3 / B7 / B20";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     } else {
-                                        setModel = "ODU-IDU 100";
-                                        iduModel = "IDU-100";
-                                        oduModel = "ODU-100";
-                                        catSpec = "LTE Cat. 3 • 30 Mb/s";
-                                        bandsSpec = "FDD B3 (1800 MHz)";
-                                        coaxSpec = "PoCoax • Zasilanie ODU";
+                                        // On ODU-IDU 300, U270 does NOT exist; it is an ODU-IDU 300
+                                        setModel = "ODU-IDU 300";
+                                        iduModel = "IDU-300";
+                                        oduModel = "ODU-300";
+                                        catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
+                                        bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
+                                        coaxSpec = "PoCoax • Unicable LNB";
                                     }
+                                    Log.d("OduManager", "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
                                     break;
                                 }
                             }
@@ -456,18 +542,31 @@ public class MainActivity extends Activity {
         }
 
         private String parseRouterTelemetry(String html, long realPing) {
-            String rsrp = extractParam(html, "rsrp", "RSRP");
-            String rsrq = extractParam(html, "rsrq", "RSRQ");
-            String sinr = extractParam(html, "sinr", "SINR");
-            String rssi = extractParam(html, "rssi", "RSSI");
-            String band = extractParam(html, "band", "BAND");
-            String cellId = extractParam(html, "cellid", "Cell ID");
+            String rsrp = extractParam(html, new String[]{"rsrp", "lte_rsrp", "lteRsrp", "RSRP"}, new String[]{"RSRP", "Moc sygnału RSRP"});
+            String rsrq = extractParam(html, new String[]{"rsrq", "lte_rsrq", "lteRsrq", "RSRQ"}, new String[]{"RSRQ", "Jakość sygnału RSRQ"});
+            String sinr = extractParam(html, new String[]{"sinr", "lte_sinr", "lteSinr", "SINR", "snr", "SNR"}, new String[]{"SINR", "SNR", "Stosunek sygnału do szumu"});
+            String rssi = extractParam(html, new String[]{"rssi", "lte_rssi", "lteRssi", "RSSI"}, new String[]{"RSSI"});
+            String band = extractParam(html, new String[]{"band", "lte_band", "lteBand", "BAND", "current_band"}, new String[]{"Pasmo", "Band", "Częstotliwość"});
+            String cellId = extractParam(html, new String[]{"cellid", "cell_id", "cellId", "enodeb", "eNB", "eNodeB"}, new String[]{"Cell ID", "eNodeB", "Identyfikator stacji"});
+
             int signalLevel = extractSignalLevel(html, rsrp);
-            boolean isLtePlus = html.contains("2CA") || html.contains("LTE+") || html.contains("LTE-A") || html.contains("CA");
+            boolean hasSignal = signalLevel > 0;
+            boolean isLtePlus = hasSignal && (html.contains("2CA") || html.contains("LTE+") || html.contains("LTE-A") || html.contains("CA"));
+
+            // Real data rule: If no cellular signal from SIM/antenna, show "---" across all RF metrics
+            if (!hasSignal) {
+                rsrp = "---";
+                rsrq = "---";
+                sinr = "---";
+                rssi = "---";
+                band = "---";
+                cellId = "---";
+            }
 
             return "{"
                     + "\"realPingMs\":" + realPing + ","
                     + "\"signalLevel\":" + signalLevel + ","
+                    + "\"hasSignal\":" + hasSignal + ","
                     + "\"isLtePlus\":" + isLtePlus + ","
                     + "\"rsrp\":\"" + jsEscape(rsrp) + "\","
                     + "\"rsrq\":\"" + jsEscape(rsrq) + "\","
@@ -478,51 +577,88 @@ public class MainActivity extends Activity {
                     + "}";
         }
 
-        private String extractParam(String text, String key, String label) {
-            if (text == null || text.isEmpty()) return "Brak odczytu";
-            // Check JS variable or table cell: var rsrp = '...'; or <td>RSRP</td><td>...</td>
-            Pattern p1 = Pattern.compile("(?i)(?:var\\s+)?" + key + "\\s*=\\s*['\"]([^'\"]+)['\"]");
-            Matcher m1 = p1.matcher(text);
-            if (m1.find()) {
-                String val = m1.group(1).trim();
-                if (!val.isEmpty()) return val;
+        private boolean isValidValue(String val) {
+            if (val == null) return false;
+            String v = val.trim();
+            if (v.isEmpty() || v.equals("-") || v.equals("--") || v.equals("---")
+                    || v.equalsIgnoreCase("null") || v.equalsIgnoreCase("undefined")
+                    || v.equalsIgnoreCase("n/a") || v.equalsIgnoreCase("brak")
+                    || v.equalsIgnoreCase("none")) {
+                return false;
+            }
+            return true;
+        }
+
+        private String extractParam(String text, String[] keys, String[] labels) {
+            if (text == null || text.isEmpty()) return "---";
+
+            for (String key : keys) {
+                Pattern p1 = Pattern.compile("(?i)(?:var\\s+)?[\"']?" + Pattern.quote(key) + "[\"']?\\s*[:=]\\s*['\"]([^'\"]+)['\"]");
+                Matcher m1 = p1.matcher(text);
+                if (m1.find()) {
+                    String val = m1.group(1).trim();
+                    if (isValidValue(val)) return val;
+                }
             }
 
-            Pattern p2 = Pattern.compile("(?i)" + label + "\\s*[:=]?\\s*</td>?\\s*<td[^>]*>([^<]+)<");
-            Matcher m2 = p2.matcher(text);
-            if (m2.find()) {
-                String val = m2.group(1).trim();
-                if (!val.isEmpty()) return val;
+            for (String label : labels) {
+                Pattern p2 = Pattern.compile("(?i)(?:" + Pattern.quote(label) + ")[\\s:=]*</t[dh]?>?\\s*<t[dh][^>]*>([^<]+)</t[dh]>");
+                Matcher m2 = p2.matcher(text);
+                if (m2.find()) {
+                    String val = m2.group(1).trim();
+                    if (isValidValue(val)) return val;
+                }
+
+                Pattern p3 = Pattern.compile("(?i)(?:" + Pattern.quote(label) + ")[\\s:=]+(?:<[^>]+>)?([^<\\r\\n]+)");
+                Matcher m3 = p3.matcher(text);
+                if (m3.find()) {
+                    String val = m3.group(1).trim();
+                    if (isValidValue(val)) return val;
+                }
             }
 
-            return "Brak odczytu";
+            return "---";
         }
 
         private int extractSignalLevel(String text, String rsrpStr) {
-            // Check if signal level is explicitly reported (1..5)
-            Pattern p = Pattern.compile("(?i)(?:sigLevel|signal_level|signal|lteSigLevel)\\s*=\\s*['\"]?([1-5])['\"]?");
+            if (text == null || text.isEmpty()) return 0;
+
+            if (text.contains("No SIM inserted") || text.contains("Brak karty SIM")
+                    || text.contains("SIM card not inserted") || text.contains("Nie włożono karty")
+                    || text.contains("Rozłączono") || text.contains("Disconnected")
+                    || text.contains("Brak usługi") || text.contains("No Service")
+                    || text.contains("Brak zasięgu") || text.contains("No signal")) {
+                return 0;
+            }
+
+            Pattern p = Pattern.compile("(?i)(?:sigLevel|signal_level|signal|lteSigLevel|sig_level|bars)\\s*[:=]\\s*['\"]?([0-5])['\"]?");
             Matcher m = p.matcher(text);
             if (m.find()) {
                 try {
-                    return Integer.parseInt(m.group(1));
+                    int lvl = Integer.parseInt(m.group(1));
+                    return Math.max(0, Math.min(5, lvl));
                 } catch (Exception ignored) {
                 }
             }
 
-            // Fallback calculation based on genuine RSRP
-            if (rsrpStr != null && !rsrpStr.equals("Brak odczytu")) {
+            if (rsrpStr != null && !rsrpStr.equals("---")) {
                 try {
                     String num = rsrpStr.replaceAll("[^-\\d]", "");
-                    int r = Integer.parseInt(num);
-                    if (r >= -80) return 5;
-                    if (r >= -90) return 4;
-                    if (r >= -100) return 3;
-                    if (r >= -110) return 2;
-                    return 1;
+                    if (!num.isEmpty() && !num.equals("-")) {
+                        int r = Integer.parseInt(num);
+                        if (r <= -140 || r >= 0) return 0;
+                        if (r >= -80) return 5;
+                        if (r >= -90) return 4;
+                        if (r >= -100) return 3;
+                        if (r >= -110) return 2;
+                        return 1;
+                    }
                 } catch (Exception ignored) {
                 }
             }
-            return 4;
+
+            // Real data rule: If no cellular signal is confirmed, return 0 (no signal), never a fake 4 bars!
+            return 0;
         }
 
         @JavascriptInterface

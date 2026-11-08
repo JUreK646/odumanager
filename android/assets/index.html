@@ -766,6 +766,10 @@
     .sig-bar.b5 { height: 31px; }
 
     /* Signal Rules */
+    .meter-0 .sig-bar {
+      background: rgba(148, 163, 184, 0.22);
+      box-shadow: none;
+    }
     .meter-1 .sig-bar.b1 {
       background: var(--danger);
       box-shadow: 0 0 8px rgba(234, 33, 67, 0.55);
@@ -781,6 +785,33 @@
       box-shadow: 0 0 8px rgba(16, 185, 129, 0.50);
     }
 
+    .no-signal-cross-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(234, 33, 67, 0.12);
+      border: 1.5px solid rgba(234, 33, 67, 0.35);
+      color: var(--danger);
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      box-shadow: 0 4px 12px rgba(234, 33, 67, 0.15);
+    }
+    .no-signal-cross-badge .cross-icon-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
     /* LTE / LTE+ Pill */
     .lte-tag-pill {
       padding: 4px 11px;
@@ -791,6 +822,12 @@
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 0.04em;
+      transition: all 0.2s ease;
+    }
+    .lte-tag-pill.no-service {
+      background: rgba(148, 163, 184, 0.15);
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      color: var(--text-muted);
     }
 
     .signal-quality-text {
@@ -1034,7 +1071,7 @@
     <div class="ambient-orb o3"></div>
   </div>
 
-  <!-- 1. NORMAL STARTUP SCREEN -->
+  <!-- 1. STARTUP SCREEN -->
   <section class="screen active" id="splashScreen">
     <div class="splash-spacer"></div>
     <div class="splash-center">
@@ -1142,10 +1179,10 @@
           <span class="dm-topbar-title">Device Manager</span>
           <span class="dm-topbar-sub">
             <span class="live-dot"></span>
-            <span id="dmTopbarStatus">Wykryto router ODU-IDU</span>
+            <span id="dmTopbarStatus">Wykrywanie routera...</span>
           </span>
         </div>
-        <button class="dm-refresh-btn" onclick="recheckConnection()" title="Odśwież">
+        <button class="dm-refresh-btn" onclick="recheckConnection()" title="Skanuj ponownie">
           ↻
         </button>
       </header>
@@ -1160,13 +1197,13 @@
 
         <div class="router-info-col">
           <div class="router-title-line">
-            <span class="router-model-name" id="tileRouterModel">ODU-IDU 300</span>
+            <span class="router-model-name" id="tileRouterModel">Wykrywanie...</span>
             <span class="router-ip-pill" id="tileRouterIp">192.168.0.1</span>
           </div>
-          <div class="router-sub-line" id="tileRouterSub">IDU-300 + ODU-300 • Cyfrowy Polsat / Plus</div>
+          <div class="router-sub-line" id="tileRouterSub">Cyfrowy Polsat / Plus</div>
           <div class="router-meta-line">
             <span class="live-dot"></span>
-            <span id="tileRouterMeta">Online</span>
+            <span id="tileRouterMeta">Sprawdzanie stanu...</span>
           </div>
         </div>
 
@@ -1184,7 +1221,7 @@
             <img src="idu_router.png" alt="IDU" />
           </div>
           <div>
-            <div class="sheet-title" id="modalDeviceTitle">ODU-IDU 300</div>
+            <div class="sheet-title" id="modalDeviceTitle">Router ODU-IDU</div>
             <div class="sheet-sub" id="modalDeviceIp">http://192.168.0.1</div>
           </div>
         </div>
@@ -1224,7 +1261,7 @@
       <header class="dash-header liquid-glass">
         <div class="dash-header-title">
           <span class="live-dot"></span>
-          <span class="dash-model-badge" id="dashModelBadge">ODU-IDU 300</span>
+          <span class="dash-model-badge" id="dashModelBadge">ODU-IDU</span>
         </div>
         <div class="dash-header-actions">
           <button class="dash-pill-btn" onclick="openBandDrawer()">
@@ -1241,15 +1278,20 @@
         <div class="signal-top-row">
           <div class="signal-bars-cluster">
             <!-- 5 Dynamic Signal Bars: 1 = Red, 2-3 = Yellow, 4-5 = Green -->
-            <div class="signal-bars-meter meter-4" id="signalBarsMeter">
+            <div class="signal-bars-meter meter-0" id="signalBarsMeter">
               <div class="sig-bar b1"></div>
               <div class="sig-bar b2"></div>
               <div class="sig-bar b3"></div>
               <div class="sig-bar b4"></div>
               <div class="sig-bar b5"></div>
             </div>
+            <!-- Red Cross badge when no cellular signal / no SIM -->
+            <div class="no-signal-cross-badge" id="noSignalCrossBadge" style="display:none;">
+              <span class="cross-icon-circle">✕</span>
+              <span>Brak zasięgu</span>
+            </div>
             <!-- LTE or LTE+ Pill -->
-            <div class="lte-tag-pill" id="lteTagPill">LTE+</div>
+            <div class="lte-tag-pill" id="lteTagPill">---</div>
           </div>
 
           <div class="signal-quality-text">
@@ -1294,7 +1336,7 @@
         <div class="tele-cell">
           <span class="tele-label">Odpowiedź routera (Ping)</span>
           <span class="tele-value" id="valPing">---</span>
-          <span class="tele-sub">Czas HTTP</span>
+          <span class="tele-sub">Rzeczywisty HTTP</span>
         </div>
 
         <div class="tele-cell">
@@ -1319,9 +1361,9 @@
       <div class="agg-switch-card">
         <div class="agg-switch-left">
           <span class="agg-title">Agregacja pasm (LTE+)</span>
-          <span class="agg-sub" id="aggSubText">Łączenie pasm (2CA) aktywne</span>
+          <span class="agg-sub" id="aggSubText">Łączenie pasm (2CA)</span>
         </div>
-        <div class="toggle-track active" id="aggToggle" onclick="toggleAggregation()">
+        <div class="toggle-track" id="aggToggle" onclick="toggleAggregation()">
           <div class="toggle-thumb"></div>
         </div>
       </div>
@@ -1349,7 +1391,7 @@
         <div class="band-item-pill selected" data-band="B3" onclick="toggleBandSelect(this)">
           <div class="band-info-left">
             <span class="band-name-main">LTE 1800 MHz (Band 3)</span>
-            <span class="band-name-sub">Główne pasmo pojemnościowe</span>
+            <span class="band-name-sub">Główne pasmo</span>
           </div>
           <div class="band-checkbox">✓</div>
         </div>
@@ -1387,9 +1429,9 @@
 
   <script>
     let currentGatewayIp = '192.168.0.1';
-    let detectedRouterModel = 'ODU-IDU 300';
+    let detectedRouterModel = 'ODU-IDU 200';
     let currentSignalLevel = 4;
-    let isAggregationEnabled = true;
+    let isAggregationEnabled = false;
     let telemetryPollTimer = null;
 
     function showScreen(id) {
@@ -1414,24 +1456,30 @@
         currentGatewayIp = gwIp;
       }
 
-      if (!wifiOn) {
+      if (!wifiOn || !oduDetected) {
         closeLoginModal();
         closeBandDrawer();
-        document.getElementById('noWifiTitle').textContent = 'Podłącz się do Wi-Fi swojego ODU-IDU';
-        document.getElementById('noWifiDesc').textContent =
-          'Włącz Wi-Fi w telefonie i połącz się z siecią routera ODU-IDU.';
+        if (!wifiOn) {
+          document.getElementById('noWifiTitle').textContent = 'Podłącz się do Wi-Fi swojego ODU-IDU';
+          document.getElementById('noWifiDesc').textContent =
+            'Włącz Wi-Fi w telefonie i połącz się z siecią routera ODU-IDU.';
+        } else {
+          document.getElementById('noWifiTitle').textContent = 'Nie wykryto routera ODU-IDU';
+          document.getElementById('noWifiDesc').textContent =
+            'Połączono z siecią Wi-Fi, ale pod bramą ' + currentGatewayIp + ' nie znaleziono routera ODU-IDU 200 ani 300.';
+        }
         showScreen('noWifiScreen');
         return;
       }
 
-      detectedRouterModel = setModel || 'ODU-IDU 300';
+      detectedRouterModel = setModel || 'ODU-IDU 200';
 
       document.getElementById('dmTopbarStatus').textContent =
         'Wykryto router ' + detectedRouterModel;
       document.getElementById('tileRouterModel').textContent = detectedRouterModel;
       document.getElementById('tileRouterIp').textContent = currentGatewayIp;
       document.getElementById('tileRouterSub').textContent =
-        (iduModel || 'IDU-300') + ' + ' + (oduModel || 'ODU-300') + ' • Cyfrowy Polsat / Plus';
+        (iduModel || 'IDU') + ' + ' + (oduModel || 'ODU') + ' • Cyfrowy Polsat / Plus';
 
       const realPingText = pingMs > 0 ? (' • ' + pingMs + ' ms') : '';
       document.getElementById('tileRouterMeta').textContent =
@@ -1581,44 +1629,60 @@
     };
 
     function applyTelemetryUpdate(data) {
-      if (data.signalLevel) {
-        setSignalLevel(data.signalLevel);
-      }
+      const hasSig = data.hasSignal !== undefined ? data.hasSignal : (data.signalLevel > 0);
+      setSignalLevel(data.signalLevel || 0, hasSig);
+
       if (data.realPingMs > 0) {
         document.getElementById('valPing').textContent = data.realPingMs + ' ms';
       }
-      if (data.rsrp && data.rsrp !== 'Brak odczytu') {
-        document.getElementById('valRsrp').textContent = data.rsrp;
-        document.getElementById('signalRsrpLabel').textContent = 'RSRP ' + data.rsrp;
-      }
-      if (data.rsrq && data.rsrq !== 'Brak odczytu') {
-        document.getElementById('valRsrq').textContent = data.rsrq;
-      }
-      if (data.sinr && data.sinr !== 'Brak odczytu') {
-        document.getElementById('valSinr').textContent = data.sinr;
-      }
-      if (data.rssi && data.rssi !== 'Brak odczytu') {
-        document.getElementById('valRssi').textContent = data.rssi;
-      }
-      if (data.band && data.band !== 'Brak odczytu') {
-        document.getElementById('dashBandsRibbon').textContent = data.band;
-      }
-      if (data.cellId && data.cellId !== 'Brak odczytu') {
-        document.getElementById('valEnb').textContent = data.cellId;
-      }
-      if (data.isLtePlus !== undefined) {
+
+      if (hasSig) {
+        document.getElementById('valRsrp').textContent = (data.rsrp && data.rsrp !== '---') ? data.rsrp : '---';
+        document.getElementById('signalRsrpLabel').textContent = (data.rsrp && data.rsrp !== '---') ? ('RSRP ' + data.rsrp) : 'RSRP ---';
+        document.getElementById('valRsrq').textContent = (data.rsrq && data.rsrq !== '---') ? data.rsrq : '---';
+        document.getElementById('valSinr').textContent = (data.sinr && data.sinr !== '---') ? data.sinr : '---';
+        document.getElementById('valRssi').textContent = (data.rssi && data.rssi !== '---') ? data.rssi : '---';
+        document.getElementById('dashBandsRibbon').textContent = (data.band && data.band !== '---') ? data.band : '---';
+        document.getElementById('valEnb').textContent = (data.cellId && data.cellId !== '---') ? data.cellId : '---';
         document.getElementById('lteTagPill').textContent = data.isLtePlus ? 'LTE+' : 'LTE';
+      } else {
+        // User specification: When no signal, show cross and NO parameters (clean dashes)
+        document.getElementById('valRsrp').textContent = '---';
+        document.getElementById('signalRsrpLabel').textContent = 'Brak parametrów';
+        document.getElementById('valRsrq').textContent = '---';
+        document.getElementById('valSinr').textContent = '---';
+        document.getElementById('valRssi').textContent = '---';
+        document.getElementById('dashBandsRibbon').textContent = '--- (Brak sygnału)';
+        document.getElementById('valEnb').textContent = '---';
+        document.getElementById('lteTagPill').textContent = 'Brak LTE';
       }
     }
 
-    // Set signal bars: 1 = Red, 2-3 = Yellow, 4-5 = Green
-    function setSignalLevel(level) {
-      currentSignalLevel = Math.max(1, Math.min(5, level));
+    // Set signal bars: 0 = Cross (no signal), 1 = Red, 2-3 = Yellow, 4-5 = Green
+    function setSignalLevel(level, hasSignal) {
       const meter = document.getElementById('signalBarsMeter');
-      meter.className = 'signal-bars-meter meter-' + currentSignalLevel;
-
+      const crossBadge = document.getElementById('noSignalCrossBadge');
       const statusEl = document.getElementById('signalStatusLabel');
       const subRsrp = document.getElementById('subRsrp');
+      const ltePill = document.getElementById('lteTagPill');
+
+      if (!hasSignal || level <= 0) {
+        currentSignalLevel = 0;
+        meter.className = 'signal-bars-meter meter-0';
+        if (crossBadge) crossBadge.style.display = 'inline-flex';
+        statusEl.textContent = '✕ Brak zasięgu z karty';
+        statusEl.style.color = 'var(--danger)';
+        subRsrp.textContent = 'Brak odczytu';
+        subRsrp.style.color = 'var(--danger)';
+        ltePill.textContent = 'Brak LTE';
+        ltePill.classList.add('no-service');
+        return;
+      }
+
+      currentSignalLevel = Math.max(1, Math.min(5, level));
+      meter.className = 'signal-bars-meter meter-' + currentSignalLevel;
+      if (crossBadge) crossBadge.style.display = 'none';
+      ltePill.classList.remove('no-service');
 
       if (currentSignalLevel === 1) {
         statusEl.textContent = 'Słaby sygnał (1/5)';
