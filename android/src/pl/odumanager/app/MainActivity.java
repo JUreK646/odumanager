@@ -220,12 +220,9 @@ public class MainActivity extends Activity {
                     boolean oduDetected = false;
                     long pingMs = -1;
 
-                    String setModel = "ODU-IDU 200";
-                    String iduModel = "IDU-200";
-                    String oduModel = "ODU-200";
-                    String catSpec = "LTE Cat. 4 • 150 Mb/s";
-                    String bandsSpec = "FDD B3 / B7 / B20";
-                    String coaxSpec = "PoCoax • Unicable LNB";
+                    String routerModel = "IDU-300";
+                    String routerSub = "Zestaw ODU-IDU 300 • Dual-Band Wi-Fi";
+                    String specChip = "LTE Cat. 6 • 2.4 / 5 GHz";
 
                     if (wifiOn) {
                         String[] candidates = gwCandidate.equals("192.168.0.1")
@@ -255,28 +252,24 @@ public class MainActivity extends Activity {
                                     gwCandidate = ip;
                                     pingMs = Math.max(1, elapsed);
 
-                                    String combined = rootHtml + "\n" + adminXml;
-                                    if (combined.contains("300") || combined.contains("CPE3") || combined.contains("ALR-PT30") || combined.contains("2CA")) {
-                                        setModel = "ODU-IDU 300";
-                                        iduModel = "IDU-300";
-                                        oduModel = "ODU-300";
-                                        catSpec = "LTE Cat. 6 • 300 Mb/s";
-                                        bandsSpec = "B1/B3/B7/B8/B20 + B38";
-                                        coaxSpec = "PoCoax • Unicable LNB";
-                                    } else if (combined.contains("U270") || combined.contains("tdwebslteBANDonly") || combined.contains("Unicable") || combined.contains("/idu/home.shtml")) {
-                                        setModel = "ODU-IDU 200";
-                                        iduModel = "IDU-200";
-                                        oduModel = "ODU-200";
-                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
-                                        bandsSpec = "FDD B3 / B7 / B20";
-                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    // Distinguish IDU-300 vs IDU-200 vs IDU-100 based on actual firmware capabilities
+                                    boolean has5GhzOrTdd = adminXml.contains("setting 5g menu3")
+                                            || adminXml.contains("sysfwnetd2570")
+                                            || adminXml.contains("ALR-PT30")
+                                            || adminXml.contains("CPE3");
+
+                                    if (has5GhzOrTdd) {
+                                        routerModel = "IDU-300";
+                                        routerSub = "Router ODU-IDU 300 • Cyfrowy Polsat / Plus";
+                                        specChip = "Wi-Fi 2.4/5 GHz • LTE";
+                                    } else if (adminXml.contains("ODU") || rootHtml.contains("/idu/home")) {
+                                        routerModel = "IDU-200";
+                                        routerSub = "Router ODU-IDU 200 • Cyfrowy Polsat / Plus";
+                                        specChip = "Wi-Fi 2.4 GHz • LTE";
                                     } else {
-                                        setModel = "ODU-IDU 100";
-                                        iduModel = "IDU-100";
-                                        oduModel = "ODU-100";
-                                        catSpec = "LTE Cat. 3 • 30 Mb/s";
-                                        bandsSpec = "FDD B3 (1800 MHz)";
-                                        coaxSpec = "PoCoax • Zasilanie ODU";
+                                        routerModel = "IDU-100";
+                                        routerSub = "Router ODU-IDU 100 • Cyfrowy Polsat / Plus";
+                                        specChip = "Wi-Fi 2.4 GHz • LTE";
                                     }
                                     break;
                                 }
@@ -287,28 +280,22 @@ public class MainActivity extends Activity {
                     final boolean finalOdu = oduDetected;
                     final String finalGw = gwCandidate;
                     final long finalPing = pingMs;
-                    final String fSetModel = setModel;
-                    final String fIduModel = iduModel;
-                    final String fOduModel = oduModel;
-                    final String fCatSpec = catSpec;
-                    final String fBandsSpec = bandsSpec;
-                    final String fCoaxSpec = coaxSpec;
+                    final String fRouterModel = routerModel;
+                    final String fRouterSub = routerSub;
+                    final String fSpecChip = specChip;
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             String js = String.format(
-                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s');",
+                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, '%s', %d, '%s', '%s', '%s');",
                                 wifiOn,
                                 finalOdu,
                                 jsEscape(finalGw),
                                 finalPing,
-                                jsEscape(fSetModel),
-                                jsEscape(fIduModel),
-                                jsEscape(fOduModel),
-                                jsEscape(fCatSpec),
-                                jsEscape(fBandsSpec),
-                                jsEscape(fCoaxSpec)
+                                jsEscape(fRouterModel),
+                                jsEscape(fRouterSub),
+                                jsEscape(fSpecChip)
                             );
                             webView.evaluateJavascript(js, null);
                         }

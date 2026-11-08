@@ -81,16 +81,16 @@
     .liquid-glass {
       background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.80) 0%,
-        rgba(255, 255, 255, 0.50) 52%,
-        rgba(255, 255, 255, 0.72) 100%
+        rgba(255, 255, 255, 0.82) 0%,
+        rgba(255, 255, 255, 0.52) 52%,
+        rgba(255, 255, 255, 0.74) 100%
       );
       backdrop-filter: blur(28px) saturate(195%);
       -webkit-backdrop-filter: blur(28px) saturate(195%);
-      border: 1.5px solid rgba(255, 255, 255, 0.90);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
       box-shadow:
-        0 18px 40px -14px rgba(15, 23, 42, 0.10),
-        0 4px 14px -2px rgba(24, 86, 255, 0.06),
+        0 16px 36px -12px rgba(15, 23, 42, 0.10),
+        0 4px 12px -2px rgba(24, 86, 255, 0.06),
         inset 0 2px 3px rgba(255, 255, 255, 0.96),
         inset 0 -2px 6px rgba(148, 163, 184, 0.14);
     }
@@ -288,17 +288,17 @@
     }
 
     /* ==========================================
-       3. DEVICE MANAGER (HORIZONTAL LIQUID GLASS TILES)
+       3. DEVICE MANAGER (COMPACT HORIZONTAL ROUTER TILE)
        ========================================== */
     #deviceManagerScreen {
       justify-content: flex-start;
-      padding: 16px 16px 28px;
+      padding: 18px 16px 28px;
       overflow-y: auto;
     }
 
     .dm-container {
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -308,9 +308,9 @@
     /* Top Liquid Glass Header Pill */
     .dm-topbar {
       width: 100%;
-      height: 60px;
+      height: 56px;
       border-radius: 999px;
-      padding: 0 10px 0 20px;
+      padding: 0 8px 0 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -323,7 +323,7 @@
     }
 
     .dm-topbar-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-primary);
@@ -333,17 +333,17 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--success);
     }
 
     .live-dot {
-      width: 7px;
-      height: 7px;
+      width: 6.5px;
+      height: 6.5px;
       border-radius: 50%;
       background: #10B981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.20);
       animation: dotPulse 2s infinite;
       flex-shrink: 0;
     }
@@ -353,8 +353,8 @@
     }
 
     .dm-refresh-btn {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: 1.5px solid rgba(255, 255, 255, 0.92);
       background: rgba(255, 255, 255, 0.68);
@@ -364,7 +364,7 @@
       justify-content: center;
       cursor: pointer;
       color: var(--text-primary);
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       transition: transform 0.2s ease;
     }
@@ -372,123 +372,94 @@
       transform: scale(0.9) rotate(90deg);
     }
 
-    .section-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 2px 8px 0;
-    }
-
     .section-caption {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       color: var(--text-secondary);
+      padding-left: 8px;
       letter-spacing: -0.01em;
     }
 
-    .auto-detect-pill {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--primary);
-      background: rgba(24, 86, 255, 0.10);
-      border: 1px solid rgba(24, 86, 255, 0.20);
-      padding: 3px 10px;
-      border-radius: 999px;
-    }
-
-    /* HORIZONTAL ROUNDED LIQUID GLASS DEVICE TILES */
-    .horizontal-tiles-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .device-tile-horizontal {
+    /* COMPACT HORIZONTAL LIQUID GLASS ROUTER TILE */
+    .router-tile-compact {
       position: relative;
       width: 100%;
-      border-radius: 30px;
-      padding: 14px 16px 14px 14px;
+      border-radius: 26px;
+      padding: 12px 14px 12px 12px;
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 15px;
+      gap: 13px;
       cursor: pointer;
-      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+      transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s ease;
       overflow: hidden;
     }
 
-    .device-tile-horizontal::before {
+    .router-tile-compact::before {
       content: "";
       position: absolute;
-      inset: 1.5px;
-      border-radius: 28px;
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0) 46%);
+      inset: 1px;
+      border-radius: 25px;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 48%);
       pointer-events: none;
     }
 
-    .device-tile-horizontal:active {
+    .router-tile-compact:active {
       transform: scale(0.975);
     }
 
-    /* Left Real Hardware Photo Well inside Horizontal Tile */
-    .tile-photo-well {
+    /* Compact Router Icon Box on Left */
+    .router-icon-well {
       position: relative;
       z-index: 2;
-      width: 92px;
-      height: 92px;
-      border-radius: 22px;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(241, 245, 249, 0.75) 100%);
+      width: 68px;
+      height: 56px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(241, 245, 249, 0.78) 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.98);
       box-shadow:
-        0 8px 18px -6px rgba(15, 23, 42, 0.08),
-        inset 0 2px 4px rgba(255, 255, 255, 0.98);
+        0 6px 14px -4px rgba(15, 23, 42, 0.08),
+        inset 0 1.5px 3px rgba(255, 255, 255, 0.98);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px;
+      padding: 6px;
       flex-shrink: 0;
     }
 
-    .tile-photo-well img {
+    .router-icon-well img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 5px 8px rgba(15, 23, 42, 0.12));
+      filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.16));
     }
 
-    /* Middle Details Column inside Horizontal Tile */
-    .tile-info-col {
+    /* Compact Middle Info Column */
+    .router-info-col {
       position: relative;
       z-index: 2;
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 3px;
     }
 
-    .tile-top-row {
+    .router-title-line {
       display: flex;
       align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .tile-status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.98);
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--success);
+    .router-model-name {
+      font-size: 16.5px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
     }
 
-    .tile-ip-badge {
-      padding: 3px 9px;
+    .router-ip-pill {
+      padding: 2px 8px;
       border-radius: 999px;
       background: rgba(24, 86, 255, 0.10);
       border: 1px solid rgba(24, 86, 255, 0.22);
@@ -498,18 +469,8 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
-    .tile-title {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .tile-subtitle {
-      font-size: 12px;
+    .router-sub-line {
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--text-secondary);
       white-space: nowrap;
@@ -517,58 +478,32 @@
       text-overflow: ellipsis;
     }
 
-    .tile-meta-row {
+    .router-meta-line {
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-    }
-
-    .tile-meta-chip {
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--text-secondary);
+      color: var(--success);
     }
 
-    /* Right Chevron Action Button inside Horizontal Tile */
-    .tile-chevron-btn {
+    /* Compact Right Chevron Button */
+    .router-chevron {
       position: relative;
       z-index: 2;
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: linear-gradient(135deg, rgba(43, 108, 255, 0.92) 0%, rgba(24, 86, 255, 0.85) 100%);
       color: #FFFFFF;
-      border: 1.5px solid rgba(255, 255, 255, 0.80);
-      box-shadow: 0 6px 14px -3px rgba(24, 86, 255, 0.42);
+      border: 1.5px solid rgba(255, 255, 255, 0.82);
+      box-shadow: 0 5px 12px -3px rgba(24, 86, 255, 0.40);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       flex-shrink: 0;
-    }
-
-    /* Bottom Horizontal Summary Strip */
-    .network-summary-strip {
-      border-radius: 24px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .network-summary-strip strong {
-      color: var(--text-primary);
-      font-weight: 700;
     }
 
     /* ==========================================
@@ -597,8 +532,8 @@
 
     .login-glass-sheet {
       width: 100%;
-      max-width: 375px;
-      border-radius: 34px;
+      max-width: 370px;
+      border-radius: 32px;
       padding: 22px 20px 20px;
       background: linear-gradient(
         145deg,
@@ -634,13 +569,13 @@
     }
 
     .mini-icon-box {
-      width: 54px;
-      height: 54px;
-      border-radius: 18px;
+      width: 56px;
+      height: 46px;
+      border-radius: 15px;
       background: #FFFFFF;
       border: 1.5px solid rgba(255, 255, 255, 0.96);
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
-      padding: 6px;
+      box-shadow: 0 5px 12px rgba(15, 23, 42, 0.08);
+      padding: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -709,10 +644,10 @@
 
     .glass-input {
       width: 100%;
-      height: 52px;
+      height: 50px;
       padding: 0 48px 0 16px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.76);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
       border: 1.5px solid rgba(255, 255, 255, 0.94);
       box-shadow:
         inset 0 2px 5px rgba(15, 23, 42, 0.04),
@@ -782,7 +717,7 @@
     <div class="splash-spacer"></div>
     <div class="splash-center">
       <div class="app-logo-clean">
-        <img src="odu200.png" alt="ODU-200" />
+        <img src="odu200.png" alt="ODU Manager" />
       </div>
       <div class="splash-app-name">ODU Manager</div>
     </div>
@@ -899,7 +834,7 @@
 
       <h1 class="state-title" id="noWifiTitle">Podłącz się do Wi-Fi swojego ODU-IDU</h1>
       <p class="state-desc" id="noWifiDesc">
-        Włącz Wi-Fi i połącz telefon z siecią swojego routera ODU-IDU, aby automatycznie wykryć model urządzenia.
+        Włącz Wi-Fi i połącz telefon z siecią swojego routera ODU-IDU, aby automatycznie wykryć urządzenie.
       </p>
 
       <div class="action-stack">
@@ -913,7 +848,7 @@
     </div>
   </section>
 
-  <!-- 3. LIQUID GLASS DEVICE MANAGER (HORIZONTAL ROUNDED TILES + AUTO-DETECTED MODEL) -->
+  <!-- 3. LIQUID GLASS DEVICE MANAGER (SINGLE COMPACT HORIZONTAL ROUTER TILE) -->
   <section class="screen" id="deviceManagerScreen">
     <div class="dm-container">
 
@@ -923,112 +858,50 @@
           <span class="dm-topbar-title">Device Manager</span>
           <span class="dm-topbar-sub">
             <span class="live-dot"></span>
-            <span id="dmTopbarStatus">Automatycznie wykryto ODU-IDU 200</span>
+            <span id="dmTopbarStatus">Wykryto router w sieci</span>
           </span>
         </div>
-        <button class="dm-refresh-btn" onclick="recheckConnection()" title="Skanuj ponownie">
+        <button class="dm-refresh-btn" onclick="recheckConnection()" title="Odśwież">
           ↻
         </button>
       </header>
 
-      <div class="section-header-row">
-        <span class="section-caption">Wykryte urządzenia w sieci</span>
-        <span class="auto-detect-pill" id="autoDetectBadge">Auto-detekcja • OK</span>
-      </div>
+      <div class="section-caption">Wykryte urządzenie</div>
 
-      <!-- HORIZONTAL ROUNDED LIQUID GLASS TILES -->
-      <div class="horizontal-tiles-list">
+      <!-- SINGLE COMPACT HORIZONTAL ROUNDED ROUTER TILE -->
+      <article class="router-tile-compact liquid-glass" onclick="openLoginModal()">
+        <div class="router-icon-well">
+          <img src="idu_router.png" alt="Router IDU" />
+        </div>
 
-        <!-- Horizontal Tile 1: Complete Detected Set ODU-IDU -->
-        <article class="device-tile-horizontal liquid-glass" onclick="openLoginModal('set')">
-          <div class="tile-photo-well">
-            <img src="odu_pair_trans.png" alt="Zestaw ODU-IDU" />
+        <div class="router-info-col">
+          <div class="router-title-line">
+            <span class="router-model-name" id="tileRouterModel">IDU-300</span>
+            <span class="router-ip-pill" id="tileRouterIp">192.168.0.1</span>
           </div>
-          <div class="tile-info-col">
-            <div class="tile-top-row">
-              <span class="tile-status-badge">
-                <span class="live-dot"></span>
-                Wykryto zestaw
-              </span>
-              <span class="tile-ip-badge" id="tileSetIp">192.168.0.1</span>
-            </div>
-            <div class="tile-title" id="tileSetTitle">Zestaw ODU-IDU 200</div>
-            <div class="tile-subtitle">Cyfrowy Polsat / Plus • Internet Domowy</div>
-            <div class="tile-meta-row">
-              <span class="tile-meta-chip" id="tileSetCat">LTE Cat. 4 • 150 Mb/s</span>
-              <span class="tile-meta-chip" id="tileSetPing">Ping 2 ms</span>
-            </div>
+          <div class="router-sub-line" id="tileRouterSub">Router ODU-IDU 300 • Cyfrowy Polsat / Plus</div>
+          <div class="router-meta-line">
+            <span class="live-dot"></span>
+            <span id="tileRouterMeta">Online • Wi-Fi 2.4/5 GHz • 2 ms</span>
           </div>
-          <div class="tile-chevron-btn">›</div>
-        </article>
+        </div>
 
-        <!-- Horizontal Tile 2: Indoor Wi-Fi Router IDU -->
-        <article class="device-tile-horizontal liquid-glass" onclick="openLoginModal('idu')">
-          <div class="tile-photo-well">
-            <img src="idu_unit.png" alt="Router IDU" />
-          </div>
-          <div class="tile-info-col">
-            <div class="tile-top-row">
-              <span class="tile-status-badge">
-                <span class="live-dot"></span>
-                Router domowy
-              </span>
-              <span class="tile-ip-badge" id="tileIduIp">192.168.0.1</span>
-            </div>
-            <div class="tile-title" id="tileIduTitle">Router Wi-Fi IDU-200</div>
-            <div class="tile-subtitle">Jednostka wewnętrzna • Brama sieciowa</div>
-            <div class="tile-meta-row">
-              <span class="tile-meta-chip">Wi-Fi / 4× LAN</span>
-              <span class="tile-meta-chip">Panel: /idu/home.shtml</span>
-            </div>
-          </div>
-          <div class="tile-chevron-btn">›</div>
-        </article>
-
-        <!-- Horizontal Tile 3: Outdoor LTE Modem ODU -->
-        <article class="device-tile-horizontal liquid-glass" onclick="openLoginModal('odu')">
-          <div class="tile-photo-well">
-            <img src="odu_unit.png" alt="Modem ODU" />
-          </div>
-          <div class="tile-info-col">
-            <div class="tile-top-row">
-              <span class="tile-status-badge">
-                <span class="live-dot"></span>
-                Modem LTE
-              </span>
-              <span class="tile-ip-badge">PoCoax</span>
-            </div>
-            <div class="tile-title" id="tileOduTitle">Modem zewnętrzny ODU-200</div>
-            <div class="tile-subtitle">Jednostka zewnętrzna • Antena LTE</div>
-            <div class="tile-meta-row">
-              <span class="tile-meta-chip" id="tileOduBands">FDD B3 / B7 / B20</span>
-              <span class="tile-meta-chip" id="tileOduCoax">PoCoax • Unicable LNB</span>
-            </div>
-          </div>
-          <div class="tile-chevron-btn">›</div>
-        </article>
-
-      </div>
-
-      <!-- Rounded Liquid Glass Footer Info Strip -->
-      <div class="network-summary-strip liquid-glass">
-        <span>Brama: <strong id="footerGwIp">http://192.168.0.1</strong></span>
-        <span>Dotknij kafelka, aby się zalogować</span>
-      </div>
+        <div class="router-chevron">›</div>
+      </article>
 
     </div>
   </section>
 
-  <!-- 4. LIQUID GLASS LOGIN MODAL (OPENS WHEN TAPPING ANY HORIZONTAL DEVICE TILE) -->
+  <!-- 4. LIQUID GLASS LOGIN MODAL -->
   <div class="login-backdrop" id="loginBackdrop" onclick="backdropClick(event)">
     <div class="login-glass-sheet">
       <div class="sheet-header">
         <div class="sheet-device-mini">
           <div class="mini-icon-box">
-            <img src="odu_pair_trans.png" id="modalDeviceImg" alt="Urządzenie ODU-IDU" />
+            <img src="idu_router.png" alt="Router IDU" />
           </div>
           <div>
-            <div class="sheet-title" id="modalDeviceTitle">Zestaw ODU-IDU 200</div>
+            <div class="sheet-title" id="modalDeviceTitle">IDU-300</div>
             <div class="sheet-sub" id="modalDeviceIp">http://192.168.0.1</div>
           </div>
         </div>
@@ -1044,16 +917,16 @@
         </div>
 
         <div class="glass-field">
-          <label>Hasło routera ODU-IDU</label>
+          <label>Hasło routera</label>
           <div class="glass-input-wrap">
-            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło administratora" />
+            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło" />
             <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
           </div>
         </div>
       </div>
 
       <button class="btn-glass-primary" id="loginSubmitBtn" onclick="submitDeviceLogin()">
-        Zaloguj się do urządzenia
+        Zaloguj się
       </button>
 
       <div class="login-feedback" id="loginFeedback"></div>
@@ -1062,9 +935,7 @@
 
   <script>
     let currentGatewayIp = '192.168.0.1';
-    let detectedSetModel = 'ODU-IDU 200';
-    let detectedIduModel = 'IDU-200';
-    let detectedOduModel = 'ODU-200';
+    let detectedRouterModel = 'IDU-300';
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1076,12 +947,9 @@
       oduDetected,
       gwIp,
       pingMs,
-      setModel,
-      iduModel,
-      oduModel,
-      catSpec,
-      bandsSpec,
-      coaxSpec
+      routerModel,
+      routerSub,
+      specChip
     ) {
       if (gwIp && gwIp.length > 0) {
         currentGatewayIp = gwIp;
@@ -1098,35 +966,28 @@
 
       if (!oduDetected) {
         closeLoginModal();
-        document.getElementById('noWifiTitle').textContent = 'Nie wykryto routera ODU-IDU w tej sieci Wi-Fi';
+        document.getElementById('noWifiTitle').textContent = 'Nie wykryto routera ODU-IDU';
         document.getElementById('noWifiDesc').textContent =
-          'Jesteś połączony z Wi-Fi (brama ' + currentGatewayIp + '), ale nie odpowiada na niej żaden zestaw ODU-IDU. Przełącz się na sieć Wi-Fi swojego routera ODU-IDU.';
+          'Połączono z Wi-Fi (brama ' + currentGatewayIp + '), ale nie wykryto pod tym adresem routera ODU-IDU.';
         showScreen('noWifiScreen');
         return;
       }
 
-      // Real ODU-IDU router detected! Populate auto-detected model & specs
-      detectedSetModel = setModel || 'ODU-IDU 200';
-      detectedIduModel = iduModel || 'IDU-200';
-      detectedOduModel = oduModel || 'ODU-200';
+      detectedRouterModel = routerModel || 'IDU-300';
 
       document.getElementById('dmTopbarStatus').textContent =
-        'Automatycznie wykryto ' + detectedSetModel + ' (' + currentGatewayIp + ')';
-      document.getElementById('autoDetectBadge').textContent =
-        detectedSetModel + ' • Online';
+        'Wykryto ' + detectedRouterModel + ' (' + currentGatewayIp + ')';
+      document.getElementById('tileRouterModel').textContent = detectedRouterModel;
+      document.getElementById('tileRouterIp').textContent = currentGatewayIp;
+      document.getElementById('tileRouterSub').textContent =
+        routerSub || ('Router ' + detectedRouterModel + ' • Cyfrowy Polsat / Plus');
 
-      document.getElementById('tileSetIp').textContent = currentGatewayIp;
-      document.getElementById('tileIduIp').textContent = currentGatewayIp;
-      document.getElementById('footerGwIp').textContent = 'http://' + currentGatewayIp;
+      const pingTxt = pingMs > 0 ? (' • ' + pingMs + ' ms') : '';
+      document.getElementById('tileRouterMeta').textContent =
+        'Online • ' + (specChip || 'Wi-Fi / LTE') + pingTxt;
 
-      document.getElementById('tileSetTitle').textContent = 'Zestaw ' + detectedSetModel;
-      document.getElementById('tileIduTitle').textContent = 'Router Wi-Fi ' + detectedIduModel;
-      document.getElementById('tileOduTitle').textContent = 'Modem zewnętrzny ' + detectedOduModel;
-
-      if (catSpec) document.getElementById('tileSetCat').textContent = catSpec;
-      if (pingMs > 0) document.getElementById('tileSetPing').textContent = 'Odpowiedź ' + pingMs + ' ms';
-      if (bandsSpec) document.getElementById('tileOduBands').textContent = bandsSpec;
-      if (coaxSpec) document.getElementById('tileOduCoax').textContent = coaxSpec;
+      document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
+      document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
 
       showScreen('deviceManagerScreen');
     };
@@ -1155,29 +1016,14 @@
       if (window.OduBridge && window.OduBridge.checkOduConnection) {
         window.OduBridge.checkOduConnection(currentGatewayIp);
       }
-    };
+    }
 
-    function openLoginModal(unitType) {
+    function openLoginModal() {
       const fb = document.getElementById('loginFeedback');
       fb.className = 'login-feedback';
       fb.textContent = '';
-
-      const imgEl = document.getElementById('modalDeviceImg');
-      const titleEl = document.getElementById('modalDeviceTitle');
-      const ipEl = document.getElementById('modalDeviceIp');
-
-      if (unitType === 'idu') {
-        imgEl.src = 'idu_unit.png';
-        titleEl.textContent = 'Router Wi-Fi ' + detectedIduModel;
-      } else if (unitType === 'odu') {
-        imgEl.src = 'odu_unit.png';
-        titleEl.textContent = 'Modem ' + detectedOduModel + ' (przez ' + detectedIduModel + ')';
-      } else {
-        imgEl.src = 'odu_pair_trans.png';
-        titleEl.textContent = 'Zestaw ' + detectedSetModel;
-      }
-
-      ipEl.textContent = 'http://' + currentGatewayIp;
+      document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
+      document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
       document.getElementById('loginBackdrop').classList.add('open');
     }
 
@@ -1220,20 +1066,20 @@
 
       if (!user || !pass) {
         fb.className = 'login-feedback show err';
-        fb.textContent = 'Wpisz nazwę użytkownika oraz hasło routera.';
+        fb.textContent = 'Wpisz nazwę użytkownika oraz hasło.';
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Logowanie do ' + currentGatewayIp + '...';
+      btn.textContent = 'Logowanie...';
       fb.className = 'login-feedback show';
-      fb.textContent = 'Łączenie z http://' + currentGatewayIp + '/cgi-bin/adm.cgi...';
+      fb.textContent = 'Autoryzacja w ' + detectedRouterModel + ' (' + currentGatewayIp + ')...';
 
       if (window.OduBridge && window.OduBridge.loginToRouter) {
         window.OduBridge.loginToRouter(currentGatewayIp, user, pass);
       } else {
         btn.disabled = false;
-        btn.textContent = 'Zaloguj się do urządzenia';
+        btn.textContent = 'Zaloguj się';
       }
     }
 
@@ -1241,7 +1087,7 @@
       const fb = document.getElementById('loginFeedback');
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = false;
-      btn.textContent = 'Zaloguj się do urządzenia';
+      btn.textContent = 'Zaloguj się';
 
       if (success) {
         fb.className = 'login-feedback show ok';
@@ -1253,7 +1099,7 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(performInitialCheck, 650);
+      setTimeout(performInitialCheck, 600);
     });
   </script>
 </body>
