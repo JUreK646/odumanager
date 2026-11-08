@@ -51,25 +51,6 @@ Program łączy się bezpośrednio z domowym routerem IDU i anteną ODU po lokal
 
 ---
 
-## 🛠️ Architektura i komunikacja z routerem
-
-* **Adres bramy IDU**: domyślnie `http://192.168.0.1` (lub `http://192.168.1.1`).
-* **Autoryzacja**: protokół HTTP POST / CGI Session Cookie (domyślny login: `admin`, hasło: `admin`).
-* **Endpointy diagnostyczne ODU-IDU**:
-  * Status sygnału i RF: `/cgi-bin/status_network.cgi` lub `/api/lte/status`
-  * Parametry kabla i połączenia ODU: `/cgi-bin/status_odu.cgi`
-  * Zarządzanie pasmami LTE: `/cgi-bin/network_settings.cgi`
-  * Restart zestawu: `/cgi-bin/reboot.cgi`
-
----
-
-## 💻 Sugerowany stos technologiczny
-* **Frontend**: React + TypeScript + Vite + Tailwind CSS / Lucide Icons.
-* **Backend / Klient API**: Node.js (Fastify / Express) lub lekki demon w Pythonie / Go.
-* **Dystrybucja**: Aplikacja webowa lokalna (`localhost:4000`) lub aplikacja okienkowa (Electron / Tauri / PWA).
-
----
-
 ## 📄 Licencja
 Projekt jest udostępniany na warunkach otwartoźródłowej licencji **MIT**. Szczegóły w pliku [LICENSE](LICENSE).
 
