@@ -5,19 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>ODU Manager</title>
   <style>
-    /* TypeUI Design System Tokens (Clean + Minimal + Liquid Glass) */
     :root {
       --surface: #FFFFFF;
       --surface-subtle: #F8FAFC;
       --text-primary: #141414;
       --text-secondary: #64748B;
-      --text-muted: #94A3B8;
       --primary: #1856FF;
       --primary-pressed: #1040CC;
       --danger: #EA2143;
-      --success: #07CA6B;
       --border: #E2E8F0;
-      --radius-lg: 20px;
       --radius-md: 14px;
     }
 
@@ -33,7 +29,7 @@
       height: 100%;
       background: var(--surface);
       color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Roboto', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', 'Inter', sans-serif;
       -webkit-font-smoothing: antialiased;
       user-select: none;
       overflow-x: hidden;
@@ -50,17 +46,16 @@
       background: var(--surface);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.32s ease, transform 0.32s ease;
+      transition: opacity 0.28s ease;
     }
 
     .screen.active {
       opacity: 1;
       pointer-events: auto;
-      transform: translateY(0);
     }
 
     /* ==========================================
-       1. NORMAL STARTUP SCREEN (SPLASH)
+       1. NORMAL STARTUP SCREEN
        ========================================== */
     #splashScreen {
       z-index: 30;
@@ -68,7 +63,7 @@
       padding: 64px 24px 48px;
     }
 
-    .splash-Spacer {
+    .splash-spacer {
       height: 24px;
     }
 
@@ -76,7 +71,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-       gap: 16px;
+      gap: 16px;
     }
 
     .app-logo-clean {
@@ -104,7 +99,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
     }
 
     .spinner {
@@ -121,166 +115,76 @@
     }
 
     /* ==========================================
-       2. NO WI-FI SCREEN (LIQUID GLASS WIFI + X)
+       2. NO WI-FI SCREEN (PURE iOS LIQUID GLASS WIFI + X)
        ========================================== */
     #noWifiScreen {
       z-index: 20;
       text-align: center;
+      background: radial-gradient(circle at 50% 34%, #F4F8FF 0%, #FFFFFF 68%);
     }
 
     .wifi-card-wrap {
       width: 100%;
-      max-width: 360px;
+      max-width: 350px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* LIQUID GLASS ICON STAGE */
-    .liquid-stage {
+    /* Standalone iOS SF Symbol Wi-Fi + X in Liquid Glass (no circle/box container) */
+    .ios-wifi-glass-wrap {
       position: relative;
-      width: 148px;
-      height: 148px;
+      width: 156px;
+      height: 132px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+      animation: floatSymbol 3.2s ease-in-out infinite;
     }
 
-    /* Ambient refracted color orbs behind the liquid glass */
-    .liquid-blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(22px);
-      opacity: 0.65;
-      animation: blobFloat 5s ease-in-out infinite alternate;
-    }
-
-    .liquid-blob.b1 {
-      width: 88px;
-      height: 88px;
-      background: radial-gradient(circle, #60A5FA 0%, #1856FF 100%);
-      top: 10px;
-      left: 12px;
-    }
-
-    .liquid-blob.b2 {
-      width: 84px;
-      height: 84px;
-      background: radial-gradient(circle, #FF6B8B 0%, #EA2143 100%);
-      bottom: 8px;
-      right: 10px;
-      animation-delay: -2.5s;
-    }
-
-    @keyframes blobFloat {
-      0% { transform: translate(0, 0) scale(0.95); }
-      100% { transform: translate(8px, -8px) scale(1.08); }
-    }
-
-    /* Main Liquid Glass Squircle */
-    .liquid-glass-tile {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      border-radius: 34px;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.78) 0%,
-        rgba(255, 255, 255, 0.42) 50%,
-        rgba(248, 250, 252, 0.65) 100%
-      );
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
-      box-shadow:
-        0 20px 40px -12px rgba(20, 20, 20, 0.12),
-        0 4px 12px rgba(24, 86, 255, 0.08),
-        inset 0 2px 3px rgba(255, 255, 255, 0.95),
-        inset 0 -2px 6px rgba(148, 163, 184, 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: glassHover 3.4s ease-in-out infinite;
-    }
-
-    /* Specular liquid highlight arc */
-    .liquid-glass-tile::before {
-      content: "";
-      position: absolute;
-      inset: 3px;
-      border-radius: 30px;
-      background: linear-gradient(160deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 45%);
-      pointer-events: none;
-    }
-
-    @keyframes glassHover {
+    @keyframes floatSymbol {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
+      50% { transform: translateY(-5px); }
     }
 
-    /* Wi-Fi SVG inside Liquid Glass */
-    .wifi-svg {
-      width: 58px;
-      height: 58px;
+    .ios-wifi-svg {
+      width: 156px;
+      height: 132px;
       overflow: visible;
     }
 
-    .wifi-arc {
-      fill: none;
-      stroke: #1E293B;
-      stroke-width: 5.5;
-      stroke-linecap: round;
-      opacity: 0.25;
-      animation: wifiSearch 2.2s ease-in-out infinite;
+    /* Subtle sequential liquid refraction pulse on the 3 iOS Wi-Fi bars */
+    .glass-bar-1 {
+      animation: barGlassPulse 2.4s ease-in-out infinite;
+      animation-delay: 0s;
+      transform-origin: 108px 104px;
+    }
+    .glass-bar-2 {
+      animation: barGlassPulse 2.4s ease-in-out infinite;
+      animation-delay: 0.25s;
+      transform-origin: 108px 104px;
+    }
+    .glass-bar-3 {
+      animation: barGlassPulse 2.4s ease-in-out infinite;
+      animation-delay: 0.5s;
+      transform-origin: 108px 104px;
     }
 
-    .wifi-arc.a1 { animation-delay: 0s; }
-    .wifi-arc.a2 { animation-delay: 0.25s; }
-    .wifi-arc.a3 { animation-delay: 0.5s; }
-
-    .wifi-dot {
-      fill: #1E293B;
-      opacity: 0.45;
+    @keyframes barGlassPulse {
+      0%, 100% { opacity: 0.72; }
+      50% { opacity: 1; }
     }
 
-    @keyframes wifiSearch {
-      0%, 100% { opacity: 0.22; }
-      50% { opacity: 0.65; }
+    /* Standalone Liquid Glass X animation */
+    .glass-x-group {
+      transform-origin: 154px 92px;
+      animation: xGlassBreath 2.2s ease-in-out infinite;
     }
 
-    /* Liquid Glass Red X Badge */
-    .liquid-x-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 6px;
-      width: 42px;
-      height: 42px;
-      border-radius: 15px;
-      background: linear-gradient(135deg, rgba(234, 33, 67, 0.92) 0%, rgba(220, 38, 38, 0.78) 100%);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
-      box-shadow:
-        0 10px 20px -4px rgba(234, 33, 67, 0.42),
-        inset 0 1.5px 2px rgba(255, 255, 255, 0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: xPulse 2.2s ease-in-out infinite;
-    }
-
-    @keyframes xPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-
-    .liquid-x-badge svg {
-      width: 20px;
-      height: 20px;
-      stroke: #FFFFFF;
-      stroke-width: 3;
-      stroke-linecap: round;
+    @keyframes xGlassBreath {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.08) rotate(2deg); }
     }
 
     .state-title {
@@ -328,7 +232,7 @@
     .btn-primary {
       background: var(--primary);
       color: #FFFFFF;
-      box-shadow: 0 8px 20px -6px rgba(24, 86, 255, 0.45);
+      box-shadow: 0 8px 20px -6px rgba(24, 86, 255, 0.42);
     }
 
     .btn-primary:active {
@@ -342,7 +246,7 @@
     }
 
     .btn-text {
-      margin-top: 8px;
+      margin-top: 6px;
       background: transparent;
       border: none;
       color: var(--text-secondary);
@@ -427,7 +331,6 @@
       text-align: center;
     }
 
-    /* Clean Segmented Model Selector */
     .segmented-control {
       width: 100%;
       display: grid;
@@ -464,7 +367,6 @@
       text-align: center;
     }
 
-    /* Simple Form */
     .form-box {
       width: 100%;
       display: flex;
@@ -528,7 +430,7 @@
 
   <!-- 1. NORMAL STARTUP SCREEN -->
   <section class="screen active" id="splashScreen">
-    <div class="splash-Spacer"></div>
+    <div class="splash-spacer"></div>
     <div class="splash-center">
       <div class="app-logo-clean">
         <img src="odu200.png" alt="ODU-200" />
@@ -540,28 +442,182 @@
     </div>
   </section>
 
-  <!-- 2. NO WI-FI SCREEN (LIQUID GLASS WIFI + X) -->
+  <!-- 2. NO WI-FI SCREEN (AUTHENTIC iOS SF SYMBOL WIFI + X IN LIQUID GLASS, NO CIRCLE/BOX) -->
   <section class="screen" id="noWifiScreen">
     <div class="wifi-card-wrap">
-      <div class="liquid-stage">
-        <div class="liquid-blob b1"></div>
-        <div class="liquid-blob b2"></div>
 
-        <div class="liquid-glass-tile">
-          <svg class="wifi-svg" viewBox="0 0 64 64">
-            <path class="wifi-arc a3" d="M8 24 C21 11, 43 11, 56 24" />
-            <path class="wifi-arc a2" d="M16 33 C25 24, 39 24, 48 33" />
-            <path class="wifi-arc a1" d="M24 42 C28.5 37.5, 35.5 37.5, 40 42" />
-            <circle class="wifi-dot" cx="32" cy="50" r="3.5" />
-          </svg>
-        </div>
+      <div class="ios-wifi-glass-wrap">
+        <svg class="ios-wifi-svg" viewBox="0 0 216 148" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Translucent iOS Liquid Glass Body for Wi-Fi Bars -->
+            <linearGradient id="iosWifiGlassBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#DCEBFF" stop-opacity="0.88" />
+              <stop offset="45%" stop-color="#93C5FD" stop-opacity="0.52" />
+              <stop offset="80%" stop-color="#3B82F6" stop-opacity="0.44" />
+              <stop offset="100%" stop-color="#BFDBFE" stop-opacity="0.85" />
+            </linearGradient>
 
-        <div class="liquid-x-badge">
-          <svg viewBox="0 0 24 24">
-            <line x1="7" y1="7" x2="17" y2="17" />
-            <line x1="17" y1="7" x2="7" y2="17" />
-          </svg>
-        </div>
+            <!-- Top-left Specular Highlight Gradient for Wi-Fi Bars -->
+            <linearGradient id="iosWifiGlassRim" x1="0%" y1="0%" x2="80%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
+              <stop offset="50%" stop-color="#E0F2FE" stop-opacity="0.65" />
+              <stop offset="100%" stop-color="#60A5FA" stop-opacity="0.55" />
+            </linearGradient>
+
+            <!-- Inner Glass Sheen Overlay -->
+            <linearGradient id="iosWifiSheen" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.72" />
+              <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0.0" />
+            </linearGradient>
+
+            <!-- Translucent iOS Liquid Glass Body for the Standalone X -->
+            <linearGradient id="iosXGlassBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF8FA3" stop-opacity="0.92" />
+              <stop offset="50%" stop-color="#EA2143" stop-opacity="0.72" />
+              <stop offset="100%" stop-color="#FF4D6D" stop-opacity="0.90" />
+            </linearGradient>
+
+            <!-- Specular Glass Rim for the Standalone X -->
+            <linearGradient id="iosXGlassRim" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
+              <stop offset="55%" stop-color="#FFE4E8" stop-opacity="0.75" />
+              <stop offset="100%" stop-color="#FB7185" stop-opacity="0.65" />
+            </linearGradient>
+
+            <!-- Soft Refractive Drop Shadow for Wi-Fi Glass Bars -->
+            <filter id="wifiLiquidShadow" x="-25%" y="-25%" width="150%" height="160%">
+              <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#1E40AF" flood-opacity="0.16" />
+              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#3B82F6" flood-opacity="0.12" />
+            </filter>
+
+            <!-- Soft Refractive Drop Shadow for Standalone Liquid Glass X -->
+            <filter id="xLiquidShadow" x="-35%" y="-35%" width="170%" height="170%">
+              <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#EA2143" flood-opacity="0.28" />
+              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#FFFFFF" flood-opacity="0.5" />
+            </filter>
+          </defs>
+
+          <!-- AUTHENTIC APPLE iOS SF SYMBOL WI-FI FILLED WEDGES IN LIQUID GLASS -->
+          <g filter="url(#wifiLiquidShadow)">
+            <!-- Outer Wi-Fi Wedge (Arc 3) -->
+            <g class="glass-bar-3">
+              <path
+                d="M 28.4 49.6
+                   A 104 104 0 0 1 171.6 49.6
+                   A 8.5 8.5 0 0 1 159.4 61.8
+                   A 86.8 86.8 0 0 0 40.6 61.8
+                   A 8.5 8.5 0 0 1 28.4 49.6 Z"
+                fill="url(#iosWifiGlassBody)"
+                stroke="url(#iosWifiGlassRim)"
+                stroke-width="1.8"
+              />
+              <!-- Specular top glass reflection -->
+              <path
+                d="M 32 49.2 A 101 101 0 0 1 168 49.2 A 95 95 0 0 0 32 49.2 Z"
+                fill="url(#iosWifiSheen)"
+              />
+            </g>
+
+            <!-- Middle Wi-Fi Wedge (Arc 2) -->
+            <g class="glass-bar-2">
+              <path
+                d="M 52.8 74.2
+                   A 69.5 69.5 0 0 1 147.2 74.2
+                   A 8.5 8.5 0 0 1 135.0 86.4
+                   A 52.3 52.3 0 0 0 65.0 86.4
+                   A 8.5 8.5 0 0 1 52.8 74.2 Z"
+                fill="url(#iosWifiGlassBody)"
+                stroke="url(#iosWifiGlassRim)"
+                stroke-width="1.8"
+              />
+              <path
+                d="M 56 73.8 A 66 66 0 0 1 144 73.8 A 61 61 0 0 0 56 73.8 Z"
+                fill="url(#iosWifiSheen)"
+              />
+            </g>
+
+            <!-- Inner Wi-Fi Wedge (Arc 1) + Bottom Dot -->
+            <g class="glass-bar-1">
+              <path
+                d="M 77.2 98.6
+                   A 35 35 0 0 1 122.8 98.6
+                   A 8.5 8.5 0 0 1 110.6 110.8
+                   A 17.8 17.8 0 0 0 89.4 110.8
+                   A 8.5 8.5 0 0 1 77.2 98.6 Z"
+                fill="url(#iosWifiGlassBody)"
+                stroke="url(#iosWifiGlassRim)"
+                stroke-width="1.8"
+              />
+              <!-- Bottom iOS Wi-Fi Circle Dot -->
+              <circle
+                cx="100"
+                cy="126"
+                r="10.5"
+                fill="url(#iosWifiGlassBody)"
+                stroke="url(#iosWifiGlassRim)"
+                stroke-width="1.8"
+              />
+              <ellipse
+                cx="98"
+                cy="121.5"
+                rx="6"
+                ry="3"
+                fill="url(#iosWifiSheen)"
+              />
+            </g>
+          </g>
+
+          <!-- STANDALONE LIQUID GLASS 'X' (NO CIRCLE/SQUARE CONTAINER) -->
+          <g class="glass-x-group" filter="url(#xLiquidShadow)">
+            <!-- First Glass Capsule of X (\) -->
+            <g transform="translate(154, 96) rotate(45)">
+              <rect
+                x="-23"
+                y="-6.5"
+                width="46"
+                height="13"
+                rx="6.5"
+                fill="url(#iosXGlassBody)"
+                stroke="url(#iosXGlassRim)"
+                stroke-width="1.6"
+              />
+              <!-- Specular glass highlight strip inside rod -->
+              <rect
+                x="-19"
+                y="-4.5"
+                width="38"
+                height="3.5"
+                rx="1.75"
+                fill="#FFFFFF"
+                fill-opacity="0.55"
+              />
+            </g>
+
+            <!-- Second Glass Capsule of X (/) -->
+            <g transform="translate(154, 96) rotate(-45)">
+              <rect
+                x="-23"
+                y="-6.5"
+                width="46"
+                height="13"
+                rx="6.5"
+                fill="url(#iosXGlassBody)"
+                stroke="url(#iosXGlassRim)"
+                stroke-width="1.6"
+              />
+              <!-- Specular glass highlight strip inside rod -->
+              <rect
+                x="-19"
+                y="-4.5"
+                width="38"
+                height="3.5"
+                rx="1.75"
+                fill="#FFFFFF"
+                fill-opacity="0.55"
+              />
+            </g>
+          </g>
+        </svg>
       </div>
 
       <h1 class="state-title">Podłącz się do Wi-Fi swojego ODU-IDU</h1>
@@ -664,7 +720,6 @@
       lastOduReachable = oduReachable;
       updateBadge(wifiOn, oduReachable);
 
-      // If not connected to Wi-Fi or ODU gateway is not reachable on current Wi-Fi, show the Liquid Glass Wi-Fi + X screen
       if (!wifiOn || !oduReachable) {
         showScreen('noWifiScreen');
       } else {
@@ -677,7 +732,6 @@
       if (window.OduBridge && window.OduBridge.checkOduConnection) {
         window.OduBridge.checkOduConnection(gw);
       } else {
-        // Browser preview fallback: show Liquid Glass No-Wi-Fi screen after normal splash
         updateBadge(false, false);
         showScreen('noWifiScreen');
       }
@@ -695,7 +749,6 @@
     }
 
     window.onNativeResume = function() {
-      // Automatically re-check when user comes back from Android Wi-Fi settings
       const gw = document.getElementById('gwInput').value.trim();
       if (window.OduBridge && window.OduBridge.checkOduConnection) {
         window.OduBridge.checkOduConnection(gw);
