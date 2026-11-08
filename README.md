@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.svg" width="128" height="128" alt="ODU Manager Icon" />
+</p>
+
 # 🛰️ ODU Manager — Cyfrowy Polsat / Plus
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
