@@ -25,7 +25,7 @@ foreach ($m in $mipmaps) {
     Copy-Item -Force "$ROOT\assets\icon.png" "$dir\ic_launcher.png"
 }
 
-$studioPhoto = "C:\Users\Jurek\.gemini\antigravity\brain\e3bd3e07-61c3-4803-b421-6b2b4881838c\scratch\studio_odu200.png"
+$studioPhoto = "C:\Users\Jurek\.gemini\antigravity\brain\e3bd3e07-61c3-4803-b421-6b2b4881838c\scratch\studio_odu200_clean.png"
 if (Test-Path $studioPhoto) {
     Copy-Item -Force $studioPhoto "$ANDROID_DIR\assets\odu200.png"
 } else {
@@ -61,7 +61,7 @@ Write-Host "5. Adding classes.dex to APK..."
 Write-Host "6. Running zipalign..."
 & "$BUILD_TOOLS\zipalign.exe" -f 4 "$BUILD_DIR\unaligned.apk" "$BUILD_DIR\aligned.apk"
 
-$KEYSTORE = "$BUILD_DIR\debug.keystore"
+$KEYSTORE = "$ANDROID_DIR\debug.keystore"
 if (-not (Test-Path $KEYSTORE)) {
     Write-Host "Generating debug keystore..."
     & "$JDK\bin\keytool.exe" -genkeypair -v `
