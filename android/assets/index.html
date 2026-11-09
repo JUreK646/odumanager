@@ -675,44 +675,54 @@
     .dash-header-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
     .dash-pill-btn {
-      height: 38px;
-      padding: 0 14px;
-      border-radius: 999px;
-      border: 1.5px solid rgba(255, 255, 255, 0.92);
-      background: linear-gradient(135deg, rgba(43, 108, 255, 0.92) 0%, rgba(24, 86, 255, 0.85) 100%);
-      color: #FFFFFF;
-      font-size: 13px;
-      font-weight: 700;
-      display: flex;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(24, 86, 255, 0.22);
+      background: rgba(24, 86, 255, 0.08);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      box-shadow: 0 4px 12px -2px rgba(24, 86, 255, 0.35);
-      transition: transform 0.14s ease;
+      box-shadow: none;
+      transition: background 0.15s ease, transform 0.1s ease;
     }
     .dash-pill-btn:active {
-      transform: scale(0.96);
+      background: rgba(24, 86, 255, 0.16);
+      transform: scale(0.97);
+    }
+    .dash-pill-btn .btn-svg {
+      color: var(--primary);
+      flex-shrink: 0;
     }
     .dash-icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255, 255, 255, 0.92);
-      background: rgba(255, 255, 255, 0.72);
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(255, 255, 255, 0.85);
       color: var(--text-secondary);
-      font-size: 16px;
-      font-weight: 700;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.14s ease;
+      box-shadow: none;
+      transition: background 0.15s ease, transform 0.1s ease;
     }
     .dash-icon-btn:active {
-      transform: scale(0.92);
+      background: rgba(226, 232, 240, 0.85);
+      transform: scale(0.95);
+    }
+    .dash-icon-btn .btn-svg {
+      color: var(--text-secondary);
+      flex-shrink: 0;
     }
 
     /* Hero Liquid Glass Signal Card */
@@ -739,11 +749,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
     }
     .signal-bars-cluster {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     /* 5 Dynamic Signal Bars: 1 = Red, 2-3 = Yellow, 4-5 = Green */
@@ -789,46 +801,54 @@
     .no-signal-cross-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(234, 33, 67, 0.12);
-      border: 1.5px solid rgba(234, 33, 67, 0.35);
-      color: var(--danger);
-      font-size: 11.5px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      box-shadow: 0 4px 12px rgba(234, 33, 67, 0.15);
-    }
-    .no-signal-cross-badge .cross-icon-circle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
-      background: var(--danger);
-      color: #FFFFFF;
+      gap: 5px;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 7px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #DC2626;
       font-size: 11px;
-      font-weight: 900;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: none;
+    }
+    .no-signal-cross-badge .badge-icon-svg {
+      flex-shrink: 0;
+      color: #DC2626;
     }
 
     /* LTE / LTE+ Pill */
     .lte-tag-pill {
-      padding: 4px 11px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(24, 86, 255, 0.15) 0%, rgba(59, 130, 246, 0.22) 100%);
-      border: 1.5px solid rgba(24, 86, 255, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 7px;
+      background: rgba(24, 86, 255, 0.08);
+      border: 1px solid rgba(24, 86, 255, 0.20);
       color: var(--primary);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      transition: all 0.2s ease;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.18s ease;
     }
     .lte-tag-pill.no-service {
-      background: rgba(148, 163, 184, 0.15);
-      border: 1.5px solid rgba(148, 163, 184, 0.35);
-      color: var(--text-muted);
+      background: rgba(100, 116, 139, 0.08);
+      border: 1px solid rgba(100, 116, 139, 0.20);
+      color: #64748B;
+    }
+    .lte-tag-pill.tag-lock {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #B45309;
     }
 
     .signal-quality-text {
@@ -1062,59 +1082,104 @@
       transform: translateX(20px);
     }
 
-    /* Router Alert Banner */
+    /* Router Alert Banner (Aesthetic, Pleasant Liquid Glass with Vector Icons) */
     .router-alert-banner {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
-      padding: 12px 16px;
-      border-radius: 18px;
+      padding: 12px 14px;
+      border-radius: 14px;
       margin-bottom: 14px;
-      backdrop-filter: blur(24px) saturate(190%);
-      -webkit-backdrop-filter: blur(24px) saturate(190%);
-      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.08);
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      border-left: 3.5px solid #EF4444;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .router-alert-banner.alert-danger {
-      background: linear-gradient(135deg, rgba(254, 242, 242, 0.94) 0%, rgba(254, 226, 226, 0.88) 100%);
-      border: 1.5px solid rgba(239, 68, 68, 0.45);
-      color: #991B1B;
+      background: linear-gradient(135deg, rgba(254, 242, 242, 0.88) 0%, rgba(255, 255, 255, 0.94) 100%);
+      border-color: rgba(239, 68, 68, 0.20);
+      border-left-color: #EF4444;
     }
     .router-alert-banner.alert-warning {
-      background: linear-gradient(135deg, rgba(254, 252, 232, 0.94) 0%, rgba(254, 240, 199, 0.88) 100%);
-      border: 1.5px solid rgba(245, 158, 11, 0.45);
-      color: #92400E;
-    }
-    .router-alert-banner.alert-success {
-      background: linear-gradient(135deg, rgba(240, 253, 244, 0.94) 0%, rgba(220, 252, 231, 0.88) 100%);
-      border: 1.5px solid rgba(16, 185, 129, 0.45);
-      color: #065F46;
+      background: linear-gradient(135deg, rgba(254, 252, 232, 0.88) 0%, rgba(255, 255, 255, 0.94) 100%);
+      border-color: rgba(245, 158, 11, 0.22);
+      border-left-color: #F59E0B;
     }
     .router-alert-banner.alert-info {
-      background: linear-gradient(135deg, rgba(239, 246, 255, 0.94) 0%, rgba(219, 234, 254, 0.88) 100%);
-      border: 1.5px solid rgba(59, 130, 246, 0.45);
-      color: #1E40AF;
+      background: linear-gradient(135deg, rgba(239, 246, 255, 0.88) 0%, rgba(255, 255, 255, 0.94) 100%);
+      border-color: rgba(59, 130, 246, 0.20);
+      border-left-color: #3B82F6;
     }
-    .router-alert-banner .alert-icon {
-      font-size: 20px;
+    .router-alert-banner.alert-success {
+      background: linear-gradient(135deg, rgba(240, 253, 244, 0.88) 0%, rgba(255, 255, 255, 0.94) 100%);
+      border-color: rgba(16, 185, 129, 0.20);
+      border-left-color: #10B981;
+    }
+
+    .alert-icon-container {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+      margin-top: 1px;
     }
+    .alert-danger .alert-icon-container {
+      background: rgba(239, 68, 68, 0.10);
+      color: #EF4444;
+    }
+    .alert-warning .alert-icon-container {
+      background: rgba(245, 158, 11, 0.12);
+      color: #D97706;
+    }
+    .alert-info .alert-icon-container {
+      background: rgba(59, 130, 246, 0.10);
+      color: #2563EB;
+    }
+    .alert-success .alert-icon-container {
+      background: rgba(16, 185, 129, 0.10);
+      color: #059669;
+    }
+
     .router-alert-banner .alert-content {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
       min-width: 0;
+      flex: 1;
     }
     .router-alert-banner .alert-title {
       font-size: 13px;
-      font-weight: 800;
-      line-height: 1.25;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      color: #1E293B;
     }
+    .alert-danger .alert-title {
+      color: #B91C1C;
+    }
+    .alert-warning .alert-title {
+      color: #B45309;
+    }
+    .alert-info .alert-title {
+      color: #1D4ED8;
+    }
+    .alert-success .alert-title {
+      color: #047857;
+    }
+
     .router-alert-banner .alert-desc {
-      font-size: 11.5px;
-      font-weight: 500;
-      opacity: 0.92;
-      line-height: 1.35;
+      font-size: 12px;
+      font-weight: 450;
+      color: #475569;
+      line-height: 1.42;
+      opacity: 0.95;
     }
 
     /* Removed legacy messages panel */
@@ -1307,7 +1372,9 @@
             <div class="sheet-sub" id="modalDeviceIp">http://192.168.0.1</div>
           </div>
         </div>
-        <button class="sheet-close-btn" onclick="closeLoginModal()">✕</button>
+        <button class="sheet-close-btn" onclick="closeLoginModal()" title="Zamknij">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <div class="glass-form">
@@ -1349,20 +1416,23 @@
           <span class="dash-model-badge" id="dashModelBadge">ODU-IDU</span>
         </div>
         <div class="dash-header-actions">
-          <button class="dash-pill-btn" onclick="openBandDrawer()">
-            ⚡ Pasma
+          <button class="dash-pill-btn" onclick="openBandDrawer()" title="Konfiguracja pasm">
+            <svg class="btn-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Pasma</span>
           </button>
           <button class="dash-icon-btn" onclick="exitToDeviceManager()" title="Wróć do listy">
-            ✕
+            <svg class="btn-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
       </header>
 
-      <!-- Router Alert Banner (Dynamic highest priority message) -->
+      <!-- Router Alert Banner (Aesthetic Liquid Glass with Vector SVGs) -->
       <div class="router-alert-banner" id="routerAlertBanner" style="display:none;">
-        <span class="alert-icon" id="routerAlertIcon">⚠️</span>
+        <div class="alert-icon-container" id="routerAlertIconBox">
+          <!-- Dynamically populated SVG vector icon -->
+        </div>
         <div class="alert-content">
-          <div class="alert-title" id="routerAlertTitle">Status urządzenia</div>
+          <div class="alert-title" id="routerAlertTitle">Komunikat urządzenia</div>
           <div class="alert-desc" id="routerAlertDesc">---</div>
         </div>
       </div>
@@ -1379,9 +1449,9 @@
               <div class="sig-bar b4"></div>
               <div class="sig-bar b5"></div>
             </div>
-            <!-- Red Cross badge when no cellular signal / no SIM -->
+            <!-- Clean Red Cross Chip when no cellular signal / no SIM -->
             <div class="no-signal-cross-badge" id="noSignalCrossBadge" style="display:none;">
-              <span class="cross-icon-circle">✕</span>
+              <svg class="badge-icon-svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               <span>Brak zasięgu</span>
             </div>
             <!-- LTE or LTE+ Pill -->
@@ -1448,7 +1518,9 @@
     <aside class="slide-drawer liquid-glass" id="bandDrawer">
       <div class="drawer-header">
         <span class="drawer-title">Wymuszanie pasm</span>
-        <button class="drawer-close-btn" onclick="closeBandDrawer()">✕</button>
+        <button class="drawer-close-btn" onclick="closeBandDrawer()" title="Zamknij">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <!-- LTE+ Aggregation Switch -->
@@ -1487,7 +1559,7 @@
             <span class="band-name-main">LTE 1800 MHz (Band 3)</span>
             <span class="band-name-sub">Główne pasmo</span>
           </div>
-          <div class="band-checkbox">✓</div>
+          <div class="band-checkbox"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
 
         <div class="band-item-pill" data-band="B1" onclick="toggleBandSelect(this)">
@@ -1503,7 +1575,7 @@
             <span class="band-name-main">LTE 2600 MHz FDD (Band 7)</span>
             <span class="band-name-sub">Maksymalna prędkość FDD</span>
           </div>
-          <div class="band-checkbox">✓</div>
+          <div class="band-checkbox"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         </div>
 
         <div class="band-item-pill" data-band="B38" onclick="toggleBandSelect(this)">
@@ -1598,10 +1670,10 @@
       const devMsgDot = document.getElementById('deviceMsgDot');
       if (devMsgText) {
         if (msgs && msgs.some(m => m.level === 'danger' || m.level === 'warning')) {
-          devMsgText.textContent = '⚠️ Wykryto ostrzeżenie z routera';
+          devMsgText.textContent = 'Wykryto ostrzeżenie z routera';
           if (devMsgDot) devMsgDot.style.background = '#EF4444';
         } else {
-          devMsgText.textContent = '✓ ' + detectedRouterModel + ' aktywny (' + currentGatewayIp + realPingText + ')';
+          devMsgText.textContent = detectedRouterModel + ' aktywny (' + currentGatewayIp + realPingText + ')';
           if (devMsgDot) devMsgDot.style.background = '#10B981';
         }
       }
@@ -1721,14 +1793,14 @@
           try { localStorage.setItem('odu_router_password', pass); } catch (e) {}
         }
         fb.className = 'login-feedback show ok';
-        fb.textContent = '✓ ' + message;
+        fb.textContent = message;
         setTimeout(() => {
           closeLoginModal();
           enterDashboard(telemetryData);
         }, 400);
       } else {
         fb.className = 'login-feedback show err';
-        fb.textContent = '✕ ' + message;
+        fb.textContent = message;
         try { localStorage.removeItem('odu_router_password'); } catch (e) {}
         document.getElementById('loginBackdrop').classList.add('open');
       }
@@ -1791,18 +1863,22 @@
         document.getElementById('valRsrp').textContent = '---';
         const isLock = data.messages && data.messages.some(m => m.id === 'sim_lock_operator');
         const isSimInv = data.messages && data.messages.some(m => m.id === 'sim_invalid');
+        const ltePillEl = document.getElementById('lteTagPill');
         if (isLock) {
           document.getElementById('signalRsrpLabel').textContent = 'Blokada SIM Lock';
           document.getElementById('dashBandsRibbon').textContent = 'Karta zablokowana przez operatora Plus';
-          document.getElementById('lteTagPill').textContent = 'SIM Lock';
+          ltePillEl.textContent = 'SIM Lock';
+          ltePillEl.className = 'lte-tag-pill tag-lock';
         } else if (isSimInv) {
           document.getElementById('signalRsrpLabel').textContent = 'Karta nieobsługiwana';
           document.getElementById('dashBandsRibbon').textContent = 'Nieprawidłowa karta SIM';
-          document.getElementById('lteTagPill').textContent = 'Błąd SIM';
+          ltePillEl.textContent = 'Błąd SIM';
+          ltePillEl.className = 'lte-tag-pill no-service';
         } else {
           document.getElementById('signalRsrpLabel').textContent = 'Brak parametrów';
           document.getElementById('dashBandsRibbon').textContent = '--- (Brak sygnału)';
-          document.getElementById('lteTagPill').textContent = 'Brak LTE';
+          ltePillEl.textContent = 'Brak LTE';
+          ltePillEl.className = 'lte-tag-pill no-service';
         }
         document.getElementById('valRsrq').textContent = '---';
         document.getElementById('valSinr').textContent = '---';
@@ -1820,13 +1896,13 @@
           const simInvFault = data.messages.find(m => m.id === 'sim_invalid');
           const topDanger = data.messages.find(m => m.level === 'danger');
           if (lockFault) {
-            devMsgText.textContent = '🔒 Blokada SIM Lock: Karta Orange zablokowana';
+            devMsgText.textContent = 'Blokada SIM Lock: Karta Orange zablokowana';
             if (devMsgDot) devMsgDot.style.background = '#EF4444';
           } else if (simInvFault) {
-            devMsgText.textContent = '🚫 Karta SIM nieprawidłowa / brak autoryzacji';
+            devMsgText.textContent = 'Karta SIM nieprawidłowa lub brak autoryzacji';
             if (devMsgDot) devMsgDot.style.background = '#EF4444';
           } else if (topDanger) {
-            devMsgText.textContent = '⚠️ ' + (topDanger.title || 'Wykryto problem z routerem');
+            devMsgText.textContent = (topDanger.title || 'Wykryto problem z routerem').replace(/[^\x00-\x7FąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s\-\.\,\:\(\)\/]/g, '').trim();
             if (devMsgDot) devMsgDot.style.background = '#EF4444';
           }
         }
@@ -1843,9 +1919,34 @@
         .replace(/'/g, '&#039;');
     }
 
+    function getAlertSvgIcon(id, level) {
+      if (id === 'sim_lock_operator' || id === 'auth_required' || id === 'sim_pin_lock' || id === 'sim_puk_lock' || id === 'lock') {
+        // Padlock SVG
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+      }
+      if (id === 'no_cellular_signal' || id === 'signal_off') {
+        // Signal slash SVG
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M5 13a10 10 0 0 1 14 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>';
+      }
+      if (id === 'odu_link_fault' || id === 'link_off') {
+        // Disconnect / cable link fault SVG
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 0 1 0 12.72"></path><line x1="2" y1="2" x2="22" y2="22"></line><path d="M5 12.55a11 11 0 0 1 14.08 0"></path></svg>';
+      }
+      if (id === 'sim_invalid' || id === 'sim_missing_fault' || id === 'sim_error') {
+        // SIM card error SVG
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path><line x1="9" y1="13" x2="15" y2="13"></line></svg>';
+      }
+      if (id === 'sms_full_alert' || id === 'sms') {
+        // SMS message SVG
+        return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+      }
+      // General alert triangle SVG
+      return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+    }
+
     function renderRouterMessages(messages) {
       const alertBanner = document.getElementById('routerAlertBanner');
-      const alertIcon = document.getElementById('routerAlertIcon');
+      const alertIconBox = document.getElementById('routerAlertIconBox');
       const alertTitle = document.getElementById('routerAlertTitle');
       const alertDesc = document.getElementById('routerAlertDesc');
 
@@ -1858,23 +1959,34 @@
         return;
       }
 
-      // Highest priority fault for hero alert banner
+      // Priority fault for hero alert banner
       let topAlert = faults.find(m => m.id === 'sim_lock_operator')
         || faults.find(m => m.id === 'sim_invalid')
+        || faults.find(m => m.id === 'odu_link_fault')
+        || faults.find(m => m.id === 'no_cellular_signal')
         || faults.find(m => m.level === 'danger')
         || faults[0];
 
       alertBanner.style.display = 'flex';
       alertBanner.className = 'router-alert-banner alert-' + (topAlert.level || 'danger');
-      if (alertIcon) alertIcon.textContent = topAlert.icon || '⚠️';
-      if (topAlert.id === 'sim_lock_operator') {
-        alertTitle.textContent = '🔒 Blokada SIM Lock: Karta zablokowana';
-      } else if (topAlert.id === 'sim_invalid') {
-        alertTitle.textContent = '🚫 Karta SIM nieprawidłowa';
-      } else {
-        alertTitle.textContent = '⚠️ Powiadomienie: Coś jest nie tak!';
+      if (alertIconBox) {
+        alertIconBox.innerHTML = getAlertSvgIcon(topAlert.id || topAlert.icon, topAlert.level);
       }
-      alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem z routerem';
+
+      if (topAlert.id === 'sim_lock_operator') {
+        alertTitle.textContent = 'Blokada karty SIM (SIM Lock)';
+      } else if (topAlert.id === 'sim_invalid') {
+        alertTitle.textContent = 'Karta SIM nieprawidłowa';
+      } else if (topAlert.id === 'odu_link_fault') {
+        alertTitle.textContent = 'Brak połączenia ODU z IDU';
+      } else if (topAlert.id === 'no_cellular_signal') {
+        alertTitle.textContent = 'Brak sygnału sieci komórkowej';
+      } else if (topAlert.id === 'sim_puk_lock' || topAlert.id === 'sim_pin_lock') {
+        alertTitle.textContent = 'Wymagana autoryzacja SIM';
+      } else {
+        alertTitle.textContent = (topAlert.title || 'Komunikat routera').replace(/[^\x00-\x7FąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s\-\.\,\:\(\)\/]/g, '').trim();
+      }
+      alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem ze statusem routera';
     }
 
     function refreshMessages() {
@@ -1895,12 +2007,12 @@
         currentSignalLevel = 0;
         meter.className = 'signal-bars-meter meter-0';
         if (crossBadge) crossBadge.style.display = 'inline-flex';
-        statusEl.textContent = '✕ Brak zasięgu z karty';
+        statusEl.textContent = 'Brak zasięgu z karty';
         statusEl.style.color = 'var(--danger)';
         subRsrp.textContent = 'Brak odczytu';
         subRsrp.style.color = 'var(--danger)';
         ltePill.textContent = 'Brak LTE';
-        ltePill.classList.add('no-service');
+        ltePill.className = 'lte-tag-pill no-service';
         return;
       }
 
@@ -1945,7 +2057,11 @@
     function toggleBandSelect(el) {
       el.classList.toggle('selected');
       const cb = el.querySelector('.band-checkbox');
-      cb.textContent = el.classList.contains('selected') ? '✓' : '';
+      if (el.classList.contains('selected')) {
+        cb.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      } else {
+        cb.innerHTML = '';
+      }
     }
 
     function toggleAggregation() {

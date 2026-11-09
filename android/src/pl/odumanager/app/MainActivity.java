@@ -916,7 +916,7 @@ public class MainActivity extends Activity {
                     msgAlert.put("category", "KOMUNIKAT Z ROUTERA");
                     msgAlert.put("time", timeStr);
                     msgAlert.put("level", "danger");
-                    msgAlert.put("icon", "⚠️");
+                    msgAlert.put("icon", "alert");
                     msgAlert.put("title", "Komunikat z panelu routera");
                     msgAlert.put("text", rawAlert);
                     arr.put(msgAlert);
@@ -936,7 +936,7 @@ public class MainActivity extends Activity {
                     msgOdu.put("category", "AWARIA ODU");
                     msgOdu.put("time", timeStr);
                     msgOdu.put("level", "danger");
-                    msgOdu.put("icon", "⚠️");
+                    msgOdu.put("icon", "link_off");
                     msgOdu.put("title", "Brak połączenia pomiędzy ODU a IDU");
                     msgOdu.put("text", "Router IDU zgłasza brak połączenia z anteną zewnętrzną ODU. Sprawdź kabel koncentryczny anteny i zasilanie PoCoax.");
                     arr.put(msgOdu);
@@ -969,8 +969,8 @@ public class MainActivity extends Activity {
                     msgLock.put("category", "BLOKADA OPERATORA");
                     msgLock.put("time", timeStr);
                     msgLock.put("level", "danger");
-                    msgLock.put("icon", "🔒");
-                    msgLock.put("title", "Blokada SIM Lock: Karta Orange zablokowana");
+                    msgLock.put("icon", "lock");
+                    msgLock.put("title", "Blokada SIM Lock (karta zablokowana)");
                     msgLock.put("text", "Włożona karta Orange jest zablokowana przez blokadę operatora Plus/Cyfrowy Polsat (USIM SIMLOCK • NETLOCK Locked). Router wymaga kodu odblokowującego (Code to disable Operator Lock).");
                     arr.put(msgLock);
                 }
@@ -989,7 +989,7 @@ public class MainActivity extends Activity {
                     msgSimInv.put("category", "BŁĄD KARTY SIM");
                     msgSimInv.put("time", timeStr);
                     msgSimInv.put("level", "danger");
-                    msgSimInv.put("icon", "🚫");
+                    msgSimInv.put("icon", "sim_error");
                     msgSimInv.put("title", "Karta SIM nieprawidłowa lub nieobsługiwana");
                     msgSimInv.put("text", "Router zgłasza: Karta USIM w modemie ODU jest nieprawidłowa lub nie pochodzi od autoryzowanego operatora sieci.");
                     arr.put(msgSimInv);
@@ -1011,7 +1011,7 @@ public class MainActivity extends Activity {
                         msgSim.put("category", "BLOKADA SIM");
                         msgSim.put("time", timeStr);
                         msgSim.put("level", "danger");
-                        msgSim.put("icon", "🚫");
+                        msgSim.put("icon", "lock");
                         msgSim.put("title", "Karta SIM zablokowana (kod PUK)");
                         msgSim.put("text", "Karta SIM w modemie zewnętrznym ODU została zablokowana. Wymagane odblokowanie kodem PUK od operatora.");
                         arr.put(msgSim);
@@ -1021,7 +1021,7 @@ public class MainActivity extends Activity {
                         msgSim.put("category", "BLOKADA SIM");
                         msgSim.put("time", timeStr);
                         msgSim.put("level", "warning");
-                        msgSim.put("icon", "🔐");
+                        msgSim.put("icon", "lock");
                         msgSim.put("title", "Wymagany kod PIN karty SIM");
                         msgSim.put("text", "Karta SIM oczekuje na autoryzację kodem PIN w panelu routera.");
                         arr.put(msgSim);
@@ -1031,7 +1031,7 @@ public class MainActivity extends Activity {
                         msgSim.put("category", "BŁĄD KARTY SIM");
                         msgSim.put("time", timeStr);
                         msgSim.put("level", "danger");
-                        msgSim.put("icon", "✕");
+                        msgSim.put("icon", "sim_error");
                         msgSim.put("title", "Brak karty SIM w modemie ODU");
                         msgSim.put("text", "Router zgłasza brak karty USIM w slocie modemu ODU.");
                         arr.put(msgSim);
@@ -1051,7 +1051,7 @@ public class MainActivity extends Activity {
                     msgAuth.put("category", "AUTORYZACJA");
                     msgAuth.put("time", timeStr);
                     msgAuth.put("level", "warning");
-                    msgAuth.put("icon", "🔐");
+                    msgAuth.put("icon", "lock");
                     msgAuth.put("title", "Wymagane logowanie do routera");
                     msgAuth.put("text", "Aplikacja oczekuje na autoryzację w panelu routera. Kliknij w ikonę urządzenia i podaj hasło administratora.");
                     arr.put(msgAuth);
@@ -1064,7 +1064,7 @@ public class MainActivity extends Activity {
                     msgNet.put("category", "BRAK SYGNAŁU");
                     msgNet.put("time", timeStr);
                     msgNet.put("level", "danger");
-                    msgNet.put("icon", "📵");
+                    msgNet.put("icon", "signal_off");
                     msgNet.put("title", "Brak zasięgu sieci komórkowej");
                     msgNet.put("text", "Router nie odbiera sygnału ze stacji bazowej operatora. Sprawdź ustawienie anteny zewnętrznej.");
                     arr.put(msgNet);
@@ -1077,7 +1077,7 @@ public class MainActivity extends Activity {
                     msgSms.put("category", "PAMIĘĆ SMS");
                     msgSms.put("time", timeStr);
                     msgSms.put("level", "warning");
-                    msgSms.put("icon", "💬");
+                    msgSms.put("icon", "sms");
                     msgSms.put("title", "Pamięć SMS jest przepełniona");
                     msgSms.put("text", "Pamięć skrzynki SMS na karcie SIM jest pełna. Nowe wiadomości mogą nie docierać.");
                     arr.put(msgSms);
