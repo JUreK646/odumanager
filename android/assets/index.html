@@ -1732,6 +1732,7 @@
     let currentSignalLevel = 4;
     let isAggregationEnabled = false;
     let telemetryPollTimer = null;
+    let currentTelemetryData = null;
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1811,6 +1812,14 @@
       }
 
       showScreen('deviceManagerScreen');
+
+      // Auto-fetch status if password was previously saved
+      try {
+        const savedPass = localStorage.getItem('odu_router_password');
+        if (savedPass && window.OduBridge && window.OduBridge.loginToRouter) {
+          window.OduBridge.loginToRouter(currentGatewayIp, 'admin', savedPass);
+        }
+      } catch (e) {}
     };
 
     function performInitialCheck() {
@@ -1841,11 +1850,21 @@
     };
 
     function openLoginModal() {
+      if (currentTelemetryData) {
+        enterDashboard(currentTelemetryData);
+        return;
+      }
       const fb = document.getElementById('loginFeedback');
       fb.className = 'login-feedback';
       fb.textContent = '';
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
+      try {
+        const savedPass = localStorage.getItem('odu_router_password');
+        if (savedPass && !document.getElementById('loginPass').value) {
+          document.getElementById('loginPass').value = savedPass;
+        }
+      } catch (e) {}
       document.getElementById('loginBackdrop').classList.add('open');
     }
 
@@ -1903,6 +1922,10 @@
       btn.textContent = 'Zaloguj się do panelu';
 
       if (success) {
+        const pass = document.getElementById('loginPass').value;
+        if (pass) {
+          try { localStorage.setItem('odu_router_password', pass); } catch (e) {}
+        }
         fb.className = 'login-feedback show ok';
         fb.textContent = '✓ ' + message;
         setTimeout(() => {
@@ -1978,8 +2001,26 @@
         document.getElementById('lteTagPill').textContent = 'Brak LTE';
       }
 
+      currentTelemetryData = data;
       if (data.messages) {
         renderRouterMessages(data.messages);
+        const devMsgText = document.getElementById('deviceMsgText');
+        const devMsgDot = document.getElementById('deviceMsgDot');
+        if (devMsgText && Array.isArray(data.messages)) {
+          const lockFault = data.messages.find(m => m.id === 'sim_lock_operator');
+          const simInvFault = data.messages.find(m => m.id === 'sim_invalid');
+          const topDanger = data.messages.find(m => m.level === 'danger');
+          if (lockFault) {
+            devMsgText.textContent = '🔒 Blokada SIM Lock: Karta Orange zablokowana';
+            if (devMsgDot) devMsgDot.style.background = '#EF4444';
+          } else if (simInvFault) {
+            devMsgText.textContent = '🚫 Karta SIM nieprawidłowa / brak autoryzacji';
+            if (devMsgDot) devMsgDot.style.background = '#EF4444';
+          } else if (topDanger) {
+            devMsgText.textContent = '⚠️ ' + (topDanger.title || 'Wykryto problem z routerem');
+            if (devMsgDot) devMsgDot.style.background = '#EF4444';
+          }
+        }
       }
     }
 
@@ -2038,8 +2079,14 @@
         alertBanner.style.display = 'flex';
         alertBanner.className = 'router-alert-banner alert-' + (topAlert.level || 'danger');
         if (alertIcon) alertIcon.textContent = topAlert.icon || '⚠️';
-        if (alertTitle) alertTitle.textContent = 'Powiadomienie: Coś jest nie tak!';
-        if (alertDesc) alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem z routerem';
+        if (topAlert.id === 'sim_lock_operator') {
+          alertTitle.textContent = '🔒 Blokada SIM Lock: Karta zablokowana';
+        } else if (topAlert.id === 'sim_invalid') {
+          alertTitle.textContent = '🚫 Karta SIM nieprawidłowa';
+        } else {
+          alertTitle.textContent = '⚠️ Powiadomienie: Coś jest nie tak!';
+        }
+        alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem z routerem';
       }
 
       // Render cards in router messages list

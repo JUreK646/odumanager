@@ -417,43 +417,49 @@ public class MainActivity extends Activity {
                                     gwCandidate = ip;
                                     realMeasuredPing = Math.max(1, elapsed);
 
-                                    // Genuine hardware platform fingerprinting:
-                                    // ODU-IDU 200 platform signature: U270 (InterPhone IDU-200 / ODU-200)
-                                    boolean is200 = adminXml.contains("U270") || adminXml.contains("IDU-200") || adminXml.contains("ODU-200") || rootHtml.contains("IDU-200");
-
-                                    // ODU-IDU 100 platform signature: U100
-                                    boolean is100 = !is200 && (adminXml.contains("U100") || adminXml.contains("IDU-100") || adminXml.contains("ODU-100"));
-
-                                    // ODU-IDU 300 platform signature: U300, IDU-300, ODU-300, PT30, PT40, CPE3, or B1 2100MHz (sysfwnetd2100)
-                                    boolean is300 = !is200 && !is100 && (adminXml.contains("U300")
+                                    // 1. ODU-IDU 300 signature: EasyMesh support (mesh_tplg, setting mesh tplg), MT7621, B1 2100MHz (sysfwnetd2100), U300, IDU-300
+                                    boolean is300 = adminXml.contains("mesh_tplg")
+                                            || adminXml.contains("setting mesh tplg")
+                                            || adminXml.contains("setting 5g menu3_mesh_5G")
+                                            || adminXml.contains("sysfwnetd2100")
+                                            || adminXml.contains("U300")
                                             || adminXml.contains("IDU-300")
                                             || adminXml.contains("ODU-300")
-                                            || rootHtml.contains("IDU-300")
-                                            || adminXml.contains("PT30")
-                                            || adminXml.contains("PT40")
-                                            || adminXml.contains("CPE3")
-                                            || adminXml.contains("sysfwnetd2100"));
+                                            || rootHtml.contains("IDU-300");
+
+                                    // 2. ODU-IDU 200 signature: U270 (without EasyMesh), MT7620 Cat.4
+                                    boolean is200 = !is300 && (adminXml.contains("U270")
+                                            || adminXml.contains("IDU-200")
+                                            || adminXml.contains("ODU-200")
+                                            || rootHtml.contains("IDU-200"));
+
+                                    // 3. ODU-IDU 100 signature: U100, RT3352 Cat.3
+                                    boolean is100 = !is300 && !is200 && (adminXml.contains("U100")
+                                            || adminXml.contains("IDU-100")
+                                            || adminXml.contains("ODU-100")
+                                            || rootHtml.contains("IDU-100"));
 
                                     if (!is200 && !is100 && !is300) {
-                                        is200 = true; // Reference standard
+                                        is300 = true; // Fallback to 300 if modern dictionary
                                     }
 
                                     Log.d(TAG, "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
-                                    Log.d(TAG, "Fingerprint check: is200=" + is200 + ", is300=" + is300 + ", is100=" + is100);
+                                    Log.d(TAG, "Debug search - mesh_tplg: " + adminXml.indexOf("mesh_tplg") + ", U270: " + adminXml.indexOf("U270") + ", mesh: " + adminXml.indexOf("mesh"));
+                                    Log.d(TAG, "Fingerprint check: is300=" + is300 + ", is200=" + is200 + ", is100=" + is100);
 
-                                    if (is200) {
-                                        setModel = "ODU-IDU 200";
-                                        iduModel = "IDU-200";
-                                        oduModel = "ODU-200";
-                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
-                                        bandsSpec = "B3 / B7 / B8 / B20 + B38 TDD";
-                                        coaxSpec = "PoCoax • Unicable LNB";
-                                    } else if (is300) {
+                                    if (is300) {
                                         setModel = "ODU-IDU 300";
                                         iduModel = "IDU-300";
                                         oduModel = "ODU-300";
                                         catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
                                         bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
+                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    } else if (is200) {
+                                        setModel = "ODU-IDU 200";
+                                        iduModel = "IDU-200";
+                                        oduModel = "ODU-200";
+                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
+                                        bandsSpec = "B3 / B7 / B8 / B20 + B38 TDD";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     } else if (is100) {
                                         setModel = "ODU-IDU 100";
@@ -463,11 +469,11 @@ public class MainActivity extends Activity {
                                         bandsSpec = "FDD B3 (1800 MHz)";
                                         coaxSpec = "PoCoax • Zasilanie ODU";
                                     } else {
-                                        setModel = "ODU-IDU 200";
-                                        iduModel = "IDU-200";
-                                        oduModel = "ODU-200";
-                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
-                                        bandsSpec = "B3 / B7 / B8 / B20 + B38 TDD";
+                                        setModel = "ODU-IDU 300";
+                                        iduModel = "IDU-300";
+                                        oduModel = "ODU-300";
+                                        catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
+                                        bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     }
                                     Log.d(TAG, "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
@@ -566,7 +572,7 @@ public class MainActivity extends Activity {
                         } else if (location.contains("id=401")) {
                             success = false;
                             message = "Nieprawidłowe hasło lub login routera (kod 401). Wpisz poprawne hasło.";
-                        } else if (location.contains("/idu/home") || responseCode == 200 || (responseCode == 302 && !location.contains("401"))) {
+                        } else if (location.contains("/idu/home") || location.contains("netlock") || location.contains("simlock") || responseCode == 200 || (responseCode == 302 && !location.contains("401"))) {
                             success = true;
                             message = "Zalogowano pomyślnie do " + targetIp;
 
@@ -576,8 +582,13 @@ public class MainActivity extends Activity {
                             String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                             String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
                             String statusHtml = fetchHttpString("http://" + targetIp + "/idu/status.shtml", 2000);
+                            String netlockHtml = fetchHttpString("http://" + targetIp + "/idu/netlock.shtml", 2000);
+                            String simlockHtml = fetchHttpString("http://" + targetIp + "/idu/simlock.shtml", 2000);
+                            String pinHtml = fetchHttpString("http://" + targetIp + "/idu/pin.shtml", 2000);
+                            String locHtml = (!location.isEmpty() && location.startsWith("/")) ? fetchHttpString("http://" + targetIp + location, 2000) : "";
 
-                            jsonTelemetry = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml, realPing, targetIp, "ODU-IDU 200");
+                            String combined = homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml + "\n" + netlockHtml + "\n" + simlockHtml + "\n" + pinHtml + "\n" + locHtml;
+                            jsonTelemetry = parseRouterTelemetry(combined, realPing, targetIp, "ODU-IDU 300");
                         } else {
                             success = false;
                             message = "Odpowiedź routera HTTP " + responseCode;
@@ -625,8 +636,12 @@ public class MainActivity extends Activity {
                     String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                     String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
                     String statusHtml = fetchHttpString("http://" + targetIp + "/idu/status.shtml", 2000);
+                    String netlockHtml = fetchHttpString("http://" + targetIp + "/idu/netlock.shtml", 2000);
+                    String simlockHtml = fetchHttpString("http://" + targetIp + "/idu/simlock.shtml", 2000);
+                    String pinHtml = fetchHttpString("http://" + targetIp + "/idu/pin.shtml", 2000);
 
-                    final String json = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml, realPing, targetIp, "ODU-IDU 200");
+                    String combined = homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml + "\n" + netlockHtml + "\n" + simlockHtml + "\n" + pinHtml;
+                    final String json = parseRouterTelemetry(combined, realPing, targetIp, "ODU-IDU 300");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -745,50 +760,97 @@ public class MainActivity extends Activity {
                     arr.put(msgOdu);
                 }
 
-                // 2. SIM / USIM faults
-                boolean pukLock = html.contains("PUK lock") || html.contains("PUK jest Zamknięty") || html.contains("Wymagany PUK");
-                boolean pinLock = html.contains("PIN lock") || html.contains("PIN jest Zamknięty") || html.contains("Wymagany PIN");
+                // 2. Blokada SIM Lock / NETLOCK / Operator Lock (np. karta Orange w routerze Plus)
+                boolean isSimLock = html.contains("Blokada SIM Lock")
+                        || html.contains("karta niedozwolona")
+                        || html.contains("language USIM Netlock")
+                        || html.contains("language USIM Not Ready")
+                        || html.contains("Operator Lock")
+                        || html.contains("NETLOCK")
+                        || html.contains("Unlock NETLOCK")
+                        || html.contains("W celu zdjęcia blokady SIM Lock")
+                        || html.contains("Code to disable Operator Lock")
+                        || html.contains("disable the Operator Lock")
+                        || html.contains("card not permitted")
+                        || html.contains("Device is locked");
+
+                if (isSimLock) {
+                    JSONObject msgLock = new JSONObject();
+                    msgLock.put("id", "sim_lock_operator");
+                    msgLock.put("category", "BLOKADA OPERATORA");
+                    msgLock.put("time", timeStr);
+                    msgLock.put("level", "danger");
+                    msgLock.put("icon", "🔒");
+                    msgLock.put("title", "Blokada SIM Lock (karta niedozwolona)");
+                    msgLock.put("text", "Włożona karta SIM (np. Orange) jest zablokowana przez blokadę operatora Plus/Cyfrowy Polsat (SIM Lock / NETLOCK). Karta nie może połączyć się z siecią – prosimy o odblokowanie routera kodem odblokowującym.");
+                    arr.put(msgLock);
+                }
+
+                // 3. Karta USIM nieprawidłowa
+                boolean isSimInvalid = !isSimLock && (html.contains("karta USIM jest nieprawidłowa")
+                        || html.contains("karta SIM jest nieprawidłowa")
+                        || html.contains("USIM Card invalid")
+                        || html.contains("invalid sim card")
+                        || html.contains("disconnected invalid sim card")
+                        || html.contains("Nieprawidłowa karta"));
+
+                if (isSimInvalid) {
+                    JSONObject msgSimInv = new JSONObject();
+                    msgSimInv.put("id", "sim_invalid");
+                    msgSimInv.put("category", "BŁĄD KARTY SIM");
+                    msgSimInv.put("time", timeStr);
+                    msgSimInv.put("level", "danger");
+                    msgSimInv.put("icon", "🚫");
+                    msgSimInv.put("title", "Karta SIM nieprawidłowa lub nieobsługiwana");
+                    msgSimInv.put("text", "Router zgłasza: Karta USIM w modemie ODU jest nieprawidłowa lub nie pochodzi od autoryzowanego operatora sieci.");
+                    arr.put(msgSimInv);
+                }
+
+                // 4. SIM / USIM faults (PIN / PUK / Missing)
+                boolean pukLock = html.contains("PUK lock") || html.contains("PUK jest Zamknięty") || html.contains("Wymagany PUK") || html.contains("PUK jest zablokowany");
+                boolean pinLock = html.contains("PIN lock") || html.contains("PIN jest Zamknięty") || html.contains("Wymagany PIN") || html.contains("PIN jest zablokowany");
                 boolean simMissing = html.contains("No SIM inserted")
                         || html.contains("Brak karty SIM")
-                        || html.contains("Brak karty USIM lub karta USIM jest nieprawidłowa!")
                         || html.contains("SIM card not inserted")
                         || html.contains("Nie włożono karty")
                         || html.contains("SIM not inserted");
 
-                if (pukLock) {
-                    JSONObject msgSim = new JSONObject();
-                    msgSim.put("id", "sim_puk_lock");
-                    msgSim.put("category", "BLOKADA SIM");
-                    msgSim.put("time", timeStr);
-                    msgSim.put("level", "danger");
-                    msgSim.put("icon", "🚫");
-                    msgSim.put("title", "Karta SIM zablokowana (kod PUK)");
-                    msgSim.put("text", "Karta SIM w modemie zewnętrznym ODU została zablokowana. Wymagane odblokowanie kodem PUK od operatora.");
-                    arr.put(msgSim);
-                } else if (pinLock) {
-                    JSONObject msgSim = new JSONObject();
-                    msgSim.put("id", "sim_pin_lock");
-                    msgSim.put("category", "BLOKADA SIM");
-                    msgSim.put("time", timeStr);
-                    msgSim.put("level", "warning");
-                    msgSim.put("icon", "🔐");
-                    msgSim.put("title", "Wymagany kod PIN karty SIM");
-                    msgSim.put("text", "Karta SIM oczekuje na autoryzację kodem PIN w panelu routera.");
-                    arr.put(msgSim);
-                } else if (simMissing) {
-                    JSONObject msgSim = new JSONObject();
-                    msgSim.put("id", "sim_missing_fault");
-                    msgSim.put("category", "BŁĄD KARTY SIM");
-                    msgSim.put("time", timeStr);
-                    msgSim.put("level", "danger");
-                    msgSim.put("icon", "✕");
-                    msgSim.put("title", "Brak karty SIM w modemie ODU");
-                    msgSim.put("text", "Router zgłasza brak karty USIM lub karta jest nieprawidłowo osadzona w slocie ODU.");
-                    arr.put(msgSim);
+                if (!isSimLock && !isSimInvalid) {
+                    if (pukLock) {
+                        JSONObject msgSim = new JSONObject();
+                        msgSim.put("id", "sim_puk_lock");
+                        msgSim.put("category", "BLOKADA SIM");
+                        msgSim.put("time", timeStr);
+                        msgSim.put("level", "danger");
+                        msgSim.put("icon", "🚫");
+                        msgSim.put("title", "Karta SIM zablokowana (kod PUK)");
+                        msgSim.put("text", "Karta SIM w modemie zewnętrznym ODU została zablokowana. Wymagane odblokowanie kodem PUK od operatora.");
+                        arr.put(msgSim);
+                    } else if (pinLock) {
+                        JSONObject msgSim = new JSONObject();
+                        msgSim.put("id", "sim_pin_lock");
+                        msgSim.put("category", "BLOKADA SIM");
+                        msgSim.put("time", timeStr);
+                        msgSim.put("level", "warning");
+                        msgSim.put("icon", "🔐");
+                        msgSim.put("title", "Wymagany kod PIN karty SIM");
+                        msgSim.put("text", "Karta SIM oczekuje na autoryzację kodem PIN w panelu routera.");
+                        arr.put(msgSim);
+                    } else if (simMissing) {
+                        JSONObject msgSim = new JSONObject();
+                        msgSim.put("id", "sim_missing_fault");
+                        msgSim.put("category", "BŁĄD KARTY SIM");
+                        msgSim.put("time", timeStr);
+                        msgSim.put("level", "danger");
+                        msgSim.put("icon", "✕");
+                        msgSim.put("title", "Brak karty SIM w modemie ODU");
+                        msgSim.put("text", "Router zgłasza brak karty USIM w slocie modemu ODU.");
+                        arr.put(msgSim);
+                    }
                 }
 
-                // 3. Cellular signal fault
-                if (!hasSignal && !oduDisconnected) {
+                // 5. Cellular signal fault
+                if (!hasSignal && !oduDisconnected && !isSimLock && !isSimInvalid && !simMissing && !pinLock && !pukLock) {
                     JSONObject msgNet = new JSONObject();
                     msgNet.put("id", "no_cellular_signal");
                     msgNet.put("category", "BRAK SYGNAŁU");
