@@ -5,25 +5,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.RouteInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.util.Log;
-import android.net.wifi.WifiManager;
-import android.net.DhcpInfo;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -43,12 +46,56 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends Activity {
 
+    private static final String TAG = "OduManager";
+
+    // Strict private IPv4 pattern to protect against SSRF and unauthorized network destinations
+    private static final Pattern PRIVATE_IPV4_PATTERN =
+            Pattern.compile("^((192\\.168\\.\\d{1,3}\\.\\d{1,3})|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.(1[6-9]|2\\d|3[0-1])\\.\\d{1,3}\\.\\d{1,3}))$");
+
     private WebView webView;
     private ConnectivityManager.NetworkCallback networkCallback;
 
     static {
         // Automatically accept and maintain session cookies across HttpURLConnection requests
         CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+    }
+
+    private static boolean isValidRouterIp(String ip) {
+        if (ip == null || ip.isEmpty() || ip.length() > 15) return false;
+        Matcher m = PRIVATE_IPV4_PATTERN.matcher(ip);
+        if (!m.matches()) return false;
+        String[] parts = ip.split("\\.");
+        if (parts.length != 4) return false;
+        for (String part : parts) {
+            try {
+                int val = Integer.parseInt(part);
+                if (val < 0 || val > 255) return false;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String sanitizeTargetIp(String ip) {
+        if (ip != null && isValidRouterIp(ip.trim())) {
+            return ip.trim();
+        }
+        String detected = getDetectedGatewayIp();
+        if (isValidRouterIp(detected)) {
+            return detected;
+        }
+        return "192.168.0.1";
+    }
+
+    private static String sanitizeBandSelection(String bands) {
+        if (bands == null) return "";
+        // Only permit alphanumeric characters, commas and spaces (e.g. "B1,B3,B7" or "1,3,7,20,38")
+        String sanitized = bands.replaceAll("[^a-zA-Z0-9, ]", "").trim();
+        if (sanitized.length() > 64) {
+            sanitized = sanitized.substring(0, 64);
+        }
+        return sanitized;
     }
 
     @Override
@@ -73,15 +120,44 @@ public class MainActivity extends Activity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
+
+        // Security hardening: restrict file and content system access from WebView
+        settings.setAllowFileAccess(false);
+        settings.setAllowContentAccess(false);
+        settings.setAllowFileAccessFromFileURLs(false);
+        settings.setAllowUniversalAccessFromFileURLs(false);
+        settings.setSaveFormData(false);
+        settings.setGeolocationEnabled(false);
+
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         webView.setBackgroundColor(Color.parseColor("#EAF2FF"));
         webView.setWebChromeClient(new WebChromeClient());
-        webView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null && url.startsWith("file:///android_asset/")) {
+                    return false;
+                }
+                Log.w(TAG, "Blocked unauthorized navigation attempt to: " + url);
+                return true;
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request != null && request.getUrl() != null) {
+                    String url = request.getUrl().toString();
+                    if (url.startsWith("file:///android_asset/")) {
+                        return false;
+                    }
+                    Log.w(TAG, "Blocked unauthorized navigation attempt to: " + url);
+                    return true;
+                }
+                return true;
+            }
+        });
         webView.addJavascriptInterface(new OduBridge(), "OduBridge");
 
         setContentView(webView);
@@ -223,6 +299,11 @@ public class MainActivity extends Activity {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(urlString);
+            String host = url.getHost();
+            if (!isValidRouterIp(host)) {
+                Log.w(TAG, "Rejected HTTP request to non-private router host: " + host);
+                return "";
+            }
             conn = (HttpURLConnection) url.openConnection();
             conn.setUseCaches(false);
             conn.setDefaultUseCaches(false);
@@ -253,11 +334,6 @@ public class MainActivity extends Activity {
             }
         }
         return "";
-    }
-
-    private static String jsEscape(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
     }
 
     public class OduBridge {
@@ -297,7 +373,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     final boolean wifiOn = checkWifiTransport();
-                    String gwCandidate = getDetectedGatewayIp();
+                    String gwCandidate = sanitizeTargetIp(getDetectedGatewayIp());
                     boolean oduDetected = false;
                     long realMeasuredPing = -1;
 
@@ -314,6 +390,7 @@ public class MainActivity extends Activity {
                                 : new String[]{gwCandidate, "192.168.0.1"};
 
                         for (String ip : candidates) {
+                            if (!isValidRouterIp(ip)) continue;
                             long t0 = System.currentTimeMillis();
                             String rootHtml = fetchHttpString("http://" + ip + "/", 2000);
                             long elapsed = System.currentTimeMillis() - t0;
@@ -353,8 +430,8 @@ public class MainActivity extends Activity {
 
                                     boolean is200 = !is300 && !is100;
 
-                                    Log.d("OduManager", "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
-                                    Log.d("OduManager", "Fingerprint check: is300=" + is300 + " (mesh=" + hasMesh + ", size=" + is300Size + ", tag=" + has300Tag + "), is200=" + is200 + ", is100=" + is100);
+                                    Log.d(TAG, "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
+                                    Log.d(TAG, "Fingerprint check: is300=" + is300 + " (mesh=" + hasMesh + ", size=" + is300Size + ", tag=" + has300Tag + "), is200=" + is200 + ", is100=" + is100);
 
                                     if (is300) {
                                         setModel = "ODU-IDU 300";
@@ -385,7 +462,7 @@ public class MainActivity extends Activity {
                                         bandsSpec = "FDD B3 / B7 / B20";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     }
-                                    Log.d("OduManager", "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
+                                    Log.d(TAG, "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
                                     break;
                                 }
                             }
@@ -406,17 +483,17 @@ public class MainActivity extends Activity {
                         @Override
                         public void run() {
                             String js = String.format(
-                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, '%s', %d, '%s', '%s', '%s', '%s', '%s', '%s');",
+                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, %s, %d, %s, %s, %s, %s, %s, %s);",
                                 wifiOn,
                                 finalOdu,
-                                jsEscape(finalGw),
+                                JSONObject.quote(finalGw),
                                 finalPing,
-                                jsEscape(fSetModel),
-                                jsEscape(fIduModel),
-                                jsEscape(fOduModel),
-                                jsEscape(fCatSpec),
-                                jsEscape(fBandsSpec),
-                                jsEscape(fCoaxSpec)
+                                JSONObject.quote(fSetModel),
+                                JSONObject.quote(fIduModel),
+                                JSONObject.quote(fOduModel),
+                                JSONObject.quote(fCatSpec),
+                                JSONObject.quote(fBandsSpec),
+                                JSONObject.quote(fCoaxSpec)
                             );
                             webView.evaluateJavascript(js, null);
                         }
@@ -437,7 +514,10 @@ public class MainActivity extends Activity {
 
                     HttpURLConnection conn = null;
                     try {
-                        String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
+                        String targetIp = sanitizeTargetIp(gatewayIp);
+                        String safeUsername = (username != null) ? username.trim() : "admin";
+                        String safePassword = (password != null) ? password : "";
+
                         long t0 = System.currentTimeMillis();
                         URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
                         conn = (HttpURLConnection) url.openConnection();
@@ -452,9 +532,9 @@ public class MainActivity extends Activity {
                         conn.setRequestProperty("Cookie", "language=polish");
 
                         String body = "page=Login&loginName="
-                                + URLEncoder.encode(username, "UTF-8")
+                                + URLEncoder.encode(safeUsername, "UTF-8")
                                 + "&loginPassword="
-                                + URLEncoder.encode(password, "UTF-8");
+                                + URLEncoder.encode(safePassword, "UTF-8");
 
                         byte[] postBytes = body.getBytes(StandardCharsets.UTF_8);
                         conn.setFixedLengthStreamingMode(postBytes.length);
@@ -506,9 +586,9 @@ public class MainActivity extends Activity {
                         @Override
                         public void run() {
                             String js = String.format(
-                                "window.onLoginResult && window.onLoginResult(%b, '%s', %s);",
+                                "window.onLoginResult && window.onLoginResult(%b, %s, %s);",
                                 finalSuccess,
-                                jsEscape(finalMsg),
+                                JSONObject.quote(finalMsg),
                                 finalJson
                             );
                             webView.evaluateJavascript(js, null);
@@ -523,7 +603,7 @@ public class MainActivity extends Activity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
+                    String targetIp = sanitizeTargetIp(gatewayIp);
                     long t0 = System.currentTimeMillis();
                     String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
                     long realPing = Math.max(1, System.currentTimeMillis() - t0);
@@ -564,18 +644,22 @@ public class MainActivity extends Activity {
                 cellId = "---";
             }
 
-            return "{"
-                    + "\"realPingMs\":" + realPing + ","
-                    + "\"signalLevel\":" + signalLevel + ","
-                    + "\"hasSignal\":" + hasSignal + ","
-                    + "\"isLtePlus\":" + isLtePlus + ","
-                    + "\"rsrp\":\"" + jsEscape(rsrp) + "\","
-                    + "\"rsrq\":\"" + jsEscape(rsrq) + "\","
-                    + "\"sinr\":\"" + jsEscape(sinr) + "\","
-                    + "\"rssi\":\"" + jsEscape(rssi) + "\","
-                    + "\"band\":\"" + jsEscape(band) + "\","
-                    + "\"cellId\":\"" + jsEscape(cellId) + "\""
-                    + "}";
+            try {
+                JSONObject json = new JSONObject();
+                json.put("realPingMs", realPing);
+                json.put("signalLevel", signalLevel);
+                json.put("hasSignal", hasSignal);
+                json.put("isLtePlus", isLtePlus);
+                json.put("rsrp", rsrp);
+                json.put("rsrq", rsrq);
+                json.put("sinr", sinr);
+                json.put("rssi", rssi);
+                json.put("band", band);
+                json.put("cellId", cellId);
+                return json.toString();
+            } catch (Exception e) {
+                return "{}";
+            }
         }
 
         private boolean isValidValue(String val) {
@@ -668,7 +752,8 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     try {
-                        String targetIp = (gatewayIp != null && !gatewayIp.isEmpty()) ? gatewayIp : "192.168.0.1";
+                        String targetIp = sanitizeTargetIp(gatewayIp);
+                        String safeBands = sanitizeBandSelection(bandSelection);
                         URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
                         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                         conn.setConnectTimeout(3000);
@@ -678,7 +763,7 @@ public class MainActivity extends Activity {
                         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                         conn.setRequestProperty("Referer", "http://" + targetIp + "/idu/lte.shtml");
 
-                        String body = "page=lteband&band=" + URLEncoder.encode(bandSelection, "UTF-8");
+                        String body = "page=lteband&band=" + URLEncoder.encode(safeBands, "UTF-8");
                         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
                         OutputStream os = conn.getOutputStream();
                         os.write(bytes);

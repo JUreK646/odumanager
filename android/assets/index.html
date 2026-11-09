@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file: data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' file: data:; connect-src 'self';" />
   <title>ODU Manager</title>
   <style>
     :root {
@@ -1232,14 +1233,14 @@
         <div class="glass-field">
           <label>Nazwa użytkownika</label>
           <div class="glass-input-wrap">
-            <input type="text" class="glass-input" id="loginUser" value="admin" placeholder="admin" autocomplete="off" />
+            <input type="text" class="glass-input" id="loginUser" value="admin" placeholder="admin" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </div>
         </div>
 
         <div class="glass-field">
           <label>Hasło do panelu routera</label>
           <div class="glass-input-wrap">
-            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera" />
+            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" />
             <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
           </div>
         </div>
