@@ -692,6 +692,9 @@
       gap: 6px;
       cursor: pointer;
       box-shadow: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
       transition: background 0.15s ease, transform 0.1s ease;
     }
     .dash-pill-btn:active {
@@ -937,32 +940,56 @@
       padding: 24px 20px 24px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
       transform: translateX(100%);
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
       overflow-y: auto;
+      background: rgba(248, 250, 253, 0.96);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: -12px 0 36px rgba(15, 23, 42, 0.20);
+      border-left: 1px solid rgba(226, 232, 240, 0.95);
     }
     .drawer-backdrop.open .slide-drawer {
       transform: translateX(0);
     }
     .drawer-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      padding-bottom: 6px;
+      padding-bottom: 2px;
+    }
+    .drawer-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
     }
     .drawer-title {
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text-primary);
     }
+    .drawer-model-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(24, 86, 255, 0.08);
+      border: 1px solid rgba(24, 86, 255, 0.20);
+      margin-top: 2px;
+      width: fit-content;
+    }
     .drawer-close-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      background: rgba(255, 255, 255, 0.72);
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(255, 255, 255, 0.85);
       color: var(--text-secondary);
       font-size: 16px;
       font-weight: 700;
@@ -970,6 +997,13 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+    .drawer-close-btn:active {
+      background: rgba(226, 232, 240, 0.85);
     }
     .drawer-section-title {
       font-size: 12px;
@@ -988,16 +1022,25 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 15px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.68);
-      border: 1.5px solid rgba(255, 255, 255, 0.92);
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(226, 232, 240, 0.9);
       cursor: pointer;
-      transition: all 0.16s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .band-item-pill:active {
+      transform: scale(0.98);
     }
     .band-item-pill.selected {
-      background: rgba(24, 86, 255, 0.12);
-      border-color: rgba(24, 86, 255, 0.45);
+      background: rgba(24, 86, 255, 0.08);
+      border-color: rgba(24, 86, 255, 0.35);
+    }
+    .band-item-pill.selected .band-name-main {
+      color: var(--primary);
     }
     .band-info-left {
       display: flex;
@@ -1005,41 +1048,74 @@
       gap: 2px;
     }
     .band-name-main {
-      font-size: 14px;
-      font-weight: 800;
+      font-size: 13.5px;
+      font-weight: 750;
       color: var(--text-primary);
     }
     .band-name-sub {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 500;
       color: var(--text-secondary);
     }
     .band-checkbox {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      border: 2px solid rgba(148, 163, 184, 0.5);
+      border: 1.5px solid rgba(148, 163, 184, 0.45);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.16s ease;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
     }
     .band-item-pill.selected .band-checkbox {
       border-color: var(--primary);
       background: var(--primary);
       color: #FFFFFF;
-      font-size: 12px;
-      font-weight: 800;
     }
 
     .agg-switch-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 13px 16px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.72);
-      border: 1.5px solid rgba(255, 255, 255, 0.94);
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      transition: all 0.2s ease;
+    }
+    .agg-switch-card.disabled {
+      background: rgba(248, 250, 252, 0.75);
+    }
+    .agg-lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #64748B;
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid rgba(148, 163, 184, 0.20);
+      white-space: nowrap;
+    }
+    .drawer-hw-notice {
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      color: #475569;
+      font-size: 11.5px;
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .drawer-hw-notice .notice-icon-svg {
+      color: var(--primary);
+      flex-shrink: 0;
+      margin-top: 1px;
     }
     .agg-switch-left {
       display: flex;
@@ -1515,79 +1591,29 @@
 
   <!-- 6. SLIDE-OUT BAND LOCKING DRAWER -->
   <div class="drawer-backdrop" id="bandDrawerBackdrop" onclick="drawerBackdropClick(event)">
-    <aside class="slide-drawer liquid-glass" id="bandDrawer">
+    <aside class="slide-drawer" id="bandDrawer">
       <div class="drawer-header">
-        <span class="drawer-title">Wymuszanie pasm</span>
+        <div class="drawer-header-left">
+          <span class="drawer-title">Wymuszanie pasm</span>
+          <div class="drawer-model-tag" id="drawerModelTag">ODU-IDU 200 • LTE Cat. 4</div>
+        </div>
         <button class="drawer-close-btn" onclick="closeBandDrawer()" title="Zamknij">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
-      <!-- LTE+ Aggregation Switch -->
-      <div class="agg-switch-card">
-        <div class="agg-switch-left">
-          <span class="agg-title">Agregacja pasm (LTE+)</span>
-          <span class="agg-sub" id="aggSubText">Łączenie pasm (2CA)</span>
-        </div>
-        <div class="toggle-track" id="aggToggle" onclick="toggleAggregation()">
-          <div class="toggle-thumb"></div>
-        </div>
-      </div>
+      <!-- LTE+ Aggregation Switch / Card (Dynamic per model) -->
+      <div id="drawerAggContainer"></div>
 
-      <div class="drawer-section-title">Wybierz pasma LTE</div>
+      <div class="drawer-section-title" id="drawerBandsTitle">Dostępne pasma LTE</div>
 
-      <!-- Band Options Stack -->
-      <div class="band-tiles-stack">
-        <div class="band-item-pill" data-band="B20" onclick="toggleBandSelect(this)">
-          <div class="band-info-left">
-            <span class="band-name-main">LTE 800 MHz (Band 20)</span>
-            <span class="band-name-sub">Zasięg daleki</span>
-          </div>
-          <div class="band-checkbox"></div>
-        </div>
+      <!-- Band Options Stack (Dynamic per model) -->
+      <div class="band-tiles-stack" id="drawerBandsStack"></div>
 
-        <div class="band-item-pill" data-band="B8" onclick="toggleBandSelect(this)">
-          <div class="band-info-left">
-            <span class="band-name-main">LTE 900 MHz (Band 8)</span>
-            <span class="band-name-sub">Plus GSM / LTE</span>
-          </div>
-          <div class="band-checkbox"></div>
-        </div>
+      <!-- Hardware Specific Notice (Dynamic per model) -->
+      <div class="drawer-hw-notice" id="drawerHwNotice"></div>
 
-        <div class="band-item-pill selected" data-band="B3" onclick="toggleBandSelect(this)">
-          <div class="band-info-left">
-            <span class="band-name-main">LTE 1800 MHz (Band 3)</span>
-            <span class="band-name-sub">Główne pasmo</span>
-          </div>
-          <div class="band-checkbox"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-        </div>
-
-        <div class="band-item-pill" data-band="B1" onclick="toggleBandSelect(this)">
-          <div class="band-info-left">
-            <span class="band-name-main">LTE 2100 MHz (Band 1)</span>
-            <span class="band-name-sub">Dodatkowe pasmo</span>
-          </div>
-          <div class="band-checkbox"></div>
-        </div>
-
-        <div class="band-item-pill selected" data-band="B7" onclick="toggleBandSelect(this)">
-          <div class="band-info-left">
-            <span class="band-name-main">LTE 2600 MHz FDD (Band 7)</span>
-            <span class="band-name-sub">Maksymalna prędkość FDD</span>
-          </div>
-          <div class="band-checkbox"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-        </div>
-
-        <div class="band-item-pill" data-band="B38" onclick="toggleBandSelect(this)">
-          <div class="band-info-left">
-            <span class="band-name-main">LTE 2600 MHz TDD (Band 38)</span>
-            <span class="band-name-sub">Pojemnościowe TDD Polsat</span>
-          </div>
-          <div class="band-checkbox"></div>
-        </div>
-      </div>
-
-      <button class="btn-glass-primary" onclick="applyBandSelection()">
+      <button class="btn-glass-primary" id="btnApplyBands" onclick="applyBandSelection()">
         Zastosuj wybrane pasma
       </button>
     </aside>
@@ -1604,6 +1630,310 @@
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+    }
+
+    // Model Band Specifications for hardware adaptation
+    const MODEL_BAND_SPECS = {
+      'ODU-IDU 100': {
+        modelName: 'ODU-IDU 100',
+        tag: 'ODU-IDU 100 • LTE Cat. 3',
+        supportsAggregation: false,
+        aggDisabledReason: 'Chipset Cat. 3 (Brak agregacji 2CA)',
+        aggBadgeText: 'Niedostępne',
+        multiSelect: false,
+        bands: [
+          {
+            id: 'B3',
+            code: '1800',
+            name: 'LTE 1800 MHz (Band 3)',
+            desc: 'Dedykowana antena ODU-100',
+            locked: true,
+            defaultSelected: true
+          }
+        ],
+        notice: 'Zewnętrzny zestaw ODU-100 posiada fabrycznie wbudowaną antenę kierunkową nastrojoną ściśle na częstotliwość 1800 MHz (Band 3). Przełączanie innych pasm nie jest możliwe sprzętowo.'
+      },
+      'ODU-IDU 200': {
+        modelName: 'ODU-IDU 200',
+        tag: 'ODU-IDU 200 • LTE Cat. 4',
+        supportsAggregation: false,
+        aggDisabledReason: 'Modem Cat. 4 Single-Carrier (Brak agregacji 2CA)',
+        aggBadgeText: 'Brak w Cat. 4',
+        multiSelect: false,
+        bands: [
+          {
+            id: 'AUTO',
+            code: 'auto',
+            name: 'Automatyczny wybór (Auto)',
+            desc: 'Domyślne sterowanie przez stację bazową',
+            defaultSelected: true
+          },
+          {
+            id: 'B3',
+            code: '1800',
+            name: 'LTE 1800 MHz (Band 3)',
+            desc: 'Główne pasmo pojemnościowe FDD'
+          },
+          {
+            id: 'B7',
+            code: '2600',
+            name: 'LTE 2600 MHz FDD (Band 7)',
+            desc: 'Maksymalna prędkość FDD (do 150 Mb/s)'
+          },
+          {
+            id: 'B20',
+            code: '800',
+            name: 'LTE 800 MHz (Band 20)',
+            desc: 'Pasmo dalekiego zasięgu FDD'
+          },
+          {
+            id: 'B8',
+            code: '900',
+            name: 'LTE 900 MHz (Band 8)',
+            desc: 'Zasięgowe pasmo Plus GSM / LTE'
+          },
+          {
+            id: 'B38',
+            code: '2570',
+            name: 'LTE 2600 MHz TDD (Band 38)',
+            desc: 'Pojemnościowe TDD Cyfrowy Polsat'
+          }
+        ],
+        notice: 'Modem ODU-200 (kategoria Cat. 4) obsługuje pracę w jednym wybranym paśmie na raz (Single-carrier). Wybór pasma blokuje modem na wybranej częstotliwości FDD lub TDD.'
+      },
+      'ODU-IDU 300': {
+        modelName: 'ODU-IDU 300',
+        tag: 'ODU-IDU 300 • LTE Cat. 6',
+        supportsAggregation: true,
+        aggTitle: 'Agregacja pasm (LTE+)',
+        aggSub: 'Łączenie 2 pasm (2CA do 300 Mb/s)',
+        multiSelect: true,
+        bands: [
+          {
+            id: 'AUTO',
+            code: 'auto',
+            name: 'Automatyczny wybór (Auto / 2CA)',
+            desc: 'Optymalny wybór stacji bazowej',
+            defaultSelected: true
+          },
+          {
+            id: 'B1',
+            code: '2100',
+            name: 'LTE 2100 MHz (Band 1)',
+            desc: 'Pasmo miejskie FDD 2100 MHz'
+          },
+          {
+            id: 'B3',
+            code: '1800',
+            name: 'LTE 1800 MHz (Band 3)',
+            desc: 'Główne pasmo pojemnościowe FDD'
+          },
+          {
+            id: 'B7',
+            code: '2600',
+            name: 'LTE 2600 MHz FDD (Band 7)',
+            desc: 'Pasmo maksymalnej pojemności FDD'
+          },
+          {
+            id: 'B8',
+            code: '900',
+            name: 'LTE 900 MHz (Band 8)',
+            desc: 'Zasięgowe pasmo Plus GSM'
+          },
+          {
+            id: 'B20',
+            code: '800',
+            name: 'LTE 800 MHz (Band 20)',
+            desc: 'Pasmo dalekiego zasięgu FDD'
+          },
+          {
+            id: 'B38',
+            code: '2570',
+            name: 'LTE 2600 MHz TDD (Band 38)',
+            desc: 'Pojemnościowe TDD Cyfrowy Polsat'
+          }
+        ],
+        notice: 'Modem ODU-300 w technologii LTE-Advanced (Cat. 6) pozwala na łączenie dwóch nośnych jednocześnie (np. B3+B7 lub B7+B20) dla uzyskania transferu do 300 Mb/s.'
+      }
+    };
+
+    let selectedBandIds = ['AUTO'];
+
+    function getModelSpec(modelName) {
+      if (modelName && modelName.includes('100')) return MODEL_BAND_SPECS['ODU-IDU 100'];
+      if (modelName && modelName.includes('300')) return MODEL_BAND_SPECS['ODU-IDU 300'];
+      return MODEL_BAND_SPECS['ODU-IDU 200'];
+    }
+
+    function renderBandDrawer(modelName) {
+      const spec = getModelSpec(modelName || detectedRouterModel);
+      
+      const tagEl = document.getElementById('drawerModelTag');
+      if (tagEl) tagEl.textContent = spec.tag;
+
+      const aggBox = document.getElementById('drawerAggContainer');
+      if (aggBox) {
+        if (spec.supportsAggregation) {
+          aggBox.innerHTML = `
+            <div class="agg-switch-card">
+              <div class="agg-switch-left">
+                <span class="agg-title">Agregacja pasm (LTE+)</span>
+                <span class="agg-sub" id="aggSubText">${isAggregationEnabled ? 'Łączenie pasm (2CA) aktywne' : 'Jedno pasmo aktywne (Single Band)'}</span>
+              </div>
+              <div class="toggle-track ${isAggregationEnabled ? 'active' : ''}" id="aggToggle" onclick="toggleAggregation()">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>`;
+        } else {
+          aggBox.innerHTML = `
+            <div class="agg-switch-card disabled">
+              <div class="agg-switch-left">
+                <span class="agg-title">Agregacja pasm (LTE+)</span>
+                <span class="agg-sub">${spec.aggDisabledReason}</span>
+              </div>
+              <span class="agg-lock-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                ${spec.aggBadgeText}
+              </span>
+            </div>`;
+        }
+      }
+
+      const validBandIds = spec.bands.map(b => b.id);
+      selectedBandIds = selectedBandIds.filter(id => validBandIds.includes(id));
+      if (selectedBandIds.length === 0) {
+        const def = spec.bands.find(b => b.defaultSelected);
+        selectedBandIds = def ? [def.id] : [validBandIds[0]];
+      }
+
+      const stack = document.getElementById('drawerBandsStack');
+      if (stack) {
+        stack.innerHTML = spec.bands.map(band => {
+          const isSelected = selectedBandIds.includes(band.id);
+          const checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+          return `
+            <div class="band-item-pill ${isSelected ? 'selected' : ''}" data-band="${band.id}" onclick="handleBandClick('${band.id}')">
+              <div class="band-info-left">
+                <span class="band-name-main">${band.name}</span>
+                <span class="band-name-sub">${band.desc}</span>
+              </div>
+              <div class="band-checkbox">${isSelected ? checkSvg : ''}</div>
+            </div>`;
+        }).join('');
+      }
+
+      const noticeBox = document.getElementById('drawerHwNotice');
+      if (noticeBox) {
+        noticeBox.innerHTML = `
+          <svg class="notice-icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span>${spec.notice}</span>`;
+      }
+    }
+
+    function handleBandClick(bandId) {
+      const spec = getModelSpec(detectedRouterModel);
+
+      if (spec.modelName === 'ODU-IDU 100') {
+        return;
+      }
+
+      if (!spec.multiSelect || !isAggregationEnabled) {
+        if (selectedBandIds.includes(bandId)) {
+          if (bandId !== 'AUTO') {
+            selectedBandIds = ['AUTO'];
+          }
+        } else {
+          selectedBandIds = [bandId];
+        }
+      } else {
+        if (bandId === 'AUTO') {
+          selectedBandIds = ['AUTO'];
+        } else {
+          selectedBandIds = selectedBandIds.filter(id => id !== 'AUTO');
+          if (selectedBandIds.includes(bandId)) {
+            selectedBandIds = selectedBandIds.filter(id => id !== bandId);
+            if (selectedBandIds.length === 0) {
+              selectedBandIds = ['AUTO'];
+            }
+          } else {
+            if (selectedBandIds.length >= 2) {
+              selectedBandIds.shift();
+            }
+            selectedBandIds.push(bandId);
+          }
+        }
+      }
+
+      const checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      document.querySelectorAll('#drawerBandsStack .band-item-pill').forEach(pill => {
+        const id = pill.getAttribute('data-band');
+        if (selectedBandIds.includes(id)) {
+          pill.classList.add('selected');
+          pill.querySelector('.band-checkbox').innerHTML = checkSvg;
+        } else {
+          pill.classList.remove('selected');
+          pill.querySelector('.band-checkbox').innerHTML = '';
+        }
+      });
+    }
+
+    function openBandDrawer() {
+      console.log('openBandDrawer CALLED with model: ' + detectedRouterModel);
+      renderBandDrawer(detectedRouterModel);
+      document.getElementById('bandDrawerBackdrop').classList.add('open');
+    }
+
+    function closeBandDrawer() {
+      document.getElementById('bandDrawerBackdrop').classList.remove('open');
+    }
+
+    function drawerBackdropClick(e) {
+      if (e.target.id === 'bandDrawerBackdrop') {
+        closeBandDrawer();
+      }
+    }
+
+    function toggleAggregation() {
+      const spec = getModelSpec(detectedRouterModel);
+      if (!spec.supportsAggregation) return;
+
+      isAggregationEnabled = !isAggregationEnabled;
+      const track = document.getElementById('aggToggle');
+      const sub = document.getElementById('aggSubText');
+      const pill = document.getElementById('lteTagPill');
+
+      if (isAggregationEnabled) {
+        if (track) track.classList.add('active');
+        if (sub) sub.textContent = 'Łączenie pasm (2CA) aktywne';
+        if (pill) pill.textContent = 'LTE+';
+      } else {
+        if (track) track.classList.remove('active');
+        if (sub) sub.textContent = 'Jedno pasmo aktywne (Single Band)';
+        if (pill) pill.textContent = 'LTE';
+        if (selectedBandIds.length > 1) {
+          selectedBandIds = [selectedBandIds[0]];
+        }
+      }
+      renderBandDrawer(detectedRouterModel);
+    }
+
+    function applyBandSelection() {
+      const spec = getModelSpec(detectedRouterModel);
+      const bandStr = selectedBandIds.join(',');
+
+      if (window.OduBridge && window.OduBridge.applyBandLock) {
+        window.OduBridge.applyBandLock(currentGatewayIp, bandStr);
+      }
+
+      const displayNames = selectedBandIds.map(id => {
+        const b = spec.bands.find(x => x.id === id);
+        return b ? b.id : id;
+      }).join(' + ');
+
+      if (window.OduBridge && window.OduBridge.showToast) {
+        window.OduBridge.showToast('Zastosowano dla ' + spec.modelName + ': ' + displayNames);
+      }
+      closeBandDrawer();
     }
 
     // Callback invoked by Android native OduBridge
@@ -1656,6 +1986,7 @@
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
       document.getElementById('dashModelBadge').textContent = detectedRouterModel;
+      renderBandDrawer(detectedRouterModel);
 
       let msgs = [];
       if (initialMessages) {
@@ -2037,63 +2368,6 @@
         subRsrp.textContent = 'Optymalny';
         subRsrp.style.color = 'var(--success)';
       }
-    }
-
-    // Side Drawer for Band Locking
-    function openBandDrawer() {
-      document.getElementById('bandDrawerBackdrop').classList.add('open');
-    }
-
-    function closeBandDrawer() {
-      document.getElementById('bandDrawerBackdrop').classList.remove('open');
-    }
-
-    function drawerBackdropClick(e) {
-      if (e.target.id === 'bandDrawerBackdrop') {
-        closeBandDrawer();
-      }
-    }
-
-    function toggleBandSelect(el) {
-      el.classList.toggle('selected');
-      const cb = el.querySelector('.band-checkbox');
-      if (el.classList.contains('selected')) {
-        cb.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-      } else {
-        cb.innerHTML = '';
-      }
-    }
-
-    function toggleAggregation() {
-      isAggregationEnabled = !isAggregationEnabled;
-      const track = document.getElementById('aggToggle');
-      const sub = document.getElementById('aggSubText');
-      const pill = document.getElementById('lteTagPill');
-
-      if (isAggregationEnabled) {
-        track.classList.add('active');
-        sub.textContent = 'Łączenie pasm (2CA) aktywne';
-        pill.textContent = 'LTE+';
-      } else {
-        track.classList.remove('active');
-        sub.textContent = 'Jedno pasmo aktywne (Single Band)';
-        pill.textContent = 'LTE';
-      }
-    }
-
-    function applyBandSelection() {
-      const selected = Array.from(document.querySelectorAll('.band-item-pill.selected'))
-        .map(el => el.getAttribute('data-band'));
-
-      const bandStr = selected.join(',');
-      if (window.OduBridge && window.OduBridge.applyBandLock) {
-        window.OduBridge.applyBandLock(currentGatewayIp, bandStr);
-      }
-
-      if (window.OduBridge && window.OduBridge.showToast) {
-        window.OduBridge.showToast('Zastosowano pasma: ' + (selected.length > 0 ? selected.join(', ') : 'Auto'));
-      }
-      closeBandDrawer();
     }
 
     // Android Hardware Back Button Handling

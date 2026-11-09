@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
@@ -142,7 +143,13 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
         webView.setBackgroundColor(Color.parseColor("#EAF2FF"));
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(android.webkit.ConsoleMessage cm) {
+                Log.d("OduWeb", cm.message() + " -- Line " + cm.lineNumber() + " of " + cm.sourceId());
+                return true;
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -244,6 +251,17 @@ public class MainActivity extends Activity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (webView != null) {
+                webView.evaluateJavascript("openBandDrawer();", null);
+            }
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
     private boolean checkWifiTransport() {
@@ -716,6 +734,13 @@ public class MainActivity extends Activity {
                             String lteShtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 1500);
 
                             String combined = webbodyHtml + "\n" + deviceHtml + "\n" + lteInfoHtml + "\n" + homeAspHtml + "\n" + lteStatus + "\n" + homeShtml + "\n" + lteShtml;
+                            try {
+                                java.io.File outF = new java.io.File(getExternalFilesDir(null), "idu_pages_dump.txt");
+                                java.io.FileWriter fw = new java.io.FileWriter(outF, false);
+                                fw.write("=== HOME ASP ===\n" + homeAspHtml + "\n\n=== WEBBODY ASP ===\n" + webbodyHtml + "\n\n=== BODYINFO LTE ASP ===\n" + lteInfoHtml);
+                                fw.close();
+                                Log.d(TAG, "Saved idu_pages_dump.txt to: " + outF.getAbsolutePath());
+                            } catch (Exception ignored) {}
                             jsonTelemetry = parseRouterTelemetry(combined, realPing, targetIp, mDetectedModel);
                         } else {
                             success = false;
@@ -1195,23 +1220,70 @@ public class MainActivity extends Activity {
                     try {
                         String targetIp = sanitizeTargetIp(gatewayIp);
                         String safeBands = sanitizeBandSelection(bandSelection);
-                        URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
-                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setConnectTimeout(3000);
-                        conn.setReadTimeout(3000);
-                        conn.setRequestMethod("POST");
-                        conn.setDoOutput(true);
-                        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                        conn.setRequestProperty("Referer", "http://" + targetIp + "/idu/lte.shtml");
+                        Log.d(TAG, "applyBandLock -> IP: " + targetIp + ", selection: " + safeBands);
 
-                        String body = "page=lteband&band=" + URLEncoder.encode(safeBands, "UTF-8");
-                        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-                        OutputStream os = conn.getOutputStream();
-                        os.write(bytes);
-                        os.flush();
-                        os.close();
-                        conn.getResponseCode();
-                        conn.disconnect();
+                        // Map band to IDU-200 / GoAhead internal parameter
+                        String routerBandVal = "auto";
+                        if (safeBands.contains("B20")) {
+                            routerBandVal = "800";
+                        } else if (safeBands.contains("B8")) {
+                            routerBandVal = "900";
+                        } else if (safeBands.contains("B3")) {
+                            routerBandVal = "1800";
+                        } else if (safeBands.contains("B7")) {
+                            routerBandVal = "2600";
+                        } else if (safeBands.contains("B38")) {
+                            routerBandVal = "2570";
+                        } else if (safeBands.equalsIgnoreCase("AUTO")) {
+                            routerBandVal = "auto";
+                        } else {
+                            routerBandVal = safeBands.toLowerCase();
+                        }
+
+                        String[] endpoints = new String[]{
+                            "/cgi-bin/adm.cgi",
+                            "/goform/formLteBand",
+                            "/goform/setLteBand"
+                        };
+
+                        for (String ep : endpoints) {
+                            try {
+                                URL url = new URL("http://" + targetIp + ep);
+                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                conn.setConnectTimeout(2500);
+                                conn.setReadTimeout(2500);
+                                conn.setRequestMethod("POST");
+                                conn.setDoOutput(true);
+                                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                                conn.setRequestProperty("Referer", "http://" + targetIp + "/idu/lte.shtml");
+                                if (mSessionCookie != null && !mSessionCookie.isEmpty()) {
+                                    conn.setRequestProperty("Cookie", mSessionCookie);
+                                }
+
+                                String body;
+                                if (ep.contains("adm.cgi")) {
+                                    body = "page=lteband&band=" + URLEncoder.encode(routerBandVal, "UTF-8");
+                                } else {
+                                    body = "band=" + URLEncoder.encode(routerBandVal, "UTF-8");
+                                }
+
+                                byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+                                conn.setFixedLengthStreamingMode(bytes.length);
+                                OutputStream os = conn.getOutputStream();
+                                os.write(bytes);
+                                os.flush();
+                                os.close();
+                                int code = conn.getResponseCode();
+                                Log.d(TAG, "applyBandLock " + ep + " -> " + code);
+                                conn.disconnect();
+                                if (code >= 200 && code < 400) {
+                                    break;
+                                }
+                            } catch (Exception e) {
+                                Log.w(TAG, "applyBandLock error on " + ep + ": " + e.getMessage());
+                            }
+                        }
                     } catch (Exception ignored) {
                     }
                 }

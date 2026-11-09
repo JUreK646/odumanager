@@ -6,6 +6,7 @@ $PLATFORM = "$SDK\platforms\android-34\android.jar"
 $ADB = "$SDK\platform-tools\adb.exe"
 $JDK = "D:\AndroidTools\jdk-17"
 $env:JAVA_HOME = $JDK
+$env:_JAVA_OPTIONS = "-Xms64m -Xmx256m"
 $env:PATH = "$JDK\bin;$BUILD_TOOLS;$SDK\platform-tools;$env:PATH"
 
 $ROOT = "d:\odumanager"
@@ -54,6 +55,9 @@ $javaFiles = @(
 Write-Host "4. Converting bytecode to DEX with d8..."
 $classFiles = Get-ChildItem -Path "$BUILD_DIR\obj" -Filter "*.class" -Recurse | Select-Object -ExpandProperty FullName
 & "$BUILD_TOOLS\d8.bat" --lib "$PLATFORM" --output "$BUILD_DIR\dex" $classFiles
+if (-not (Test-Path "$BUILD_DIR\dex\classes.dex")) {
+    throw "classes.dex was not generated!"
+}
 
 Write-Host "5. Adding classes.dex to APK..."
 & "$JDK\bin\jar.exe" -uf "$BUILD_DIR\unaligned.apk" -C "$BUILD_DIR\dex" classes.dex
