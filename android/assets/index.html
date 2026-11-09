@@ -1627,24 +1627,6 @@
         </div>
       </div>
 
-      <!-- Router Messages & Alerts Center -->
-      <section class="messages-panel liquid-glass" id="routerMessagesSection">
-        <div class="messages-header">
-          <div class="messages-header-left">
-            <span class="messages-icon">💬</span>
-            <span class="messages-title">Komunikaty z routera</span>
-            <span class="messages-badge" id="messagesCountBadge">0</span>
-          </div>
-          <button class="messages-refresh-btn" type="button" onclick="refreshMessages()" title="Odśwież komunikaty">
-            Odśwież
-          </button>
-        </div>
-
-        <div class="messages-list" id="routerMessagesList">
-          <div class="empty-messages-state">Oczekiwanie na dane z routera...</div>
-        </div>
-      </section>
-
     </div>
   </section>
 
@@ -1850,13 +1832,11 @@
     };
 
     function openLoginModal() {
-      if (currentTelemetryData) {
-        enterDashboard(currentTelemetryData);
-        return;
-      }
       const fb = document.getElementById('loginFeedback');
-      fb.className = 'login-feedback';
-      fb.textContent = '';
+      if (fb) {
+        fb.className = 'login-feedback';
+        fb.textContent = '';
+      }
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
       try {
@@ -1935,6 +1915,8 @@
       } else {
         fb.className = 'login-feedback show err';
         fb.textContent = '✕ ' + message;
+        try { localStorage.removeItem('odu_router_password'); } catch (e) {}
+        document.getElementById('loginBackdrop').classList.add('open');
       }
     };
 
@@ -1948,6 +1930,7 @@
 
     function exitToDeviceManager() {
       stopTelemetryPolling();
+      currentTelemetryData = null;
       showScreen('deviceManagerScreen');
     }
 
@@ -1990,15 +1973,27 @@
         document.getElementById('valEnb').textContent = (data.cellId && data.cellId !== '---') ? data.cellId : '---';
         document.getElementById('lteTagPill').textContent = data.isLtePlus ? 'LTE+' : 'LTE';
       } else {
-        // User specification: When no signal, show cross and NO parameters (clean dashes)
+        // When no cellular signal or SIM Lock
         document.getElementById('valRsrp').textContent = '---';
-        document.getElementById('signalRsrpLabel').textContent = 'Brak parametrów';
+        const isLock = data.messages && data.messages.some(m => m.id === 'sim_lock_operator');
+        const isSimInv = data.messages && data.messages.some(m => m.id === 'sim_invalid');
+        if (isLock) {
+          document.getElementById('signalRsrpLabel').textContent = 'Blokada SIM Lock';
+          document.getElementById('dashBandsRibbon').textContent = 'Karta zablokowana przez operatora Plus';
+          document.getElementById('lteTagPill').textContent = 'SIM Lock';
+        } else if (isSimInv) {
+          document.getElementById('signalRsrpLabel').textContent = 'Karta nieobsługiwana';
+          document.getElementById('dashBandsRibbon').textContent = 'Nieprawidłowa karta SIM';
+          document.getElementById('lteTagPill').textContent = 'Błąd SIM';
+        } else {
+          document.getElementById('signalRsrpLabel').textContent = 'Brak parametrów';
+          document.getElementById('dashBandsRibbon').textContent = '--- (Brak sygnału)';
+          document.getElementById('lteTagPill').textContent = 'Brak LTE';
+        }
         document.getElementById('valRsrq').textContent = '---';
         document.getElementById('valSinr').textContent = '---';
         document.getElementById('valRssi').textContent = '---';
-        document.getElementById('dashBandsRibbon').textContent = '--- (Brak sygnału)';
         document.getElementById('valEnb').textContent = '---';
-        document.getElementById('lteTagPill').textContent = 'Brak LTE';
       }
 
       currentTelemetryData = data;
@@ -2035,8 +2030,6 @@
     }
 
     function renderRouterMessages(messages) {
-      const container = document.getElementById('routerMessagesList');
-      const badge = document.getElementById('messagesCountBadge');
       const alertBanner = document.getElementById('routerAlertBanner');
       const alertIcon = document.getElementById('routerAlertIcon');
       const alertTitle = document.getElementById('routerAlertTitle');
@@ -2044,75 +2037,35 @@
 
       const faults = Array.isArray(messages) ? messages.filter(m => m && (m.level === 'danger' || m.level === 'warning')) : [];
 
+      if (!alertBanner) return;
+
       if (faults.length === 0) {
-        if (badge) {
-          badge.textContent = '0';
-          badge.className = 'messages-badge badge-ok';
-        }
-        if (alertBanner) {
-          alertBanner.style.display = 'none';
-        }
-        if (container) {
-          container.innerHTML = `
-            <div class="router-ok-card">
-              <div class="ok-shield-icon">✓</div>
-              <div class="ok-details">
-                <div class="ok-title">Wszystko działa prawidłowo</div>
-                <div class="ok-text">Brak aktywnych ostrzeżeń lub błędów zgłaszanych przez modem ODU-IDU.</div>
-              </div>
-            </div>
-          `;
-        }
+        alertBanner.style.display = 'none';
         return;
       }
 
-      // There are active faults or router warnings!
-      if (badge) {
-        badge.textContent = faults.length;
-        badge.className = 'messages-badge badge-alert';
-      }
-
       // Highest priority fault for hero alert banner
-      let topAlert = faults.find(m => m.level === 'danger') || faults[0];
+      let topAlert = faults.find(m => m.id === 'sim_lock_operator')
+        || faults.find(m => m.id === 'sim_invalid')
+        || faults.find(m => m.level === 'danger')
+        || faults[0];
 
-      if (alertBanner) {
-        alertBanner.style.display = 'flex';
-        alertBanner.className = 'router-alert-banner alert-' + (topAlert.level || 'danger');
-        if (alertIcon) alertIcon.textContent = topAlert.icon || '⚠️';
-        if (topAlert.id === 'sim_lock_operator') {
-          alertTitle.textContent = '🔒 Blokada SIM Lock: Karta zablokowana';
-        } else if (topAlert.id === 'sim_invalid') {
-          alertTitle.textContent = '🚫 Karta SIM nieprawidłowa';
-        } else {
-          alertTitle.textContent = '⚠️ Powiadomienie: Coś jest nie tak!';
-        }
-        alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem z routerem';
+      alertBanner.style.display = 'flex';
+      alertBanner.className = 'router-alert-banner alert-' + (topAlert.level || 'danger');
+      if (alertIcon) alertIcon.textContent = topAlert.icon || '⚠️';
+      if (topAlert.id === 'sim_lock_operator') {
+        alertTitle.textContent = '🔒 Blokada SIM Lock: Karta zablokowana';
+      } else if (topAlert.id === 'sim_invalid') {
+        alertTitle.textContent = '🚫 Karta SIM nieprawidłowa';
+      } else {
+        alertTitle.textContent = '⚠️ Powiadomienie: Coś jest nie tak!';
       }
-
-      // Render cards in router messages list
-      if (container) {
-        container.innerHTML = faults.map(m => `
-          <div class="message-card card-${escapeHtml(m.level || 'danger')}">
-            <div class="msg-card-top">
-              <div class="msg-badge-cluster">
-                <span class="msg-cat-pill">${escapeHtml(m.category || 'POWIADOMIENIE')}</span>
-                <span class="msg-status-indicator status-${escapeHtml(m.level || 'danger')}"></span>
-              </div>
-              <span class="msg-card-time">${escapeHtml(m.time || '')}</span>
-            </div>
-            <div class="msg-card-title">${escapeHtml(m.icon ? m.icon + ' ' : '')}${escapeHtml(m.title || '')}</div>
-            <div class="msg-card-text">${escapeHtml(m.text || '')}</div>
-          </div>
-        `).join('');
-      }
+      alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem z routerem';
     }
 
     function refreshMessages() {
       if (window.OduBridge && window.OduBridge.refreshRealTelemetry) {
         window.OduBridge.refreshRealTelemetry(currentGatewayIp);
-      }
-      if (window.OduBridge && window.OduBridge.showToast) {
-        window.OduBridge.showToast('Odświeżanie komunikatów z routera...');
       }
     }
 

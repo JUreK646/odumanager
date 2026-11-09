@@ -58,6 +58,9 @@ public class MainActivity extends Activity {
 
     private WebView webView;
     private ConnectivityManager.NetworkCallback networkCallback;
+    private volatile String mSessionCookie = "language=polish";
+    private volatile String mDetectedModel = "ODU-IDU 200";
+    private volatile String mSavedPassword = "";
 
     static {
         // Automatically accept and maintain session cookies across HttpURLConnection requests
@@ -316,8 +319,27 @@ public class MainActivity extends Activity {
             conn.setConnectTimeout(timeoutMs);
             conn.setReadTimeout(timeoutMs);
             conn.setRequestMethod("GET");
-            conn.setInstanceFollowRedirects(true);
+            conn.setInstanceFollowRedirects(false);
+            String cookie = (mSessionCookie != null && !mSessionCookie.isEmpty()) ? mSessionCookie : "language=polish";
+            conn.setRequestProperty("Cookie", cookie);
+            conn.setRequestProperty("Referer", "http://" + host + "/idu/home.shtml");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36");
+
             int code = conn.getResponseCode();
+            Log.d(TAG, "fetchHttpString " + urlString + " -> HTTP " + code);
+
+            if (code == 302 || code == 301) {
+                String loc = conn.getHeaderField("Location");
+                Log.d(TAG, "fetchHttpString 302 redirect to: " + loc);
+                if (loc != null && (loc.contains("netlock") || loc.contains("simlock"))) {
+                    return "<!-- REDIRECT: " + loc + " -->\n<title>Blokada SIM Lock</title><div>Blokada SIM Lock (karta niedozwolona)</div>";
+                }
+                if (loc != null && !loc.contains("login.shtml") && !loc.equals(urlString)) {
+                    String nextUrl = loc.startsWith("http") ? loc : ("http://" + host + (loc.startsWith("/") ? "" : "/") + loc);
+                    return fetchHttpString(nextUrl, timeoutMs);
+                }
+            }
+
             if (code >= 200 && code < 400) {
                 InputStream is = conn.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
@@ -331,7 +353,8 @@ public class MainActivity extends Activity {
                 reader.close();
                 return sb.toString();
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Log.w(TAG, "fetchHttpString error on " + urlString + ": " + e.getMessage());
         } finally {
             if (conn != null) {
                 conn.disconnect();
@@ -477,6 +500,7 @@ public class MainActivity extends Activity {
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     }
                                     Log.d(TAG, "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
+                                    mDetectedModel = setModel;
                                     break;
                                 }
                             }
@@ -520,6 +544,98 @@ public class MainActivity extends Activity {
             }).start();
         }
 
+        private boolean loginInternal(String targetIp, String safeUsername, String safePassword) {
+            HttpURLConnection conn = null;
+            try {
+                URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3500);
+                conn.setReadTimeout(3500);
+                conn.setRequestMethod("POST");
+                conn.setInstanceFollowRedirects(false);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestProperty("Origin", "http://" + targetIp);
+                conn.setRequestProperty("Referer", "http://" + targetIp + "/login.shtml");
+                conn.setRequestProperty("Cookie", "language=polish");
+
+                String body = "page=Login&loginName="
+                        + URLEncoder.encode(safeUsername, "UTF-8")
+                        + "&loginPassword="
+                        + URLEncoder.encode(safePassword, "UTF-8");
+
+                byte[] postBytes = body.getBytes(StandardCharsets.UTF_8);
+                conn.setFixedLengthStreamingMode(postBytes.length);
+                OutputStream os = conn.getOutputStream();
+                os.write(postBytes);
+                os.flush();
+                os.close();
+
+                int responseCode = conn.getResponseCode();
+                String location = conn.getHeaderField("Location");
+                if (location == null) location = "";
+
+                String admBody = "";
+                try {
+                    InputStream is = (responseCode >= 200 && responseCode < 400) ? conn.getInputStream() : conn.getErrorStream();
+                    if (is != null) {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                        StringBuilder b = new StringBuilder();
+                        String l;
+                        while ((l = r.readLine()) != null) b.append(l).append('\n');
+                        r.close();
+                        admBody = b.toString();
+                    }
+                } catch (Exception ignored) {}
+                Log.d(TAG, "loginInternal: code=" + responseCode + ", loc=" + location + ", admBody len=" + admBody.length() + ": " + admBody.replace("\n", " "));
+
+                java.util.Map<String, java.util.List<String>> headers = conn.getHeaderFields();
+                if (headers != null) {
+                    java.util.List<String> cookies = headers.get("Set-Cookie");
+                    if (cookies == null) cookies = headers.get("set-cookie");
+                    if (cookies != null && !cookies.isEmpty()) {
+                        StringBuilder sb = new StringBuilder();
+                        for (String c : cookies) {
+                            String cookieVal = c.split(";")[0].trim();
+                            if (sb.length() > 0) sb.append("; ");
+                            sb.append(cookieVal);
+                        }
+                        if (!sb.toString().contains("language=")) {
+                            sb.append("; language=polish");
+                        }
+                        mSessionCookie = sb.toString();
+                        Log.d(TAG, "loginInternal: session cookie saved: " + mSessionCookie);
+                    }
+                }
+
+                boolean isFailed = location.contains("id=401")
+                        || location.contains("/login")
+                        || admBody.contains("login.asp")
+                        || admBody.contains("login.shtml")
+                        || admBody.contains("id=401")
+                        || admBody.contains("/login");
+
+                boolean isNetlock = location.contains("netlock")
+                        || location.contains("simlock")
+                        || admBody.contains("netlock")
+                        || admBody.contains("simlock");
+
+                boolean isOk = !isFailed && (isNetlock
+                        || location.contains("/idu/home")
+                        || admBody.contains("/idu/home")
+                        || (responseCode == 200 && !admBody.isEmpty() && !admBody.contains("login")));
+
+                return isOk || isNetlock;
+            } catch (Exception e) {
+                Log.w(TAG, "loginInternal error: " + e.getMessage());
+                return false;
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            }
+        }
+
         @JavascriptInterface
         public void loginToRouter(final String gatewayIp, final String username, final String password) {
             new Thread(new Runnable() {
@@ -535,6 +651,7 @@ public class MainActivity extends Activity {
                         String targetIp = sanitizeTargetIp(gatewayIp);
                         String safeUsername = (username != null) ? username.trim() : "admin";
                         String safePassword = (password != null) ? password : "";
+                        mSavedPassword = safePassword;
 
                         long t0 = System.currentTimeMillis();
                         URL url = new URL("http://" + targetIp + "/cgi-bin/adm.cgi");
@@ -566,13 +683,67 @@ public class MainActivity extends Activity {
                         String location = conn.getHeaderField("Location");
                         if (location == null) location = "";
 
-                        if (location.contains("id=401.2")) {
+                        String admBody = "";
+                        try {
+                            InputStream is = (responseCode >= 200 && responseCode < 400) ? conn.getInputStream() : conn.getErrorStream();
+                            if (is != null) {
+                                BufferedReader r = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                                StringBuilder b = new StringBuilder();
+                                String l;
+                                while ((l = r.readLine()) != null) b.append(l).append('\n');
+                                r.close();
+                                admBody = b.toString();
+                            }
+                        } catch (Exception ignored) {}
+                        Log.d(TAG, "loginToRouter POST /cgi-bin/adm.cgi -> code=" + responseCode + ", loc=" + location + ", admBody len=" + admBody.length() + ": " + admBody.replace("\n", " "));
+                        java.util.Map<String, java.util.List<String>> headers = conn.getHeaderFields();
+                        if (headers != null) {
+                            for (java.util.Map.Entry<String, java.util.List<String>> entry : headers.entrySet()) {
+                                Log.d(TAG, "adm.cgi header: " + entry.getKey() + " -> " + entry.getValue());
+                            }
+                        }
+                        if (headers != null) {
+                            java.util.List<String> cookies = headers.get("Set-Cookie");
+                            if (cookies == null) cookies = headers.get("set-cookie");
+                            if (cookies != null && !cookies.isEmpty()) {
+                                StringBuilder sb = new StringBuilder();
+                                for (String c : cookies) {
+                                    String cookieVal = c.split(";")[0].trim();
+                                    if (sb.length() > 0) sb.append("; ");
+                                    sb.append(cookieVal);
+                                }
+                                if (!sb.toString().contains("language=")) {
+                                    sb.append("; language=polish");
+                                }
+                                mSessionCookie = sb.toString();
+                                Log.d(TAG, "loginToRouter: session cookie saved: " + mSessionCookie);
+                            }
+                        }
+
+                        boolean isFailed = location.contains("id=401")
+                                || location.contains("/login")
+                                || admBody.contains("login.asp")
+                                || admBody.contains("login.shtml")
+                                || admBody.contains("id=401")
+                                || admBody.contains("/login");
+
+                        boolean isNetlock = location.contains("netlock")
+                                || location.contains("simlock")
+                                || admBody.contains("netlock")
+                                || admBody.contains("simlock");
+
+                        boolean isOk = !isFailed && (isNetlock
+                                || location.contains("/idu/home")
+                                || admBody.contains("/idu/home")
+                                || (responseCode == 200 && !admBody.isEmpty() && !admBody.contains("login")));
+
+                        if (isFailed) {
                             success = false;
-                            message = "Zbyt wiele nieudanych prób logowania (401.2). Odczekaj chwilę.";
-                        } else if (location.contains("id=401")) {
-                            success = false;
-                            message = "Nieprawidłowe hasło lub login routera (kod 401). Wpisz poprawne hasło.";
-                        } else if (location.contains("/idu/home") || location.contains("netlock") || location.contains("simlock") || responseCode == 200 || (responseCode == 302 && !location.contains("401"))) {
+                            message = location.contains("401.2")
+                                    ? "Zbyt wiele nieudanych prób logowania (401.2). Odczekaj chwilę."
+                                    : "Nieprawidłowe hasło routera. Wpisz poprawne hasło administratora.";
+                            mSavedPassword = "";
+                        } else if (isOk || isNetlock) {
                             success = true;
                             message = "Zalogowano pomyślnie do " + targetIp;
 
@@ -588,7 +759,10 @@ public class MainActivity extends Activity {
                             String locHtml = (!location.isEmpty() && location.startsWith("/")) ? fetchHttpString("http://" + targetIp + location, 2000) : "";
 
                             String combined = homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml + "\n" + netlockHtml + "\n" + simlockHtml + "\n" + pinHtml + "\n" + locHtml;
-                            jsonTelemetry = parseRouterTelemetry(combined, realPing, targetIp, "ODU-IDU 300");
+                            if (location.contains("netlock") || location.contains("simlock")) {
+                                combined += "\n<title>Blokada SIM Lock</title><div>Blokada SIM Lock (karta niedozwolona)</div>";
+                            }
+                            jsonTelemetry = parseRouterTelemetry(combined, realPing, targetIp, mDetectedModel);
                         } else {
                             success = false;
                             message = "Odpowiedź routera HTTP " + responseCode;
@@ -632,6 +806,13 @@ public class MainActivity extends Activity {
                     String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
                     long realPing = Math.max(1, System.currentTimeMillis() - t0);
 
+                    boolean isUnauth = homeHtml.isEmpty() || homeHtml.contains("top.location=\"/login.shtml\"") || homeHtml.length() < 400;
+                    if (isUnauth && mSavedPassword != null && !mSavedPassword.isEmpty()) {
+                        Log.d(TAG, "refreshRealTelemetry: unauthenticated (len=" + homeHtml.length() + "), attempting auto-relogin...");
+                        loginInternal(targetIp, "admin", mSavedPassword);
+                        homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                    }
+
                     String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
                     String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                     String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
@@ -641,7 +822,12 @@ public class MainActivity extends Activity {
                     String pinHtml = fetchHttpString("http://" + targetIp + "/idu/pin.shtml", 2000);
 
                     String combined = homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml + "\n" + netlockHtml + "\n" + simlockHtml + "\n" + pinHtml;
-                    final String json = parseRouterTelemetry(combined, realPing, targetIp, "ODU-IDU 300");
+                    Log.d(TAG, "Telemetry HTML lens - home: " + homeHtml.length() + ", lte: " + lteHtml.length() + ", netlock: " + netlockHtml.length() + ", simlock: " + simlockHtml.length() + ", pin: " + pinHtml.length());
+                    if (homeHtml.length() > 0) Log.d(TAG, "home snippet: " + homeHtml.substring(0, Math.min(200, homeHtml.length())).replace("\n", " "));
+                    if (netlockHtml.length() > 0) Log.d(TAG, "netlock snippet: " + netlockHtml.substring(0, Math.min(200, netlockHtml.length())).replace("\n", " "));
+                    if (lteHtml.length() > 0) Log.d(TAG, "lte snippet: " + lteHtml.substring(0, Math.min(200, lteHtml.length())).replace("\n", " "));
+
+                    final String json = parseRouterTelemetry(combined, realPing, targetIp, mDetectedModel);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -675,6 +861,7 @@ public class MainActivity extends Activity {
             }
 
             JSONArray messages = buildRouterMessages(html, hasSignal, isLtePlus, band, cellId, setModel, realPing, targetIp);
+            Log.d(TAG, "parseRouterTelemetry result -> hasSignal=" + hasSignal + ", msgs=" + messages.toString());
 
             try {
                 JSONObject json = new JSONObject();
@@ -765,10 +952,15 @@ public class MainActivity extends Activity {
                         || html.contains("karta niedozwolona")
                         || html.contains("language USIM Netlock")
                         || html.contains("language USIM Not Ready")
+                        || html.contains("USIM Not Ready")
+                        || html.contains("USIM Netlock")
                         || html.contains("Operator Lock")
                         || html.contains("NETLOCK")
+                        || html.contains("netlock")
+                        || html.contains("simlock")
                         || html.contains("Unlock NETLOCK")
                         || html.contains("W celu zdjęcia blokady SIM Lock")
+                        || html.contains("W celu zdj")
                         || html.contains("Code to disable Operator Lock")
                         || html.contains("disable the Operator Lock")
                         || html.contains("card not permitted")
@@ -781,8 +973,8 @@ public class MainActivity extends Activity {
                     msgLock.put("time", timeStr);
                     msgLock.put("level", "danger");
                     msgLock.put("icon", "🔒");
-                    msgLock.put("title", "Blokada SIM Lock (karta niedozwolona)");
-                    msgLock.put("text", "Włożona karta SIM (np. Orange) jest zablokowana przez blokadę operatora Plus/Cyfrowy Polsat (SIM Lock / NETLOCK). Karta nie może połączyć się z siecią – prosimy o odblokowanie routera kodem odblokowującym.");
+                    msgLock.put("title", "Blokada SIM Lock: Karta zablokowana");
+                    msgLock.put("text", "Karta Orange jest zablokowana przez blokadę operatora Plus (SIM Lock / NETLOCK). W celu odblokowania modemu ODU skontaktuj się z operatorem i wprowadź kod odblokowujący router.");
                     arr.put(msgLock);
                 }
 
@@ -849,8 +1041,24 @@ public class MainActivity extends Activity {
                     }
                 }
 
-                // 5. Cellular signal fault
-                if (!hasSignal && !oduDisconnected && !isSimLock && !isSimInvalid && !simMissing && !pinLock && !pukLock) {
+                // 5. Unauthenticated check - router requires login
+                boolean isUnauthenticated = html.replace("\n", "").trim().isEmpty()
+                        || (html.contains("top.location=\"/login.shtml\"") && !html.contains("rsrp") && !html.contains("netlock") && !html.contains("simlock") && !html.contains("Blokada SIM Lock"));
+
+                if (isUnauthenticated) {
+                    JSONObject msgAuth = new JSONObject();
+                    msgAuth.put("id", "auth_required");
+                    msgAuth.put("category", "AUTORYZACJA");
+                    msgAuth.put("time", timeStr);
+                    msgAuth.put("level", "warning");
+                    msgAuth.put("icon", "🔐");
+                    msgAuth.put("title", "Wymagane logowanie do routera");
+                    msgAuth.put("text", "Aplikacja oczekuje na autoryzację w panelu routera. Kliknij w ikonę urządzenia i podaj hasło administratora.");
+                    arr.put(msgAuth);
+                }
+
+                // 6. Cellular signal fault - only when truly authenticated and no other fault
+                if (!hasSignal && !oduDisconnected && !isSimLock && !isSimInvalid && !simMissing && !pinLock && !pukLock && !isUnauthenticated) {
                     JSONObject msgNet = new JSONObject();
                     msgNet.put("id", "no_cellular_signal");
                     msgNet.put("category", "BRAK SYGNAŁU");
