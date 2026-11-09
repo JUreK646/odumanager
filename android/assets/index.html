@@ -1680,10 +1680,10 @@
 
       showScreen('deviceManagerScreen');
 
-      // Auto-fetch status if password was previously saved
+      // Auto-fetch status with saved or default password
       try {
-        const savedPass = localStorage.getItem('odu_router_password');
-        if (savedPass && window.OduBridge && window.OduBridge.loginToRouter) {
+        const savedPass = localStorage.getItem('odu_router_password') || 'admin';
+        if (window.OduBridge && window.OduBridge.loginToRouter) {
           window.OduBridge.loginToRouter(currentGatewayIp, 'admin', savedPass);
         }
       } catch (e) {}

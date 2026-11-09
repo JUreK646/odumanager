@@ -811,6 +811,14 @@ public class MainActivity extends Activity {
             Matcher mArrayA = pArrayA.matcher(html);
             if (mArrayA.find()) {
                 String rawElements = mArrayA.group(1);
+                Log.d(TAG, "RAW ROUTER ARRAY 'a' -> " + rawElements);
+                try {
+                    java.io.FileWriter fw = new java.io.FileWriter("/sdcard/router_raw_dump.txt", false);
+                    fw.write("=== RAW ROUTER HTML DUMP ===\n");
+                    fw.write("ARRAY A: " + rawElements + "\n\n");
+                    fw.write(html);
+                    fw.close();
+                } catch (Exception ignored) {}
                 String[] items = rawElements.split(",");
                 for (int i = 0; i < items.length; i++) {
                     items[i] = items[i].trim().replaceAll("^[\"']|[\"']$", "").trim();
@@ -942,36 +950,42 @@ public class MainActivity extends Activity {
                     arr.put(msgOdu);
                 }
 
-                // 2. Blokada SIM Lock / NETLOCK / Operator Lock (np. karta Orange w routerze Plus)
-                boolean isSimLock = html.contains("Blokada SIM Lock")
-                        || html.contains("karta niedozwolona")
-                        || html.contains("language USIM Netlock")
-                        || html.contains("language USIM Not Ready")
-                        || html.contains("USIM Not Ready")
-                        || html.contains("USIM Netlock")
-                        || html.contains("USIM SIMLOCK")
-                        || html.contains("NETLOCK Locked")
-                        || html.contains("Operator Lock")
-                        || html.contains("NETLOCK")
-                        || html.contains("netlock")
-                        || html.contains("simlock")
-                        || html.contains("Unlock NETLOCK")
-                        || html.contains("W celu zdjęcia blokady SIM Lock")
-                        || html.contains("W celu zdj")
-                        || html.contains("Code to disable Operator Lock")
-                        || html.contains("disable the Operator Lock")
-                        || html.contains("card not permitted")
-                        || html.contains("Device is locked");
+                // 2. Blokada SIM Lock / NETLOCK / Operator Lock
+                String simLockMatch = null;
+                String[] lockPatterns = {
+                    "Blokada SIM Lock", "karta niedozwolona", "language USIM Netlock",
+                    "language USIM Not Ready", "USIM Not Ready", "USIM Netlock",
+                    "USIM SIMLOCK", "NETLOCK Locked", "Operator Lock",
+                    "Unlock NETLOCK", "W celu zdjęcia blokady SIM Lock", "W celu zdj",
+                    "Code to disable Operator Lock", "disable the Operator Lock",
+                    "card not permitted", "Device is locked", "NETLOCK", "netlock", "simlock"
+                };
+                for (String pat : lockPatterns) {
+                    if (html.contains(pat)) {
+                        simLockMatch = pat;
+                        break;
+                    }
+                }
+                boolean isSimLock = (simLockMatch != null);
+                Log.d("OduManager", "simLockMatch check -> " + simLockMatch);
 
                 if (isSimLock) {
+                    // Extract snippet around the match
+                    int idx = html.indexOf(simLockMatch);
+                    int start = Math.max(0, idx - 100);
+                    int end = Math.min(html.length(), idx + 200);
+                    String snippet = html.substring(start, end).replace("\n", " ").replace("\r", " ").trim();
+                    Log.d("OduManager", "simLock snippet -> " + snippet);
+
                     JSONObject msgLock = new JSONObject();
                     msgLock.put("id", "sim_lock_operator");
                     msgLock.put("category", "BLOKADA OPERATORA");
                     msgLock.put("time", timeStr);
                     msgLock.put("level", "danger");
                     msgLock.put("icon", "lock");
-                    msgLock.put("title", "Blokada SIM Lock (karta zablokowana)");
-                    msgLock.put("text", "Włożona karta Orange jest zablokowana przez blokadę operatora Plus/Cyfrowy Polsat (USIM SIMLOCK • NETLOCK Locked). Router wymaga kodu odblokowującego (Code to disable Operator Lock).");
+                    msgLock.put("title", "Blokada karty SIM (SIM Lock)");
+                    msgLock.put("text", "Router zgłasza blokadę operatora (" + simLockMatch + "). Karta SIM od innego operatora jest zablokowana i wymaga kodu odblokowania.");
+                    msgLock.put("rawSnippet", snippet);
                     arr.put(msgLock);
                 }
 
