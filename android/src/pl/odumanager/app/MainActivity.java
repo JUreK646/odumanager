@@ -487,35 +487,8 @@ public class MainActivity extends Activity {
                     final String fBandsSpec = bandsSpec;
                     final String fCoaxSpec = coaxSpec;
 
-                    JSONArray initMsgs = new JSONArray();
-                    String nowTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-
-                    try {
-                        JSONObject m1 = new JSONObject();
-                        m1.put("id", "net_wifi");
-                        m1.put("category", "POŁĄCZENIE");
-                        m1.put("level", wifiOn ? "success" : "danger");
-                        m1.put("icon", wifiOn ? "✓" : "✕");
-                        m1.put("title", wifiOn ? "Połączono z Wi-Fi" : "Brak Wi-Fi");
-                        m1.put("text", wifiOn ? "Telefon jest połączony z lokalną siecią bezprzewodową Wi-Fi." : "Włącz Wi-Fi w telefonie.");
-                        m1.put("time", nowTime);
-                        initMsgs.put(m1);
-
-                        if (finalOdu) {
-                            JSONObject m2 = new JSONObject();
-                            m2.put("id", "odu_ready");
-                            m2.put("category", "URZĄDZENIE");
-                            m2.put("level", "success");
-                            m2.put("icon", "✓");
-                            m2.put("title", "Wykryto " + fSetModel);
-                            m2.put("text", "Panel routera (" + finalGw + ") odpowiada w czasie " + finalPing + " ms. Sygnatura platformy " + (fSetModel.contains("200") ? "U270" : "IDU") + " zweryfikowana.");
-                            m2.put("time", nowTime);
-                            initMsgs.put(m2);
-                        }
-                    } catch (Exception ignored) {
-                    }
-
-                    final String initMsgsJson = initMsgs.toString();
+                    JSONArray initAlerts = new JSONArray();
+                    final String initMsgsJson = initAlerts.toString();
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -602,8 +575,9 @@ public class MainActivity extends Activity {
                             String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
                             String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                             String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
+                            String statusHtml = fetchHttpString("http://" + targetIp + "/idu/status.shtml", 2000);
 
-                            jsonTelemetry = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml, realPing, targetIp, "ODU-IDU 200");
+                            jsonTelemetry = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml, realPing, targetIp, "ODU-IDU 200");
                         } else {
                             success = false;
                             message = "Odpowiedź routera HTTP " + responseCode;
@@ -650,8 +624,9 @@ public class MainActivity extends Activity {
                     String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
                     String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                     String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
+                    String statusHtml = fetchHttpString("http://" + targetIp + "/idu/status.shtml", 2000);
 
-                    final String json = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml, realPing, targetIp, "ODU-IDU 200");
+                    final String json = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml, realPing, targetIp, "ODU-IDU 200");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -705,12 +680,52 @@ public class MainActivity extends Activity {
             }
         }
 
+        private String extractRawRouterAlert(String html) {
+            if (html == null || html.isEmpty()) return null;
+            try {
+                // 1. Look for error / result table cells and divs used in IDU-200 / IDU-300 firmware
+                Pattern p1 = Pattern.compile("(?i)<(?:td|div|span|p)[^>]*id=[\"'](?:errresult|result|alert_msg|err_msg|error_msg|status_msg)[\"'][^>]*>([^<]+)</(?:td|div|span|p)>");
+                Matcher m1 = p1.matcher(html);
+                while (m1.find()) {
+                    String txt = m1.group(1).trim().replace("&nbsp;", " ").trim();
+                    if (!txt.isEmpty() && !txt.equals("-") && !txt.equalsIgnoreCase("null") && !txt.equalsIgnoreCase("undefined")) {
+                        return txt;
+                    }
+                }
+                // 2. Look for JS alert or error functions
+                Pattern p2 = Pattern.compile("(?i)(?:alert|showError|showMsg|displayError)\\s*\\(\\s*[\"']([^\"']{4,120})[\"']\\s*\\)");
+                Matcher m2 = p2.matcher(html);
+                if (m2.find()) {
+                    String txt = m2.group(1).trim();
+                    if (!txt.isEmpty() && !txt.contains("<") && !txt.contains(">")) {
+                        return txt;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            return null;
+        }
+
         private JSONArray buildRouterMessages(String html, boolean hasSignal, boolean isLtePlus, String band, String cellId, String setModel, long realPing, String targetIp) {
             JSONArray arr = new JSONArray();
             String timeStr = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
             try {
-                // 1. ODU-IDU connection status
+                // Intercept raw router error/alert message if present in HTML
+                String rawAlert = extractRawRouterAlert(html);
+                if (rawAlert != null && !rawAlert.isEmpty()) {
+                    JSONObject msgAlert = new JSONObject();
+                    msgAlert.put("id", "router_raw_alert");
+                    msgAlert.put("category", "KOMUNIKAT Z ROUTERA");
+                    msgAlert.put("time", timeStr);
+                    msgAlert.put("level", "danger");
+                    msgAlert.put("icon", "⚠️");
+                    msgAlert.put("title", "Komunikat z panelu routera");
+                    msgAlert.put("text", rawAlert);
+                    arr.put(msgAlert);
+                }
+
+                // 1. ODU-IDU connection fault
                 boolean oduDisconnected = html.contains("Brak połączenia pomiędzy ODU oraz IDU")
                         || html.contains("Brak połączenia z ODU")
                         || html.contains("ODU Disconnected")
@@ -718,24 +733,21 @@ public class MainActivity extends Activity {
                         || html.contains("home content disconnected display")
                         || html.contains("odu config alert2");
 
-                JSONObject msgOdu = new JSONObject();
-                msgOdu.put("id", "odu_link");
-                msgOdu.put("category", "ODU-IDU");
-                msgOdu.put("time", timeStr);
                 if (oduDisconnected) {
+                    JSONObject msgOdu = new JSONObject();
+                    msgOdu.put("id", "odu_link_fault");
+                    msgOdu.put("category", "AWARIA ODU");
+                    msgOdu.put("time", timeStr);
                     msgOdu.put("level", "danger");
                     msgOdu.put("icon", "⚠️");
-                    msgOdu.put("title", "Brak połączenia ODU-IDU");
-                    msgOdu.put("text", "Brak połączenia pomiędzy ODU oraz IDU lub ODU jeszcze się uruchamia. Sprawdź kabel koncentryczny i zasilacz PoCoax.");
-                } else {
-                    msgOdu.put("level", "success");
-                    msgOdu.put("icon", "✓");
-                    msgOdu.put("title", "Połączenie ODU-IDU aktywne");
-                    msgOdu.put("text", "Moduł zewnętrzny ODU jest połączony i zasilany przez kabel koncentryczny PoCoax.");
+                    msgOdu.put("title", "Brak połączenia pomiędzy ODU a IDU");
+                    msgOdu.put("text", "Router IDU zgłasza brak połączenia z anteną zewnętrzną ODU. Sprawdź kabel koncentryczny anteny i zasilanie PoCoax.");
+                    arr.put(msgOdu);
                 }
-                arr.put(msgOdu);
 
-                // 2. SIM / USIM status
+                // 2. SIM / USIM faults
+                boolean pukLock = html.contains("PUK lock") || html.contains("PUK jest Zamknięty") || html.contains("Wymagany PUK");
+                boolean pinLock = html.contains("PIN lock") || html.contains("PIN jest Zamknięty") || html.contains("Wymagany PIN");
                 boolean simMissing = html.contains("No SIM inserted")
                         || html.contains("Brak karty SIM")
                         || html.contains("Brak karty USIM lub karta USIM jest nieprawidłowa!")
@@ -743,84 +755,63 @@ public class MainActivity extends Activity {
                         || html.contains("Nie włożono karty")
                         || html.contains("SIM not inserted");
 
-                boolean pinLock = html.contains("PIN lock") || html.contains("PIN jest Zamknięty") || html.contains("Wymagany PIN");
-                boolean pukLock = html.contains("PUK lock") || html.contains("PUK jest Zamknięty") || html.contains("Wymagany PUK");
-
-                JSONObject msgSim = new JSONObject();
-                msgSim.put("id", "sim_status");
-                msgSim.put("category", "KARTA SIM");
-                msgSim.put("time", timeStr);
                 if (pukLock) {
+                    JSONObject msgSim = new JSONObject();
+                    msgSim.put("id", "sim_puk_lock");
+                    msgSim.put("category", "BLOKADA SIM");
+                    msgSim.put("time", timeStr);
                     msgSim.put("level", "danger");
                     msgSim.put("icon", "🚫");
-                    msgSim.put("title", "Karta SIM zablokowana (PUK)");
-                    msgSim.put("text", "Wymagany kod PUK od operatora sieci. Karta SIM została zablokowana.");
+                    msgSim.put("title", "Karta SIM zablokowana (kod PUK)");
+                    msgSim.put("text", "Karta SIM w modemie zewnętrznym ODU została zablokowana. Wymagane odblokowanie kodem PUK od operatora.");
+                    arr.put(msgSim);
                 } else if (pinLock) {
+                    JSONObject msgSim = new JSONObject();
+                    msgSim.put("id", "sim_pin_lock");
+                    msgSim.put("category", "BLOKADA SIM");
+                    msgSim.put("time", timeStr);
                     msgSim.put("level", "warning");
                     msgSim.put("icon", "🔐");
-                    msgSim.put("title", "Wymagany kod PIN");
-                    msgSim.put("text", "Karta SIM oczekuje na wprowadzenie kodu PIN w panelu routera.");
-                } else if (simMissing || (!hasSignal && !oduDisconnected)) {
+                    msgSim.put("title", "Wymagany kod PIN karty SIM");
+                    msgSim.put("text", "Karta SIM oczekuje na autoryzację kodem PIN w panelu routera.");
+                    arr.put(msgSim);
+                } else if (simMissing) {
+                    JSONObject msgSim = new JSONObject();
+                    msgSim.put("id", "sim_missing_fault");
+                    msgSim.put("category", "BŁĄD KARTY SIM");
+                    msgSim.put("time", timeStr);
                     msgSim.put("level", "danger");
                     msgSim.put("icon", "✕");
-                    msgSim.put("title", "Brak karty SIM / brak sygnału z karty");
-                    msgSim.put("text", "Brak karty USIM w modemie ODU lub karta jest nieprawidłowo włożona.");
-                } else {
-                    msgSim.put("level", "success");
-                    msgSim.put("icon", "✓");
-                    msgSim.put("title", "Karta SIM aktywna");
-                    msgSim.put("text", "Karta USIM została pomyślnie zweryfikowana i zalogowana do sieci.");
+                    msgSim.put("title", "Brak karty SIM w modemie ODU");
+                    msgSim.put("text", "Router zgłasza brak karty USIM lub karta jest nieprawidłowo osadzona w slocie ODU.");
+                    arr.put(msgSim);
                 }
-                arr.put(msgSim);
 
-                // 3. LTE / Cellular network status
-                JSONObject msgNet = new JSONObject();
-                msgNet.put("id", "net_status");
-                msgNet.put("category", "SIEĆ LTE");
-                msgNet.put("time", timeStr);
-                if (!hasSignal) {
+                // 3. Cellular signal fault
+                if (!hasSignal && !oduDisconnected) {
+                    JSONObject msgNet = new JSONObject();
+                    msgNet.put("id", "no_cellular_signal");
+                    msgNet.put("category", "BRAK SYGNAŁU");
+                    msgNet.put("time", timeStr);
                     msgNet.put("level", "danger");
-                    msgNet.put("icon", "✕");
-                    msgNet.put("title", "Brak zasięgu z karty");
-                    msgNet.put("text", "Router nie ma zasięgu z karty SIM. Wskaźniki radiowe RF wyświetlają brak odczytu (---).");
-                } else {
-                    msgNet.put("level", "success");
-                    msgNet.put("icon", "📶");
-                    msgNet.put("title", isLtePlus ? "Połączono w trybie LTE+ (2CA)" : "Połączono z siecią LTE");
-                    String netDetails = isLtePlus ? "Agregacja pasm LTE-A aktywna." : "Połączenie ze stacją bazową aktywne.";
-                    if (band != null && !band.equals("---") && !band.isEmpty()) {
-                        netDetails += " Pasmo: " + band + ".";
-                    }
-                    if (cellId != null && !cellId.equals("---") && !cellId.isEmpty()) {
-                        netDetails += " Stacja (Cell ID): " + cellId + ".";
-                    }
-                    msgNet.put("text", netDetails);
+                    msgNet.put("icon", "📵");
+                    msgNet.put("title", "Brak zasięgu sieci komórkowej");
+                    msgNet.put("text", "Router nie odbiera sygnału ze stacji bazowej operatora. Sprawdź ustawienie anteny zewnętrznej.");
+                    arr.put(msgNet);
                 }
-                arr.put(msgNet);
 
-                // 4. SMS storage check
+                // 4. SMS storage full fault
                 if (html.contains("message is full") || html.contains("Usuń wiadomości aby zwolnić pamięć SMS")) {
                     JSONObject msgSms = new JSONObject();
-                    msgSms.put("id", "sms_full");
-                    msgSms.put("category", "SMS");
+                    msgSms.put("id", "sms_full_alert");
+                    msgSms.put("category", "PAMIĘĆ SMS");
                     msgSms.put("time", timeStr);
                     msgSms.put("level", "warning");
                     msgSms.put("icon", "💬");
-                    msgSms.put("title", "Pamięć SMS jest pełna");
-                    msgSms.put("text", "Pamięć skrzynki SMS na karcie/routerze jest pełna. Usuń stare wiadomości w panelu.");
+                    msgSms.put("title", "Pamięć SMS jest przepełniona");
+                    msgSms.put("text", "Pamięć skrzynki SMS na karcie SIM jest pełna. Nowe wiadomości mogą nie docierać.");
                     arr.put(msgSms);
                 }
-
-                // 5. System Gateway status
-                JSONObject msgSys = new JSONObject();
-                msgSys.put("id", "sys_status");
-                msgSys.put("category", "ROUTER IDU");
-                msgSys.put("time", timeStr);
-                msgSys.put("level", "info");
-                msgSys.put("icon", "ℹ️");
-                msgSys.put("title", "Brama sieciowa IDU");
-                msgSys.put("text", "Router " + setModel + " na adresie " + targetIp + " (czas odpowiedzi HTTP: " + realPing + " ms).");
-                arr.put(msgSys);
 
             } catch (Exception ignored) {
             }

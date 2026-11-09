@@ -1155,6 +1155,58 @@
       border-radius: 999px;
       background: var(--primary);
       color: #FFFFFF;
+      transition: all 0.25s ease;
+    }
+    .messages-badge.badge-alert {
+      background: #EF4444;
+      animation: alertPulse 1.8s infinite;
+    }
+    .messages-badge.badge-ok {
+      background: #10B981;
+    }
+    @keyframes alertPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.85; }
+    }
+    .router-ok-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(240, 253, 244, 0.85) 0%, rgba(220, 252, 231, 0.65) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.30);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.06);
+    }
+    .ok-shield-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(16, 185, 129, 0.35);
+    }
+    .ok-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .ok-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #065F46;
+    }
+    .ok-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: #047857;
+      line-height: 1.3;
     }
     .messages-refresh-btn {
       font-size: 11px;
@@ -1733,11 +1785,6 @@
       document.getElementById('tileRouterMeta').textContent =
         'Online • ' + (catSpec || 'LTE') + realPingText;
 
-      const devMsgText = document.getElementById('deviceMsgText');
-      if (devMsgText) {
-        devMsgText.textContent = '✓ ' + detectedRouterModel + ' aktywny (' + currentGatewayIp + realPingText + ')';
-      }
-
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
       document.getElementById('dashModelBadge').textContent = detectedRouterModel;
@@ -1749,8 +1796,18 @@
         } catch (e) {
         }
       }
-      if (msgs && msgs.length > 0) {
-        renderRouterMessages(msgs);
+      renderRouterMessages(msgs);
+
+      const devMsgText = document.getElementById('deviceMsgText');
+      const devMsgDot = document.getElementById('deviceMsgDot');
+      if (devMsgText) {
+        if (msgs && msgs.some(m => m.level === 'danger' || m.level === 'warning')) {
+          devMsgText.textContent = '⚠️ Wykryto ostrzeżenie z routera';
+          if (devMsgDot) devMsgDot.style.background = '#EF4444';
+        } else {
+          devMsgText.textContent = '✓ ' + detectedRouterModel + ' aktywny (' + currentGatewayIp + realPingText + ')';
+          if (devMsgDot) devMsgDot.style.background = '#10B981';
+        }
       }
 
       showScreen('deviceManagerScreen');
@@ -1944,38 +2001,55 @@
       const alertTitle = document.getElementById('routerAlertTitle');
       const alertDesc = document.getElementById('routerAlertDesc');
 
-      if (!messages || !Array.isArray(messages) || messages.length === 0) {
-        if (container) container.innerHTML = '<div class="empty-messages-state">Brak aktywnych ostrzeżeń lub komunikatów z routera.</div>';
-        if (badge) badge.textContent = '0';
-        if (alertBanner) alertBanner.style.display = 'none';
+      const faults = Array.isArray(messages) ? messages.filter(m => m && (m.level === 'danger' || m.level === 'warning')) : [];
+
+      if (faults.length === 0) {
+        if (badge) {
+          badge.textContent = '0';
+          badge.className = 'messages-badge badge-ok';
+        }
+        if (alertBanner) {
+          alertBanner.style.display = 'none';
+        }
+        if (container) {
+          container.innerHTML = `
+            <div class="router-ok-card">
+              <div class="ok-shield-icon">✓</div>
+              <div class="ok-details">
+                <div class="ok-title">Wszystko działa prawidłowo</div>
+                <div class="ok-text">Brak aktywnych ostrzeżeń lub błędów zgłaszanych przez modem ODU-IDU.</div>
+              </div>
+            </div>
+          `;
+        }
         return;
       }
 
-      if (badge) badge.textContent = messages.length;
+      // There are active faults or router warnings!
+      if (badge) {
+        badge.textContent = faults.length;
+        badge.className = 'messages-badge badge-alert';
+      }
 
-      // Select highest priority alert for top hero banner
-      let topAlert = messages.find(m => m.level === 'danger')
-                  || messages.find(m => m.level === 'warning')
-                  || messages.find(m => m.level === 'info');
+      // Highest priority fault for hero alert banner
+      let topAlert = faults.find(m => m.level === 'danger') || faults[0];
 
-      if (topAlert && alertBanner) {
+      if (alertBanner) {
         alertBanner.style.display = 'flex';
-        alertBanner.className = 'router-alert-banner alert-' + topAlert.level;
-        if (alertIcon) alertIcon.textContent = topAlert.icon || 'ℹ️';
-        if (alertTitle) alertTitle.textContent = topAlert.title || 'Komunikat routera';
-        if (alertDesc) alertDesc.textContent = topAlert.text || '';
-      } else if (alertBanner) {
-        alertBanner.style.display = 'none';
+        alertBanner.className = 'router-alert-banner alert-' + (topAlert.level || 'danger');
+        if (alertIcon) alertIcon.textContent = topAlert.icon || '⚠️';
+        if (alertTitle) alertTitle.textContent = 'Powiadomienie: Coś jest nie tak!';
+        if (alertDesc) alertDesc.textContent = topAlert.text || topAlert.title || 'Wykryto problem z routerem';
       }
 
       // Render cards in router messages list
       if (container) {
-        container.innerHTML = messages.map(m => `
-          <div class="message-card card-${escapeHtml(m.level || 'info')}">
+        container.innerHTML = faults.map(m => `
+          <div class="message-card card-${escapeHtml(m.level || 'danger')}">
             <div class="msg-card-top">
               <div class="msg-badge-cluster">
-                <span class="msg-cat-pill">${escapeHtml(m.category || 'ROUTER')}</span>
-                <span class="msg-status-indicator status-${escapeHtml(m.level || 'info')}"></span>
+                <span class="msg-cat-pill">${escapeHtml(m.category || 'POWIADOMIENIE')}</span>
+                <span class="msg-status-indicator status-${escapeHtml(m.level || 'danger')}"></span>
               </div>
               <span class="msg-card-time">${escapeHtml(m.time || '')}</span>
             </div>
