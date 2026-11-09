@@ -1321,8 +1321,11 @@
         <div class="glass-field">
           <label>Hasło do panelu routera</label>
           <div class="glass-input-wrap">
-            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter') submitDeviceLogin()" />
+            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera (domyślnie: admin)" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter') submitDeviceLogin()" />
             <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.35;">
+            Wpisz hasło do panelu routera (192.168.0.1), nie hasło do Wi-Fi. Fabryczne hasło to <b>admin</b>.
           </div>
         </div>
       </div>
@@ -1681,8 +1684,9 @@
     }
 
     function submitDeviceLogin() {
-      const user = document.getElementById('loginUser').value.trim();
-      const pass = document.getElementById('loginPass').value;
+      const user = (document.getElementById('loginUser').value || '').trim();
+      const rawPass = document.getElementById('loginPass').value || '';
+      const pass = rawPass.trim();
       const fb = document.getElementById('loginFeedback');
       const btn = document.getElementById('loginSubmitBtn');
 

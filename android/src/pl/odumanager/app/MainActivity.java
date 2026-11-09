@@ -660,7 +660,7 @@ public class MainActivity extends Activity {
                     try {
                         String targetIp = sanitizeTargetIp(gatewayIp);
                         String safeUsername = (username != null) ? username.trim() : "admin";
-                        String safePassword = (password != null) ? password : "";
+                        String safePassword = (password != null) ? password.trim() : "";
                         mSavedPassword = safePassword;
 
                         long t0 = System.currentTimeMillis();
