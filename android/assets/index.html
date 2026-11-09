@@ -1117,197 +1117,7 @@
       line-height: 1.35;
     }
 
-    /* Router Messages & Alerts Panel */
-    .messages-panel {
-      border-radius: 24px;
-      padding: 16px;
-      margin-top: 14px;
-      margin-bottom: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .messages-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-    }
-    .messages-header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .messages-icon {
-      font-size: 16px;
-    }
-    .messages-title {
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-    }
-    .messages-badge {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: var(--primary);
-      color: #FFFFFF;
-      transition: all 0.25s ease;
-    }
-    .messages-badge.badge-alert {
-      background: #EF4444;
-      animation: alertPulse 1.8s infinite;
-    }
-    .messages-badge.badge-ok {
-      background: #10B981;
-    }
-    @keyframes alertPulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.08); opacity: 0.85; }
-    }
-    .router-ok-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, rgba(240, 253, 244, 0.85) 0%, rgba(220, 252, 231, 0.65) 100%);
-      border: 1px solid rgba(16, 185, 129, 0.30);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.06);
-    }
-    .ok-shield-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      color: #FFFFFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 800;
-      flex-shrink: 0;
-      box-shadow: 0 3px 8px rgba(16, 185, 129, 0.35);
-    }
-    .ok-details {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .ok-title {
-      font-size: 12.5px;
-      font-weight: 800;
-      color: #065F46;
-    }
-    .ok-text {
-      font-size: 11px;
-      font-weight: 500;
-      color: #047857;
-      line-height: 1.3;
-    }
-    .messages-refresh-btn {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--primary);
-      background: rgba(24, 86, 255, 0.08);
-      border: 1px solid rgba(24, 86, 255, 0.20);
-      border-radius: 999px;
-      padding: 4px 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .messages-refresh-btn:active {
-      transform: scale(0.95);
-      background: rgba(24, 86, 255, 0.16);
-    }
-    .messages-list {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-    }
-    .empty-messages-state {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-align: center;
-      padding: 14px 8px;
-    }
-    .message-card {
-      border-radius: 16px;
-      padding: 11px 13px;
-      background: rgba(255, 255, 255, 0.70);
-      border: 1px solid rgba(255, 255, 255, 0.90);
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: transform 0.15s ease;
-    }
-    .message-card.card-danger {
-      border-left: 3.5px solid var(--danger);
-      background: linear-gradient(90deg, rgba(254, 242, 242, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
-    }
-    .message-card.card-warning {
-      border-left: 3.5px solid var(--warning);
-      background: linear-gradient(90deg, rgba(254, 252, 232, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
-    }
-    .message-card.card-success {
-      border-left: 3.5px solid var(--success);
-      background: linear-gradient(90deg, rgba(240, 253, 244, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
-    }
-    .message-card.card-info {
-      border-left: 3.5px solid var(--primary);
-      background: linear-gradient(90deg, rgba(239, 246, 255, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
-    }
-    .msg-card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .msg-badge-cluster {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .msg-cat-pill {
-      font-size: 9.5px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 1.5px 6px;
-      border-radius: 6px;
-      background: rgba(15, 23, 42, 0.07);
-      color: var(--text-secondary);
-    }
-    .msg-status-indicator {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-    }
-    .status-danger { background: var(--danger); box-shadow: 0 0 6px rgba(234, 33, 67, 0.6); }
-    .status-warning { background: var(--warning); box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
-    .status-success { background: var(--success); box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
-    .status-info { background: var(--primary); box-shadow: 0 0 6px rgba(24, 86, 255, 0.6); }
-    .msg-card-time {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-    .msg-card-title {
-      font-size: 12.5px;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1.25;
-    }
-    .msg-card-text {
-      font-size: 11.5px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      line-height: 1.35;
-    }
+    /* Removed legacy messages panel */
     .device-message-preview {
       display: flex;
       align-items: center;
@@ -1504,14 +1314,14 @@
         <div class="glass-field">
           <label>Nazwa użytkownika</label>
           <div class="glass-input-wrap">
-            <input type="text" class="glass-input" id="loginUser" value="admin" placeholder="admin" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <input type="text" class="glass-input" id="loginUser" value="admin" placeholder="admin" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter') submitDeviceLogin()" />
           </div>
         </div>
 
         <div class="glass-field">
           <label>Hasło do panelu routera</label>
           <div class="glass-input-wrap">
-            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <input type="password" class="glass-input" id="loginPass" value="" placeholder="Wpisz hasło routera" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter') submitDeviceLogin()" />
             <button type="button" class="input-eye-btn" id="eyeBtn" onclick="togglePassword()">Pokaż</button>
           </div>
         </div>
@@ -1549,7 +1359,7 @@
       <div class="router-alert-banner" id="routerAlertBanner" style="display:none;">
         <span class="alert-icon" id="routerAlertIcon">⚠️</span>
         <div class="alert-content">
-          <div class="alert-title" id="routerAlertTitle">Komunikat routera</div>
+          <div class="alert-title" id="routerAlertTitle">Status urządzenia</div>
           <div class="alert-desc" id="routerAlertDesc">---</div>
         </div>
       </div>

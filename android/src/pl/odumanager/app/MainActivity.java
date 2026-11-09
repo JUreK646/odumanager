@@ -440,30 +440,31 @@ public class MainActivity extends Activity {
                                     gwCandidate = ip;
                                     realMeasuredPing = Math.max(1, elapsed);
 
-                                    // 1. ODU-IDU 300 signature: EasyMesh support (mesh_tplg, setting mesh tplg), MT7621, B1 2100MHz (sysfwnetd2100), U300, IDU-300
-                                    boolean is300 = adminXml.contains("mesh_tplg")
-                                            || adminXml.contains("setting mesh tplg")
-                                            || adminXml.contains("setting 5g menu3_mesh_5G")
-                                            || adminXml.contains("sysfwnetd2100")
-                                            || adminXml.contains("U300")
-                                            || adminXml.contains("IDU-300")
-                                            || adminXml.contains("ODU-300")
-                                            || rootHtml.contains("IDU-300");
-
-                                    // 2. ODU-IDU 200 signature: U270 (without EasyMesh), MT7620 Cat.4
-                                    boolean is200 = !is300 && (adminXml.contains("U270")
+                                    // 1. ODU-IDU 200 signature: U270, IDU-200, ODU-200, MT7620 Cat.4
+                                    boolean is200 = adminXml.contains("U270")
                                             || adminXml.contains("IDU-200")
                                             || adminXml.contains("ODU-200")
-                                            || rootHtml.contains("IDU-200"));
+                                            || rootHtml.contains("IDU-200");
 
-                                    // 3. ODU-IDU 100 signature: U100, RT3352 Cat.3
-                                    boolean is100 = !is300 && !is200 && (adminXml.contains("U100")
+                                    // 2. ODU-IDU 100 signature: U100, IDU-100, ODU-100, RT3352 Cat.3
+                                    boolean is100 = !is200 && (adminXml.contains("U100")
                                             || adminXml.contains("IDU-100")
                                             || adminXml.contains("ODU-100")
                                             || rootHtml.contains("IDU-100"));
 
+                                    // 3. ODU-IDU 300 signature: U300, IDU-300, ODU-300, MT7621 Cat.6
+                                    boolean is300 = !is200 && !is100 && (adminXml.contains("U300")
+                                            || adminXml.contains("IDU-300")
+                                            || adminXml.contains("ODU-300")
+                                            || rootHtml.contains("IDU-300"));
+
                                     if (!is200 && !is100 && !is300) {
-                                        is300 = true; // Fallback to 300 if modern dictionary
+                                        // Default fallback based on platform keywords
+                                        if (adminXml.contains("U270") || rootHtml.contains("200")) {
+                                            is200 = true;
+                                        } else {
+                                            is300 = true;
+                                        }
                                     }
 
                                     Log.d(TAG, "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
@@ -554,6 +555,9 @@ public class MainActivity extends Activity {
                 conn.setRequestMethod("POST");
                 conn.setInstanceFollowRedirects(false);
                 conn.setDoOutput(true);
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36");
+                conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                conn.setRequestProperty("Accept-Language", "pl-PL,pl;q=0.9,en-US;q=0.8");
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setRequestProperty("Origin", "http://" + targetIp);
                 conn.setRequestProperty("Referer", "http://" + targetIp + "/login.shtml");
@@ -608,24 +612,30 @@ public class MainActivity extends Activity {
                     }
                 }
 
-                boolean isFailed = location.contains("id=401")
-                        || location.contains("/login")
-                        || admBody.contains("login.asp")
-                        || admBody.contains("login.shtml")
-                        || admBody.contains("id=401")
-                        || admBody.contains("/login");
+                boolean is401_2 = location.contains("401.2") || admBody.contains("401.2");
+                boolean is401 = location.contains("id=401") || admBody.contains("id=401");
+                boolean isStub = admBody.contains("top.location.href = \"/login.asp\"")
+                        || admBody.contains("top.location.href='/login.asp'")
+                        || admBody.contains("top.location=\"/login.shtml\"");
 
                 boolean isNetlock = location.contains("netlock")
                         || location.contains("simlock")
                         || admBody.contains("netlock")
                         || admBody.contains("simlock");
 
-                boolean isOk = !isFailed && (isNetlock
-                        || location.contains("/idu/home")
-                        || admBody.contains("/idu/home")
-                        || (responseCode == 200 && !admBody.isEmpty() && !admBody.contains("login")));
+                boolean isFailed = is401_2 || is401 || (isStub && !isNetlock && !admBody.contains("home.shtml"));
 
-                return isOk || isNetlock;
+                if (!isFailed) {
+                    String testHome = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                    if (testHome.length() > 500 && !testHome.contains("/login.asp")) {
+                        return true;
+                    }
+                    if (testHome.contains("netlock") || testHome.contains("simlock") || testHome.contains("Blokada SIM Lock")) {
+                        return true;
+                    }
+                }
+
+                return isNetlock;
             } catch (Exception e) {
                 Log.w(TAG, "loginInternal error: " + e.getMessage());
                 return false;
@@ -661,6 +671,9 @@ public class MainActivity extends Activity {
                         conn.setRequestMethod("POST");
                         conn.setInstanceFollowRedirects(false);
                         conn.setDoOutput(true);
+                        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36");
+                        conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                        conn.setRequestProperty("Accept-Language", "pl-PL,pl;q=0.9,en-US;q=0.8");
                         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                         conn.setRequestProperty("Origin", "http://" + targetIp);
                         conn.setRequestProperty("Referer", "http://" + targetIp + "/login.shtml");
@@ -720,35 +733,30 @@ public class MainActivity extends Activity {
                             }
                         }
 
-                        boolean isFailed = location.contains("id=401")
-                                || location.contains("/login")
-                                || admBody.contains("login.asp")
-                                || admBody.contains("login.shtml")
-                                || admBody.contains("id=401")
-                                || admBody.contains("/login");
+                        boolean is401_2 = location.contains("401.2") || admBody.contains("401.2");
+                        boolean is401 = location.contains("id=401") || admBody.contains("id=401");
+                        boolean isStub = admBody.contains("top.location.href = \"/login.asp\"")
+                                || admBody.contains("top.location.href='/login.asp'")
+                                || admBody.contains("top.location=\"/login.shtml\"");
 
                         boolean isNetlock = location.contains("netlock")
                                 || location.contains("simlock")
                                 || admBody.contains("netlock")
                                 || admBody.contains("simlock");
 
-                        boolean isOk = !isFailed && (isNetlock
-                                || location.contains("/idu/home")
-                                || admBody.contains("/idu/home")
-                                || (responseCode == 200 && !admBody.isEmpty() && !admBody.contains("login")));
+                        boolean isFailed = is401_2 || is401 || (isStub && !isNetlock && !admBody.contains("home.shtml"));
 
-                        if (isFailed) {
-                            success = false;
-                            message = location.contains("401.2")
-                                    ? "Zbyt wiele nieudanych prób logowania (401.2). Odczekaj chwilę."
-                                    : "Nieprawidłowe hasło routera. Wpisz poprawne hasło administratora.";
-                            mSavedPassword = "";
-                        } else if (isOk || isNetlock) {
+                        // Verify with genuine home page fetch
+                        String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                        boolean homeOk = homeHtml.length() > 500 && !homeHtml.contains("/login.asp");
+                        boolean homeNetlock = homeHtml.contains("netlock") || homeHtml.contains("simlock") || homeHtml.contains("Blokada SIM Lock");
+
+                        if (!isFailed && (homeOk || homeNetlock || isNetlock)) {
                             success = true;
+                            mSavedPassword = safePassword;
                             message = "Zalogowano pomyślnie do " + targetIp;
 
                             // Fetch real pages and parse genuine telemetry
-                            String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
                             String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
                             String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                             String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
@@ -759,13 +767,18 @@ public class MainActivity extends Activity {
                             String locHtml = (!location.isEmpty() && location.startsWith("/")) ? fetchHttpString("http://" + targetIp + location, 2000) : "";
 
                             String combined = homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml + "\n" + statusHtml + "\n" + netlockHtml + "\n" + simlockHtml + "\n" + pinHtml + "\n" + locHtml;
-                            if (location.contains("netlock") || location.contains("simlock")) {
+                            if (location.contains("netlock") || location.contains("simlock") || homeNetlock) {
                                 combined += "\n<title>Blokada SIM Lock</title><div>Blokada SIM Lock (karta niedozwolona)</div>";
                             }
                             jsonTelemetry = parseRouterTelemetry(combined, realPing, targetIp, mDetectedModel);
                         } else {
                             success = false;
-                            message = "Odpowiedź routera HTTP " + responseCode;
+                            mSavedPassword = "";
+                            if (is401_2) {
+                                message = "Router tymczasowo zablokował logowanie (zbyt wiele nieudanych prób). Odczekaj 2 minuty i spróbuj ponownie.";
+                            } else {
+                                message = "Nieprawidłowe hasło routera. Wpisz poprawne hasło administratora.";
+                            }
                         }
                     } catch (Exception e) {
                         success = false;
@@ -806,11 +819,15 @@ public class MainActivity extends Activity {
                     String homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
                     long realPing = Math.max(1, System.currentTimeMillis() - t0);
 
-                    boolean isUnauth = homeHtml.isEmpty() || homeHtml.contains("top.location=\"/login.shtml\"") || homeHtml.length() < 400;
+                    boolean isUnauth = homeHtml.isEmpty() || homeHtml.contains("/login.asp") || homeHtml.contains("top.location=\"/login.shtml\"") || homeHtml.length() < 400;
                     if (isUnauth && mSavedPassword != null && !mSavedPassword.isEmpty()) {
-                        Log.d(TAG, "refreshRealTelemetry: unauthenticated (len=" + homeHtml.length() + "), attempting auto-relogin...");
-                        loginInternal(targetIp, "admin", mSavedPassword);
-                        homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                        Log.d(TAG, "refreshRealTelemetry: unauthenticated (len=" + homeHtml.length() + "), attempting relogin with saved password...");
+                        boolean ok = loginInternal(targetIp, "admin", mSavedPassword);
+                        if (ok) {
+                            homeHtml = fetchHttpString("http://" + targetIp + "/idu/home.shtml", 2500);
+                        } else {
+                            mSavedPassword = ""; // Stop retrying on failure!
+                        }
                     }
 
                     String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
@@ -1043,7 +1060,10 @@ public class MainActivity extends Activity {
 
                 // 5. Unauthenticated check - router requires login
                 boolean isUnauthenticated = html.replace("\n", "").trim().isEmpty()
-                        || (html.contains("top.location=\"/login.shtml\"") && !html.contains("rsrp") && !html.contains("netlock") && !html.contains("simlock") && !html.contains("Blokada SIM Lock"));
+                        || html.contains("/login.asp")
+                        || html.contains("top.location=\"/login.shtml\"")
+                        || html.contains("id=401")
+                        || (html.length() < 500 && !html.contains("rsrp") && !html.contains("netlock") && !html.contains("simlock") && !html.contains("Blokada SIM Lock"));
 
                 if (isUnauthenticated) {
                     JSONObject msgAuth = new JSONObject();
