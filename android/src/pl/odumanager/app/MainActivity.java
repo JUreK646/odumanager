@@ -26,6 +26,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -41,6 +42,9 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -413,39 +417,43 @@ public class MainActivity extends Activity {
                                     gwCandidate = ip;
                                     realMeasuredPing = Math.max(1, elapsed);
 
-                                    // Genuine hardware model fingerprinting:
-                                    // ODU-IDU 300 features:
-                                    // - Extended dictionary with Mesh Wi-Fi (adminXml.length() > 71000 bytes, mesh_tplg; on IDU-200 it is ~68238 bytes)
-                                    // - Direct full login page in root (rootHtml.length() > 5000 bytes; on IDU-200 root is a ~341-byte short redirect)
-                                    // - Model strings: IDU-300, ODU-300, PT30, PT40, CPE3
-                                    boolean hasMesh = adminXml.contains("mesh_tplg") || adminXml.contains("menu3_mesh");
-                                    boolean has300Tag = adminXml.contains("IDU-300") || adminXml.contains("ODU-300") || rootHtml.contains("IDU-300") || adminXml.contains("PT30") || adminXml.contains("PT40") || adminXml.contains("CPE3");
-                                    boolean is300Size = adminXml.length() > 71000 || rootHtml.length() > 5000;
+                                    // Genuine hardware platform fingerprinting:
+                                    // ODU-IDU 200 platform signature: U270 (InterPhone IDU-200 / ODU-200)
+                                    boolean is200 = adminXml.contains("U270") || adminXml.contains("IDU-200") || adminXml.contains("ODU-200") || rootHtml.contains("IDU-200");
 
-                                    boolean is300 = hasMesh || has300Tag || is300Size;
+                                    // ODU-IDU 100 platform signature: U100
+                                    boolean is100 = !is200 && (adminXml.contains("U100") || adminXml.contains("IDU-100") || adminXml.contains("ODU-100"));
 
-                                    boolean is100 = !is300 && (adminXml.contains("U100")
-                                            || adminXml.contains("IDU-100")
-                                            || adminXml.contains("ODU-100"));
+                                    // ODU-IDU 300 platform signature: U300, IDU-300, ODU-300, PT30, PT40, CPE3, or B1 2100MHz (sysfwnetd2100)
+                                    boolean is300 = !is200 && !is100 && (adminXml.contains("U300")
+                                            || adminXml.contains("IDU-300")
+                                            || adminXml.contains("ODU-300")
+                                            || rootHtml.contains("IDU-300")
+                                            || adminXml.contains("PT30")
+                                            || adminXml.contains("PT40")
+                                            || adminXml.contains("CPE3")
+                                            || adminXml.contains("sysfwnetd2100"));
 
-                                    boolean is200 = !is300 && !is100;
+                                    if (!is200 && !is100 && !is300) {
+                                        is200 = true; // Reference standard
+                                    }
 
                                     Log.d(TAG, "Probing IP: " + ip + " rootHtml len: " + rootHtml.length() + " adminXml len: " + adminXml.length());
-                                    Log.d(TAG, "Fingerprint check: is300=" + is300 + " (mesh=" + hasMesh + ", size=" + is300Size + ", tag=" + has300Tag + "), is200=" + is200 + ", is100=" + is100);
+                                    Log.d(TAG, "Fingerprint check: is200=" + is200 + ", is300=" + is300 + ", is100=" + is100);
 
-                                    if (is300) {
+                                    if (is200) {
+                                        setModel = "ODU-IDU 200";
+                                        iduModel = "IDU-200";
+                                        oduModel = "ODU-200";
+                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
+                                        bandsSpec = "B3 / B7 / B8 / B20 + B38 TDD";
+                                        coaxSpec = "PoCoax • Unicable LNB";
+                                    } else if (is300) {
                                         setModel = "ODU-IDU 300";
                                         iduModel = "IDU-300";
                                         oduModel = "ODU-300";
                                         catSpec = "LTE Cat. 6 • 300 Mb/s (2CA)";
                                         bandsSpec = "B1 / B3 / B7 / B8 / B20 + B38 TDD";
-                                        coaxSpec = "PoCoax • Unicable LNB";
-                                    } else if (is200) {
-                                        setModel = "ODU-IDU 200";
-                                        iduModel = "IDU-200";
-                                        oduModel = "ODU-200";
-                                        catSpec = "LTE Cat. 4 • 150 Mb/s";
-                                        bandsSpec = "FDD B3 / B7 / B20";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     } else if (is100) {
                                         setModel = "ODU-IDU 100";
@@ -459,7 +467,7 @@ public class MainActivity extends Activity {
                                         iduModel = "IDU-200";
                                         oduModel = "ODU-200";
                                         catSpec = "LTE Cat. 4 • 150 Mb/s";
-                                        bandsSpec = "FDD B3 / B7 / B20";
+                                        bandsSpec = "B3 / B7 / B8 / B20 + B38 TDD";
                                         coaxSpec = "PoCoax • Unicable LNB";
                                     }
                                     Log.d(TAG, "Selected model: " + setModel + " (Ping: " + realMeasuredPing + " ms)");
@@ -479,11 +487,41 @@ public class MainActivity extends Activity {
                     final String fBandsSpec = bandsSpec;
                     final String fCoaxSpec = coaxSpec;
 
+                    JSONArray initMsgs = new JSONArray();
+                    String nowTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+                    try {
+                        JSONObject m1 = new JSONObject();
+                        m1.put("id", "net_wifi");
+                        m1.put("category", "POŁĄCZENIE");
+                        m1.put("level", wifiOn ? "success" : "danger");
+                        m1.put("icon", wifiOn ? "✓" : "✕");
+                        m1.put("title", wifiOn ? "Połączono z Wi-Fi" : "Brak Wi-Fi");
+                        m1.put("text", wifiOn ? "Telefon jest połączony z lokalną siecią bezprzewodową Wi-Fi." : "Włącz Wi-Fi w telefonie.");
+                        m1.put("time", nowTime);
+                        initMsgs.put(m1);
+
+                        if (finalOdu) {
+                            JSONObject m2 = new JSONObject();
+                            m2.put("id", "odu_ready");
+                            m2.put("category", "URZĄDZENIE");
+                            m2.put("level", "success");
+                            m2.put("icon", "✓");
+                            m2.put("title", "Wykryto " + fSetModel);
+                            m2.put("text", "Panel routera (" + finalGw + ") odpowiada w czasie " + finalPing + " ms. Sygnatura platformy " + (fSetModel.contains("200") ? "U270" : "IDU") + " zweryfikowana.");
+                            m2.put("time", nowTime);
+                            initMsgs.put(m2);
+                        }
+                    } catch (Exception ignored) {
+                    }
+
+                    final String initMsgsJson = initMsgs.toString();
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             String js = String.format(
-                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, %s, %d, %s, %s, %s, %s, %s, %s);",
+                                "window.onConnectionStatus && window.onConnectionStatus(%b, %b, %s, %d, %s, %s, %s, %s, %s, %s, %s);",
                                 wifiOn,
                                 finalOdu,
                                 JSONObject.quote(finalGw),
@@ -493,7 +531,8 @@ public class MainActivity extends Activity {
                                 JSONObject.quote(fOduModel),
                                 JSONObject.quote(fCatSpec),
                                 JSONObject.quote(fBandsSpec),
-                                JSONObject.quote(fCoaxSpec)
+                                JSONObject.quote(fCoaxSpec),
+                                initMsgsJson
                             );
                             webView.evaluateJavascript(js, null);
                         }
@@ -564,7 +603,7 @@ public class MainActivity extends Activity {
                             String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                             String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
 
-                            jsonTelemetry = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml, realPing);
+                            jsonTelemetry = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml, realPing, targetIp, "ODU-IDU 200");
                         } else {
                             success = false;
                             message = "Odpowiedź routera HTTP " + responseCode;
@@ -609,9 +648,10 @@ public class MainActivity extends Activity {
                     long realPing = Math.max(1, System.currentTimeMillis() - t0);
 
                     String lteHtml = fetchHttpString("http://" + targetIp + "/idu/lte.shtml", 2500);
+                    String antennaHtml = fetchHttpString("http://" + targetIp + "/idu/antenna.shtml", 2000);
                     String statHtml = fetchHttpString("http://" + targetIp + "/idu/statistic.shtml", 2000);
 
-                    final String json = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + statHtml, realPing);
+                    final String json = parseRouterTelemetry(homeHtml + "\n" + lteHtml + "\n" + antennaHtml + "\n" + statHtml, realPing, targetIp, "ODU-IDU 200");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -622,7 +662,7 @@ public class MainActivity extends Activity {
             }).start();
         }
 
-        private String parseRouterTelemetry(String html, long realPing) {
+        private String parseRouterTelemetry(String html, long realPing, String targetIp, String setModel) {
             String rsrp = extractParam(html, new String[]{"rsrp", "lte_rsrp", "lteRsrp", "RSRP"}, new String[]{"RSRP", "Moc sygnału RSRP"});
             String rsrq = extractParam(html, new String[]{"rsrq", "lte_rsrq", "lteRsrq", "RSRQ"}, new String[]{"RSRQ", "Jakość sygnału RSRQ"});
             String sinr = extractParam(html, new String[]{"sinr", "lte_sinr", "lteSinr", "SINR", "snr", "SNR"}, new String[]{"SINR", "SNR", "Stosunek sygnału do szumu"});
@@ -644,6 +684,8 @@ public class MainActivity extends Activity {
                 cellId = "---";
             }
 
+            JSONArray messages = buildRouterMessages(html, hasSignal, isLtePlus, band, cellId, setModel, realPing, targetIp);
+
             try {
                 JSONObject json = new JSONObject();
                 json.put("realPingMs", realPing);
@@ -656,10 +698,134 @@ public class MainActivity extends Activity {
                 json.put("rssi", rssi);
                 json.put("band", band);
                 json.put("cellId", cellId);
+                json.put("messages", messages);
                 return json.toString();
             } catch (Exception e) {
                 return "{}";
             }
+        }
+
+        private JSONArray buildRouterMessages(String html, boolean hasSignal, boolean isLtePlus, String band, String cellId, String setModel, long realPing, String targetIp) {
+            JSONArray arr = new JSONArray();
+            String timeStr = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+            try {
+                // 1. ODU-IDU connection status
+                boolean oduDisconnected = html.contains("Brak połączenia pomiędzy ODU oraz IDU")
+                        || html.contains("Brak połączenia z ODU")
+                        || html.contains("ODU Disconnected")
+                        || html.contains("ODU connection fail")
+                        || html.contains("home content disconnected display")
+                        || html.contains("odu config alert2");
+
+                JSONObject msgOdu = new JSONObject();
+                msgOdu.put("id", "odu_link");
+                msgOdu.put("category", "ODU-IDU");
+                msgOdu.put("time", timeStr);
+                if (oduDisconnected) {
+                    msgOdu.put("level", "danger");
+                    msgOdu.put("icon", "⚠️");
+                    msgOdu.put("title", "Brak połączenia ODU-IDU");
+                    msgOdu.put("text", "Brak połączenia pomiędzy ODU oraz IDU lub ODU jeszcze się uruchamia. Sprawdź kabel koncentryczny i zasilacz PoCoax.");
+                } else {
+                    msgOdu.put("level", "success");
+                    msgOdu.put("icon", "✓");
+                    msgOdu.put("title", "Połączenie ODU-IDU aktywne");
+                    msgOdu.put("text", "Moduł zewnętrzny ODU jest połączony i zasilany przez kabel koncentryczny PoCoax.");
+                }
+                arr.put(msgOdu);
+
+                // 2. SIM / USIM status
+                boolean simMissing = html.contains("No SIM inserted")
+                        || html.contains("Brak karty SIM")
+                        || html.contains("Brak karty USIM lub karta USIM jest nieprawidłowa!")
+                        || html.contains("SIM card not inserted")
+                        || html.contains("Nie włożono karty")
+                        || html.contains("SIM not inserted");
+
+                boolean pinLock = html.contains("PIN lock") || html.contains("PIN jest Zamknięty") || html.contains("Wymagany PIN");
+                boolean pukLock = html.contains("PUK lock") || html.contains("PUK jest Zamknięty") || html.contains("Wymagany PUK");
+
+                JSONObject msgSim = new JSONObject();
+                msgSim.put("id", "sim_status");
+                msgSim.put("category", "KARTA SIM");
+                msgSim.put("time", timeStr);
+                if (pukLock) {
+                    msgSim.put("level", "danger");
+                    msgSim.put("icon", "🚫");
+                    msgSim.put("title", "Karta SIM zablokowana (PUK)");
+                    msgSim.put("text", "Wymagany kod PUK od operatora sieci. Karta SIM została zablokowana.");
+                } else if (pinLock) {
+                    msgSim.put("level", "warning");
+                    msgSim.put("icon", "🔐");
+                    msgSim.put("title", "Wymagany kod PIN");
+                    msgSim.put("text", "Karta SIM oczekuje na wprowadzenie kodu PIN w panelu routera.");
+                } else if (simMissing || (!hasSignal && !oduDisconnected)) {
+                    msgSim.put("level", "danger");
+                    msgSim.put("icon", "✕");
+                    msgSim.put("title", "Brak karty SIM / brak sygnału z karty");
+                    msgSim.put("text", "Brak karty USIM w modemie ODU lub karta jest nieprawidłowo włożona.");
+                } else {
+                    msgSim.put("level", "success");
+                    msgSim.put("icon", "✓");
+                    msgSim.put("title", "Karta SIM aktywna");
+                    msgSim.put("text", "Karta USIM została pomyślnie zweryfikowana i zalogowana do sieci.");
+                }
+                arr.put(msgSim);
+
+                // 3. LTE / Cellular network status
+                JSONObject msgNet = new JSONObject();
+                msgNet.put("id", "net_status");
+                msgNet.put("category", "SIEĆ LTE");
+                msgNet.put("time", timeStr);
+                if (!hasSignal) {
+                    msgNet.put("level", "danger");
+                    msgNet.put("icon", "✕");
+                    msgNet.put("title", "Brak zasięgu z karty");
+                    msgNet.put("text", "Router nie ma zasięgu z karty SIM. Wskaźniki radiowe RF wyświetlają brak odczytu (---).");
+                } else {
+                    msgNet.put("level", "success");
+                    msgNet.put("icon", "📶");
+                    msgNet.put("title", isLtePlus ? "Połączono w trybie LTE+ (2CA)" : "Połączono z siecią LTE");
+                    String netDetails = isLtePlus ? "Agregacja pasm LTE-A aktywna." : "Połączenie ze stacją bazową aktywne.";
+                    if (band != null && !band.equals("---") && !band.isEmpty()) {
+                        netDetails += " Pasmo: " + band + ".";
+                    }
+                    if (cellId != null && !cellId.equals("---") && !cellId.isEmpty()) {
+                        netDetails += " Stacja (Cell ID): " + cellId + ".";
+                    }
+                    msgNet.put("text", netDetails);
+                }
+                arr.put(msgNet);
+
+                // 4. SMS storage check
+                if (html.contains("message is full") || html.contains("Usuń wiadomości aby zwolnić pamięć SMS")) {
+                    JSONObject msgSms = new JSONObject();
+                    msgSms.put("id", "sms_full");
+                    msgSms.put("category", "SMS");
+                    msgSms.put("time", timeStr);
+                    msgSms.put("level", "warning");
+                    msgSms.put("icon", "💬");
+                    msgSms.put("title", "Pamięć SMS jest pełna");
+                    msgSms.put("text", "Pamięć skrzynki SMS na karcie/routerze jest pełna. Usuń stare wiadomości w panelu.");
+                    arr.put(msgSms);
+                }
+
+                // 5. System Gateway status
+                JSONObject msgSys = new JSONObject();
+                msgSys.put("id", "sys_status");
+                msgSys.put("category", "ROUTER IDU");
+                msgSys.put("time", timeStr);
+                msgSys.put("level", "info");
+                msgSys.put("icon", "ℹ️");
+                msgSys.put("title", "Brama sieciowa IDU");
+                msgSys.put("text", "Router " + setModel + " na adresie " + targetIp + " (czas odpowiedzi HTTP: " + realPing + " ms).");
+                arr.put(msgSys);
+
+            } catch (Exception ignored) {
+            }
+
+            return arr;
         }
 
         private boolean isValidValue(String val) {

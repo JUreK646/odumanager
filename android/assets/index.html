@@ -1061,6 +1061,221 @@
     .toggle-track.active .toggle-thumb {
       transform: translateX(20px);
     }
+
+    /* Router Alert Banner */
+    .router-alert-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.08);
+    }
+    .router-alert-banner.alert-danger {
+      background: linear-gradient(135deg, rgba(254, 242, 242, 0.94) 0%, rgba(254, 226, 226, 0.88) 100%);
+      border: 1.5px solid rgba(239, 68, 68, 0.45);
+      color: #991B1B;
+    }
+    .router-alert-banner.alert-warning {
+      background: linear-gradient(135deg, rgba(254, 252, 232, 0.94) 0%, rgba(254, 240, 199, 0.88) 100%);
+      border: 1.5px solid rgba(245, 158, 11, 0.45);
+      color: #92400E;
+    }
+    .router-alert-banner.alert-success {
+      background: linear-gradient(135deg, rgba(240, 253, 244, 0.94) 0%, rgba(220, 252, 231, 0.88) 100%);
+      border: 1.5px solid rgba(16, 185, 129, 0.45);
+      color: #065F46;
+    }
+    .router-alert-banner.alert-info {
+      background: linear-gradient(135deg, rgba(239, 246, 255, 0.94) 0%, rgba(219, 234, 254, 0.88) 100%);
+      border: 1.5px solid rgba(59, 130, 246, 0.45);
+      color: #1E40AF;
+    }
+    .router-alert-banner .alert-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .router-alert-banner .alert-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .router-alert-banner .alert-title {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .router-alert-banner .alert-desc {
+      font-size: 11.5px;
+      font-weight: 500;
+      opacity: 0.92;
+      line-height: 1.35;
+    }
+
+    /* Router Messages & Alerts Panel */
+    .messages-panel {
+      border-radius: 24px;
+      padding: 16px;
+      margin-top: 14px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .messages-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .messages-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .messages-icon {
+      font-size: 16px;
+    }
+    .messages-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+    .messages-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+    .messages-refresh-btn {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(24, 86, 255, 0.08);
+      border: 1px solid rgba(24, 86, 255, 0.20);
+      border-radius: 999px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .messages-refresh-btn:active {
+      transform: scale(0.95);
+      background: rgba(24, 86, 255, 0.16);
+    }
+    .messages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .empty-messages-state {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 14px 8px;
+    }
+    .message-card {
+      border-radius: 16px;
+      padding: 11px 13px;
+      background: rgba(255, 255, 255, 0.70);
+      border: 1px solid rgba(255, 255, 255, 0.90);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: transform 0.15s ease;
+    }
+    .message-card.card-danger {
+      border-left: 3.5px solid var(--danger);
+      background: linear-gradient(90deg, rgba(254, 242, 242, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
+    }
+    .message-card.card-warning {
+      border-left: 3.5px solid var(--warning);
+      background: linear-gradient(90deg, rgba(254, 252, 232, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
+    }
+    .message-card.card-success {
+      border-left: 3.5px solid var(--success);
+      background: linear-gradient(90deg, rgba(240, 253, 244, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
+    }
+    .message-card.card-info {
+      border-left: 3.5px solid var(--primary);
+      background: linear-gradient(90deg, rgba(239, 246, 255, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%);
+    }
+    .msg-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .msg-badge-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .msg-cat-pill {
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 1.5px 6px;
+      border-radius: 6px;
+      background: rgba(15, 23, 42, 0.07);
+      color: var(--text-secondary);
+    }
+    .msg-status-indicator {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .status-danger { background: var(--danger); box-shadow: 0 0 6px rgba(234, 33, 67, 0.6); }
+    .status-warning { background: var(--warning); box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
+    .status-success { background: var(--success); box-shadow: 0 0 6px rgba(16, 185, 129, 0.6); }
+    .status-info { background: var(--primary); box-shadow: 0 0 6px rgba(24, 86, 255, 0.6); }
+    .msg-card-time {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .msg-card-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.25;
+    }
+    .msg-card-text {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      line-height: 1.35;
+    }
+    .device-message-preview {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      margin-top: 6px;
+    }
+    .device-message-preview .msg-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -1206,6 +1421,10 @@
             <span class="live-dot"></span>
             <span id="tileRouterMeta">Sprawdzanie stanu...</span>
           </div>
+          <div class="device-message-preview" id="deviceMsgPreview">
+            <span class="msg-dot" id="deviceMsgDot"></span>
+            <span id="deviceMsgText">Oczekiwanie na sygnał routera...</span>
+          </div>
         </div>
 
         <div class="router-chevron">›</div>
@@ -1273,6 +1492,15 @@
           </button>
         </div>
       </header>
+
+      <!-- Router Alert Banner (Dynamic highest priority message) -->
+      <div class="router-alert-banner" id="routerAlertBanner" style="display:none;">
+        <span class="alert-icon" id="routerAlertIcon">⚠️</span>
+        <div class="alert-content">
+          <div class="alert-title" id="routerAlertTitle">Komunikat routera</div>
+          <div class="alert-desc" id="routerAlertDesc">---</div>
+        </div>
+      </div>
 
       <!-- Hero Liquid Glass Signal Card -->
       <article class="hero-signal-card liquid-glass">
@@ -1346,6 +1574,24 @@
           <span class="tele-sub">Identyfikator komórki</span>
         </div>
       </div>
+
+      <!-- Router Messages & Alerts Center -->
+      <section class="messages-panel liquid-glass" id="routerMessagesSection">
+        <div class="messages-header">
+          <div class="messages-header-left">
+            <span class="messages-icon">💬</span>
+            <span class="messages-title">Komunikaty z routera</span>
+            <span class="messages-badge" id="messagesCountBadge">0</span>
+          </div>
+          <button class="messages-refresh-btn" type="button" onclick="refreshMessages()" title="Odśwież komunikaty">
+            Odśwież
+          </button>
+        </div>
+
+        <div class="messages-list" id="routerMessagesList">
+          <div class="empty-messages-state">Oczekiwanie na dane z routera...</div>
+        </div>
+      </section>
 
     </div>
   </section>
@@ -1451,7 +1697,8 @@
       oduModel,
       catSpec,
       bandsSpec,
-      coaxSpec
+      coaxSpec,
+      initialMessages
     ) {
       if (gwIp && gwIp.length > 0) {
         currentGatewayIp = gwIp;
@@ -1486,9 +1733,25 @@
       document.getElementById('tileRouterMeta').textContent =
         'Online • ' + (catSpec || 'LTE') + realPingText;
 
+      const devMsgText = document.getElementById('deviceMsgText');
+      if (devMsgText) {
+        devMsgText.textContent = '✓ ' + detectedRouterModel + ' aktywny (' + currentGatewayIp + realPingText + ')';
+      }
+
       document.getElementById('modalDeviceTitle').textContent = detectedRouterModel;
       document.getElementById('modalDeviceIp').textContent = 'http://' + currentGatewayIp;
       document.getElementById('dashModelBadge').textContent = detectedRouterModel;
+
+      let msgs = [];
+      if (initialMessages) {
+        try {
+          msgs = typeof initialMessages === 'string' ? JSON.parse(initialMessages) : initialMessages;
+        } catch (e) {
+        }
+      }
+      if (msgs && msgs.length > 0) {
+        renderRouterMessages(msgs);
+      }
 
       showScreen('deviceManagerScreen');
     };
@@ -1656,6 +1919,79 @@
         document.getElementById('dashBandsRibbon').textContent = '--- (Brak sygnału)';
         document.getElementById('valEnb').textContent = '---';
         document.getElementById('lteTagPill').textContent = 'Brak LTE';
+      }
+
+      if (data.messages) {
+        renderRouterMessages(data.messages);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderRouterMessages(messages) {
+      const container = document.getElementById('routerMessagesList');
+      const badge = document.getElementById('messagesCountBadge');
+      const alertBanner = document.getElementById('routerAlertBanner');
+      const alertIcon = document.getElementById('routerAlertIcon');
+      const alertTitle = document.getElementById('routerAlertTitle');
+      const alertDesc = document.getElementById('routerAlertDesc');
+
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        if (container) container.innerHTML = '<div class="empty-messages-state">Brak aktywnych ostrzeżeń lub komunikatów z routera.</div>';
+        if (badge) badge.textContent = '0';
+        if (alertBanner) alertBanner.style.display = 'none';
+        return;
+      }
+
+      if (badge) badge.textContent = messages.length;
+
+      // Select highest priority alert for top hero banner
+      let topAlert = messages.find(m => m.level === 'danger')
+                  || messages.find(m => m.level === 'warning')
+                  || messages.find(m => m.level === 'info');
+
+      if (topAlert && alertBanner) {
+        alertBanner.style.display = 'flex';
+        alertBanner.className = 'router-alert-banner alert-' + topAlert.level;
+        if (alertIcon) alertIcon.textContent = topAlert.icon || 'ℹ️';
+        if (alertTitle) alertTitle.textContent = topAlert.title || 'Komunikat routera';
+        if (alertDesc) alertDesc.textContent = topAlert.text || '';
+      } else if (alertBanner) {
+        alertBanner.style.display = 'none';
+      }
+
+      // Render cards in router messages list
+      if (container) {
+        container.innerHTML = messages.map(m => `
+          <div class="message-card card-${escapeHtml(m.level || 'info')}">
+            <div class="msg-card-top">
+              <div class="msg-badge-cluster">
+                <span class="msg-cat-pill">${escapeHtml(m.category || 'ROUTER')}</span>
+                <span class="msg-status-indicator status-${escapeHtml(m.level || 'info')}"></span>
+              </div>
+              <span class="msg-card-time">${escapeHtml(m.time || '')}</span>
+            </div>
+            <div class="msg-card-title">${escapeHtml(m.icon ? m.icon + ' ' : '')}${escapeHtml(m.title || '')}</div>
+            <div class="msg-card-text">${escapeHtml(m.text || '')}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function refreshMessages() {
+      if (window.OduBridge && window.OduBridge.refreshRealTelemetry) {
+        window.OduBridge.refreshRealTelemetry(currentGatewayIp);
+      }
+      if (window.OduBridge && window.OduBridge.showToast) {
+        window.OduBridge.showToast('Odświeżanie komunikatów z routera...');
       }
     }
 
